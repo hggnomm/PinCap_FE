@@ -1,14 +1,12 @@
 import { Avatar, Button, Col, Row } from "antd";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
 import "./index.less";
-import { Logo } from "../../assets/img";
+import { LogoIcon, TextIcon } from "../../assets/img";
 import { useSelector } from "react-redux";
 
 const HeaderCommon = () => {
   const [name, setName] = useState("");
-  // const { token } = useContext(AuthContext);
   const tokenPayload = useSelector((state) => state.auth);
 
   const navigate = useNavigate();
@@ -30,17 +28,46 @@ const HeaderCommon = () => {
   return (
     <Row className="main-header">
       <Col
-        className="logo"
+        className="left-header"
         onClick={() => {
-          navigate("/");
+          navigate("/home");
         }}
       >
-        <img src={Logo} alt="" />
+        <img className="logo-icon" src={LogoIcon} />
+        <img className="text-icon" src={TextIcon} />
       </Col>
-      <Col>
-        {/* <Avatar icon="user" /> */}
-        {tokenPayload ? <Button className="text-9xl" onClick={() => logoutHandle()}>Logout</Button> : <Button onClick={() => loginHandle()}>Login</Button>}
-        {}
+      <Col
+        className="right-header"
+      >
+        {
+          tokenPayload?.id ?
+            <>
+              <Avatar />
+              <Button
+                className="text-9xl"
+                onClick={() => logoutHandle()}
+              >Logout</Button>
+            </>
+
+
+            :
+            <>
+              <Button
+                onClick={() => loginHandle()}
+                className="button-auth-sign-in"
+              >
+                Sign in
+              </Button>
+
+              <Button
+                onClick={() => loginHandle()}
+                className="button-auth-sign-up"
+              >
+                Sign up
+              </Button>
+            </>
+
+        }
       </Col>
     </Row>
   );

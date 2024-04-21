@@ -1,1 +1,2 @@
-export { default as Logo } from "./PinCap/PinCapLogo.png";
+export { default as LogoIcon } from "./PinCap/LogoPinCap.png";
+export { default as TextIcon } from "./PinCap/PinCapText.png";

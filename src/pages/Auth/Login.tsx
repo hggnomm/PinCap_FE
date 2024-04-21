@@ -8,7 +8,7 @@ const Login = () => {
   const [api, contextHolder] = notification.useNotification();
   const dispatch = useDispatch();
   // When sign in success
-  const onLogin = async (values) => {
+  const onLogin = async (values: any) => {
     try {
       const data = await login(values);
       console.log(data)
