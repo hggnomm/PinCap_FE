@@ -1,0 +1,164 @@
+:root{
+    --white: white;
+    --black: black;
+}
+.home{
+    color: var(--black);
+    background-color: var(--white);
+    height: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 0 0;
+    background-color: #fff; /* Đặt màu nền tùy ý */
+    border-bottom: 1px solid #ddd; /* Đặt đường viền tùy ý */
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+  }
+  
+  .btn-menu-mobile {
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+
+.image-with-text-container {
+    position: relative;
+    width: 100%;
+}
+  
+.background-image {
+    width: 100%;
+    height: 100vh;
+}
+  
+.text-overlay {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 4vw;
+    font-weight: bold;
+    text-align: center;
+}
+
+.element{
+    background-color: var(--white);
+    height: 100vh;
+}
+
+.text-description{
+    font-size: 2vw;
+    font-weight: normal;
+    opacity: 0.5;
+}
+
+.banner-flex{
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(158, 184, 217, 1);
+    height: 100%;
+    color: var(--black);
+    font-size: 40px;
+}
+.image-border{
+    border-radius: 3%;
+    margin: 6% 10%;
+    width: 30%;
+    height: 80%;
+}
+.content-banner{
+    margin: auto 10%;
+    height: 80%;
+    width: 30%;
+}
+
+.content-banner-title{
+    margin-top: 30%;
+    margin-left: -10%;
+    font-weight: bold;
+    font-size: 4vw;
+}
+
+.content-banner-description{
+    margin-left: 20%;
+    margin-top: 10%;
+    font-size: 2vw;
+}
+
+.content-banner-button{
+    margin-left: 70%;
+    margin-top: 10%;
+    border-radius: 20px;
+    font-size: 1.5vw;
+    padding: 0 5%;
+}
+.content-banner-title-reverse{
+    margin-top: 30%;
+    margin-right: -10%;
+    font-weight: bold;
+    font-size: 4vw;
+    text-align: right;
+}
+.content-banner-description-reverse{
+    margin-right: 20%;
+    margin-top: 10%;
+    font-size: 2vw;
+    text-align: right;
+}
+.content-banner-button-reverse{
+    margin-right: 70%;
+    margin-top: 10%;
+    border-radius: 20px;
+    font-size: 1.5vw;
+    padding: 0 5%;
+}
+
+.banner-end{
+    background:rgba(124, 147, 195, 1);
+    height: 100vh;
+    font-size: 4vw;
+    font-weight: bold;
+    color: var(--white);
+}
+.banner-end-title{
+    padding: 5% 15%;
+    text-align: center;
+}
+.banner-end-content{
+    margin: auto 5%;
+    font-size: 2vw;
+    display: flex;
+    justify-content: space-between;
+}
+
+.content-banner-text{
+    margin: 20px auto;
+    padding-left: 2%;
+    border-left: solid 3px var(--white);
+}
+.banner-end-media{
+    width: 80vh;
+    height: 50vh;
+    border-radius: 20px;
+}
+
+
+#image-text:hover{
+    opacity: 0.5;
+}
+
+#video-text:hover{
+    opacity: 0.5;
+}

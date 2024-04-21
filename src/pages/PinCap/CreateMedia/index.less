@@ -1,0 +1,56 @@
+.create-media-container {
+  .field-create-media {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #ccc;
+
+    .btn-publish-media {
+      background-color: #ad081b;
+      color: white;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .btn-publish-media:hover {
+      color: rgb(243, 225, 65);
+    }
+  }
+  .field-form-create-media {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    .form-create-media {
+      width: 60%;
+      min-height: 450px;
+      background-color: #e6e5e5;
+      display: flex;
+
+      .upload-image {
+        height: 100%;
+        width: 100%;
+      }
+      .field-input {
+        .ant-form-item {
+          margin: 0;
+        }
+        .ant-input {
+          padding: 1rem;
+        }
+        .field-item {
+          margin-bottom: 1rem;
+          .text-label {
+            display: flex;
+            align-items: flex-start;
+            margin: 0.5rem 0;
+            font-size: 1.2em;
+          }
+        }
+      }
+    }
+  }
+}
