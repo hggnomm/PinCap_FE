@@ -41,7 +41,6 @@
     "postcss": "^8.4.38",
     "react-redux": "^9.1.0",
     "redux": "^5.0.1",
-    "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5",
     "vite": "^4.3.9"
   }

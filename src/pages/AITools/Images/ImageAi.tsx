@@ -26,7 +26,7 @@ const ImageAi = () => {
       createImage(valueForm);
     }
   }, [valueForm]);
-  const createImage = async (valueForm) => {
+  const createImage = async (valueForm: any) => {
     const data = await createImageAI(valueForm);
     if (data) {
       setIsGenerate(true);
