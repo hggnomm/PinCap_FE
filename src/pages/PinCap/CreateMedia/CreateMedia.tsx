@@ -1,63 +1,52 @@
 import React, { useEffect, useState } from "react";
 import "./index.less";
-import { Button, Col, Form, Input, Row, Select, Upload } from "antd";
+import { Alert, Button, Col, Form, Input, Row, Select, Spin, Upload } from "antd";
 import Title from "antd/es/typography/Title";
 import { UploadOutlined } from "@ant-design/icons";
 import { createMedia } from "../../../api/media";
+import { useSelector } from "react-redux";
 
 const CreateMedia = () => {
   const [form] = Form.useForm();
-  const [valueForm, setValueForm] = useState({
+  const tokenPayload = useSelector((state) => state.auth);
+  const [isLoad, setIsLoad] = useState<boolean>(false);
+
+  const [valueForm, setValueForm] = useState<any>({
     medias: null,
     mediaName: "",
     description: "",
     privacy: "",
     mediaOwner_id: "",
     type: "1",
-    tagName: []
+    tagName: [],
+    isCreated: 0
   });
-  const [mediaValue, setMediaValue] = useState({
-    medias: null,
-    mediaName: "",
-    description: "",
-    privacy: "",
-    mediaOwner_id: "9bd27d1e-ee34-4246-9239-625f2fdfa817",
-    type: "1",
-    tagName: []
-  });
+
+
+
   const handleGenerateClick = () => {
-    debugger
-    valueForm.mediaOwner_id = "9bd27d1e-ee34-4246-9239-625f2fdfa817"
     const formValue = form.getFieldsValue(valueForm);
-    console.log(formValue.mediaName)
-    
+
     const valueAPI = {
-      ...mediaValue,
+      ...valueForm,
+      mediaOwner_id: tokenPayload.id,
       medias: formValue.medias,
       mediaName: formValue.mediaName,
       description: formValue.description,
       privacy: formValue.privacy,
-      tagName: "Ảnh cứt"
-
+      tagName: "Ảnh cứt",
+      isCreated: 1
     }
 
     createNewMedia(valueAPI);
-
-    // setValueForm(value)
   };
-  useEffect(() => {
-    // createImage(valueForm);
-    // console.log(valueForm.medias.file)
-  }, [valueForm]);
 
   const createNewMedia = async (valueForm) => {
     await createMedia(valueForm);
-    // if (data) {
-    //   setIsGenerate(true);
-    //   setimageAI(data);
-    // }
+
   };
   return (
+
     <div className="create-media-container">
       <Row className="field-create-media">
         <Col>
@@ -74,7 +63,16 @@ const CreateMedia = () => {
       </Row>
 
       <Row className="field-form-create-media">
-        <Form className="form-create-media" form={form}>
+        {isLoad &&
+          <div className="publish-loading">
+            <Spin tip="Loading..." >
+
+            </Spin>
+          </div>
+
+        }
+        {/* <Form className="form-create-media" form={form}> */}
+        <Form className={`form-create-media ${isLoad ? 'set-opacity' : ""}`} form={form} disabled={isLoad}>
           <Col span={9} className="upload-image">
             <Form.Item
               name="medias"

@@ -11,12 +11,15 @@ const Login = () => {
   const onLogin = async (values: any) => {
     try {
       const data = await login(values);
-      console.log(data)
-      
-      dispatch(addToken(data.token))
-      localStorage.setItem('token', data.token);
-      window.location.reload(true)
-      
+
+      if (data) {
+        dispatch(addToken(data.token))
+        localStorage.setItem('token', data.token);
+        window.location.reload(true)
+      } else {
+        console.log("Dang Nhap that bai");
+      }
+
     } catch (e) {
       api.open({
         message: 'Login Failed',

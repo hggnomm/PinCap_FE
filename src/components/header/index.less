@@ -28,31 +28,46 @@
   }
 
   .right-header {
+    .action-header {
+      display: flex;
+      align-items: center;
+      // justify-content: flex-end;
+
+      .menu-notification {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 0.5rem;      
+      }
+      .logo-avatar {
+        margin: 0 1rem;
+      }
+      .button-auth-sign-in {
+        border-radius: 20px;
+        margin: 0 5px;
+        border: 0.5px solid #ccc;
+        background: #A25772 !important;
+        color: white;
+      }
+      .button-auth-sign-in:hover {
+        font-weight: bold;
+        color: white;
+        border: 0.5px solid #ccc;
+      }
+  
+      .button-auth-sign-up {
+        border-radius: 20px;
+        margin: 0 5px;
+        border: 0.5px solid #ccc;
+        background: #CFE2FC !important; 
+      }
+      .button-auth-sign-up:hover {
+        font-weight: bold;
+        color: #000;
+        border: 0.5px solid #ccc;
+      }
+    }
     
-    .button-auth-sign-in {
-      border-radius: 20px;
-      margin: 0 5px;
-      border: 0.5px solid #ccc;
-      background: #A25772 !important;
-      color: white;
-    }
-    .button-auth-sign-in:hover {
-      font-weight: bold;
-      color: white;
-      border: 0.5px solid #ccc;
-    }
-
-    .button-auth-sign-up {
-      border-radius: 20px;
-      margin: 0 5px;
-      border: 0.5px solid #ccc;
-      background: #CFE2FC !important; 
-    }
-    .button-auth-sign-up:hover {
-      font-weight: bold;
-      color: #000;
-      border: 0.5px solid #ccc;
-
-    }
   }
 }

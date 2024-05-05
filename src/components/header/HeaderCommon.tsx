@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./index.less";
 import { LogoIcon, TextIcon } from "../../assets/img";
 import { useSelector } from "react-redux";
+import Notification from "../notification";
 
 const HeaderCommon = () => {
   const [name, setName] = useState("");
@@ -41,14 +42,21 @@ const HeaderCommon = () => {
       >
         {
           tokenPayload?.id ?
-            <>
-              <Avatar />
-              <Button
-                className="text-9xl"
-                onClick={() => logoutHandle()}
-              >Logout</Button>
-            </>
+            <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9, offset: 0 }}>
+              <Col className="menu-notification">
+                <Notification />
+              </Col>
+              <Col className="logo-avatar">
+                <Avatar />
+              </Col>
+              <Col>
+                <Button
+                  onClick={() => logoutHandle()}>
+                  Logout
+                </Button>
+              </Col>
 
+            </Col>
 
             :
             <>
