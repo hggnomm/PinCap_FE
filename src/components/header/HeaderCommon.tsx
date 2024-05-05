@@ -8,7 +8,7 @@ import Notification from "../notification";
 
 const HeaderCommon = () => {
   const [name, setName] = useState("");
-  const tokenPayload = useSelector((state) => state.auth);
+  const tokenPayload = useSelector((state: any) => state.auth);
 
   const navigate = useNavigate();
   const [collapseMenu, setCollapseMenu] = useState(false);
@@ -21,7 +21,7 @@ const HeaderCommon = () => {
   const logoutHandle = () => {
     localStorage.removeItem("token");
     navigate("/home");
-    window.location.reload(true);
+    window.location.reload();
   };
   const loginHandle = () => {
     navigate("/sign-in");

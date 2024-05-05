@@ -2,10 +2,10 @@ import React from "react";
 import "./index.less";
 import { useNavigate } from "react-router-dom";
 
-const PinMedia = (props) => {
+const PinMedia = (props: any) => {
   const navigate = useNavigate();
   const isMp4 = props.srcUrl.endsWith(".mp4");
-  const openDetailMedia = (id) => {
+  const openDetailMedia = (id: string) => {
     navigate(`/media/${id}`);
   };
   return (

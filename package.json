@@ -27,7 +27,8 @@
     "react-parallax": "^3.5.1",
     "react-router-dom": "^6.11.2",
     "react-scroll": "^1.9.0",
-    "swiper": "^11.0.5"
+    "swiper": "^11.0.5",
+    "react-infinite-scroll-component": "^6.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",

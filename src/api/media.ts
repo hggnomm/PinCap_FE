@@ -2,7 +2,7 @@ import axios from "axios";
 
 const baseUrl = "http://localhost:80";
 
-export const getMedia = async () => {
+export const getAllMedias = async () => {
   const token = localStorage.getItem("token");
 
   const config = {
