@@ -16,7 +16,7 @@ import AlbumDetail from "./pages/Dashboard/AlbumDetail";
 import { ConfigProvider } from "antd";
 
 const App = () => {
-  const tokenPayload = useSelector((state) => state.auth);
+  const tokenPayload = useSelector((state: any) => state.auth);
   const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();

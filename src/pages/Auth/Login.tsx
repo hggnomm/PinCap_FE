@@ -3,6 +3,7 @@ import { Button, Checkbox, Col, Divider, Form, Input, Row, notification } from '
 import { login } from '../../api/auth';
 import { useDispatch } from 'react-redux';
 import { addToken } from '../../store/authSlice';
+import React from 'react';
 
 const Login = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -15,7 +16,7 @@ const Login = () => {
       if (data) {
         dispatch(addToken(data.token))
         localStorage.setItem('token', data.token);
-        window.location.reload(true)
+        window.location.reload()
       } else {
         console.log("Dang Nhap that bai");
       }

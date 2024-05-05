@@ -1,5 +1,123 @@
 .menu-notification {
-    position: relative;
+  position: relative;
+  display: flex;
+  cursor: pointer;
+
+  .numbers-notification {
+    position: absolute;
+    top: 0;
+    background: #f17126;
+    color: #fff;
+    font-size: 0.75em;
+    font-family: OpenSans-Regular;
+    border-radius: 50%;
+    height: 1rem;
+    width: auto;
+    right: -0.3rem;
+    padding: 0.3rem;
     display: flex;
-    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .list-notification {
+    max-height: 30rem;
+    overflow: auto;
+    position: absolute;
+    z-index: 100;
+    top: 2.5rem;
+    right: 0;
+    box-sizing: border-box;
+    border: 1px solid #b3c0ce;
+    border-radius: 4px;
+    background-color: #ffffff;
+    // box-shadow: -1px 13px 20px 0 #f0f2f4;
+    padding: 0 1rem 1rem 1rem;
+
+    .container-mark {
+      text-align: right;
+      padding: 0.6rem 0;
+      color: #4a5b6d;
+      font-size: 0.9em;
+      font-weight: bold;
+      font-family: MontserratAlternates-Light;
+
+      span {
+        cursor: pointer;
+      }
+    }
+
+    .item-notification {
+      display: flex;
+      border-bottom: 1px solid #ecf1f6;
+      padding: 1rem 0 0.7rem;
+
+      .left-item-notification {
+        height: 3rem;
+      }
+
+      .right-item-notification {
+        display: flex;
+        flex-direction: column;
+        width: 14rem;
+        margin-left: 1rem;
+
+        .title-notification,
+        .sub-title-notification,
+        .munites-ago {
+          color: #4a5b6d;
+          font-family: MontserratAlternates;
+          font-size: 0.9em;
+          font-weight: bold;
+          letter-spacing: 0;
+          line-height: 18px;
+          margin-bottom: 0.2rem;
+        }
+        .sub-title-notification {
+          font-family: MontserratAlternates-Light;
+        }
+        .munites-ago {
+          font-family: MontserratAlternates-Light;
+          color: #989898;
+        }
+      }
+
+      &.mark-read {
+        opacity: 0.3;
+      }
+    }
+
+    .item-notification:last-child {
+      border: 0;
+    }
+
+    .loading-notification {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .error-title-notification {
+      color: #4a5b6d;
+      font-family: MontserratAlternates;
+      font-size: 0.9em;
+      font-weight: bold;
+      letter-spacing: 0;
+      line-height: 18px;
+      min-width: 16rem;
+      margin: 1rem 0 0 0;
+      text-align: center;
+    }
+  }
+}
+
+.menu-sub-dropdown-notification {
+  right: 13rem;
+}
+
+// 992px
+@media only screen and (max-width: 992px) {
+  .menu-sub-dropdown-notification {
+    right: 0;
+  }
 }
