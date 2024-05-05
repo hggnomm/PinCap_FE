@@ -11,12 +11,37 @@ const CreateMedia = () => {
     medias: null,
     mediaName: "",
     description: "",
-    privact: "",
+    privacy: "",
+    mediaOwner_id: "",
+    type: "1",
+    tagName: []
+  });
+  const [mediaValue, setMediaValue] = useState({
+    medias: null,
+    mediaName: "",
+    description: "",
+    privacy: "",
+    mediaOwner_id: "9bd27d1e-ee34-4246-9239-625f2fdfa817",
+    type: "1",
+    tagName: []
   });
   const handleGenerateClick = () => {
-    const value = form.getFieldsValue(valueForm);
-    // console.log(value);
-    createNewMedia(value);
+    debugger
+    valueForm.mediaOwner_id = "9bd27d1e-ee34-4246-9239-625f2fdfa817"
+    const formValue = form.getFieldsValue(valueForm);
+    console.log(formValue.mediaName)
+    
+    const valueAPI = {
+      ...mediaValue,
+      medias: formValue.medias,
+      mediaName: formValue.mediaName,
+      description: formValue.description,
+      privacy: formValue.privacy,
+      tagName: "Ảnh cứt"
+
+    }
+
+    createNewMedia(valueAPI);
 
     // setValueForm(value)
   };

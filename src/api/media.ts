@@ -1,15 +1,15 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8000";
+const baseUrl = "http://localhost:80";
 
-export const getMedia = async (page: any) => {
+export const getMedia = async () => {
   const token = localStorage.getItem("token");
 
   const config = {
     method: "get",
-    url: `${baseUrl}/api/media?page=${page}`,
+    url: `${baseUrl}/api/medias`,
     headers: {
-      // 'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   };
@@ -24,9 +24,9 @@ export const createMedia = async (request: any) => {
   const token = localStorage.getItem("token");
   const config = {
     method: "post",
-    url: `${baseUrl}/api/media`,
+    url: `${baseUrl}/api/medias`,
     headers: {
-      // 'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`,
       // "Content-Type": "application/json",
       "Content-Type": "multipart/form-data",
     },
@@ -43,7 +43,7 @@ export const getDetailMedia = async (id: any) => {
   const token = localStorage.getItem("token");
   const config = {
     method: "get",
-    url: `${baseUrl}/api/media/${id}`,
+    url: `${baseUrl}/api/medias/${id}`,
     headers: {
       // 'Authorization': `Bearer ${token}`,
       "Content-Type": "application/json",

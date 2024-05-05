@@ -48,7 +48,7 @@ const App = () => {
           {
             pathname === "/sign-in" ? "" : <HeaderCommon />
           }
-          <Layout className="main-container" style={{ minHeight: "90vh" }}>
+          <Layout className="main-container" style={{ minHeight: "100vh" }}>
             {isLogin ? (
               <>
                 <SiderCommon />
