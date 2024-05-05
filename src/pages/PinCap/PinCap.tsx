@@ -2,24 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./index.less";
 import { Layout } from "antd";
-import HeaderCommon from "../../components/header/HeaderCommon";
-import SiderCommon from "../../components/sider/SiderCommon";
 import PinMedia from "./PinMedia/Pin";
 import { getMedia } from "../../api/media";
 
 const PinCap = () => {
   const [listMedia, setListMedia] = useState([]);
-  const [pageMedia, setPageMedia] = useState(1);
+
   useEffect(() => {
-    getMedia(pageMedia).then((data) => {
-      setListMedia(data.listMedia.data);
+    getMedia().then((data) => {
+      setListMedia(data);
     });
   }, []);
 
   return (
     <div className="pincap-container">
       {listMedia.map((media, index) => (
-        <PinMedia key={index} srcUrl={media.mediaURL} data={media}></PinMedia>
+        <PinMedia key={index} srcUrl={media?.mediaURL} data={media}></PinMedia>
       ))}
 
 
