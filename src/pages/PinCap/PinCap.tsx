@@ -10,13 +10,13 @@ const PinCap = () => {
 
   useEffect(() => {
     getMedia().then((data) => {
-      setListMedia(data);
+      setListMedia(data?.listMedia.data);
     });
   }, []);
 
   return (
     <div className="pincap-container">
-      {listMedia.map((media, index) => (
+      {listMedia?.map((media, index) => (
         <PinMedia key={index} srcUrl={media?.mediaURL} data={media}></PinMedia>
       ))}
 

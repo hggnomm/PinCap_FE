@@ -26,7 +26,6 @@ const CreateMedia = () => {
     tagName: []
   });
   const handleGenerateClick = () => {
-    debugger
     valueForm.mediaOwner_id = "9bd27d1e-ee34-4246-9239-625f2fdfa817"
     const formValue = form.getFieldsValue(valueForm);
     console.log(formValue.mediaName)
