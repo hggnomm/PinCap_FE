@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "http://localhost:80";
+const baseUrl = "http://localhost:81";
 
 export const createImageAI = async (request: any) => {
   const token = localStorage.getItem("token");

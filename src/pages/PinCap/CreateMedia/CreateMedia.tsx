@@ -5,6 +5,10 @@ import Title from "antd/es/typography/Title";
 import { UploadOutlined } from "@ant-design/icons";
 import { createMedia } from "../../../api/media";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import Pusher from 'pusher-js';
+import Echo from "laravel-echo";
+window.Pusher = Pusher;
 
 const CreateMedia = () => {
   const [form] = Form.useForm();
@@ -22,7 +26,52 @@ const CreateMedia = () => {
     isCreated: 0
   });
 
+  useEffect(() => {
+    const pusher = new Pusher("d85c7115593b8273d51d", {
+      cluster: "ap1",
+      encrypted: true,
+    });
+    const channel = pusher.subscribe("channel-test");
+    channel.bind("test", (data) => {
+      console.log("Received notification: ", data.user);
+      alert(JSON.stringify(data.user));
+    });
+    
+    
+    const echo = new Echo({
+      broadcaster: 'pusher',
+      key: 'd85c7115593b8273d51d',
+      cluster: 'ap1',
+      authEndpoint: 'http://localhost:81/broadcasting/auth',
+      auth: {
+        headers: {
+            Authorization: 'Bearer ' + localStorage.getItem("token"),
+        },
+    },
+  })
+  
+  const userId = "9bd244a0-c3f8-4732-9710-c3a96f44d30c"
+  // Lắng nghe sự kiện trên kênh riêng tư của người dùng
+  echo.private('notifications-follower-'+tokenPayload.id)
 
+  
+      .listen('FollowerEvent', (event) => {
+          console.log(event);
+          console.log('Received private message: ', event.message);
+          alert(123123);
+          // Xử lý thông báo ở đây
+      });
+
+    console.log(`notifications.follower.${tokenPayload.id}`);
+    
+    return () => {
+      echo.disconnect();
+      pusher.unsubscribe("channel-test");
+      pusher.disconnect();
+    };
+  }, []);
+
+  
 
   const handleGenerateClick = () => {
     const formValue = form.getFieldsValue(valueForm);

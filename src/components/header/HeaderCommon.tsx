@@ -5,6 +5,8 @@ import "./index.less";
 import { LogoIcon, TextIcon } from "../../assets/img";
 import { useSelector } from "react-redux";
 import Notification from "../notification";
+import axios from "axios";
+import Pusher from 'pusher-js';
 
 const HeaderCommon = () => {
   const [name, setName] = useState("");
@@ -18,10 +20,21 @@ const HeaderCommon = () => {
     }
   }, []);
 
-  const logoutHandle = () => {
-    localStorage.removeItem("token");
-    navigate("/home");
-    window.location.reload(true);
+    
+  const logoutHandle = async () =>  {  
+    try {
+      // Gọi API để lấy danh sách sản phẩm
+      const response = await axios.post('http://localhost:81/api/notification/test');
+      // Xử lý dữ liệu trả về ở đây
+      console.log(response.data);
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      console.error('Error fetching products:', error);
+    }
+
+    // localStorage.removeItem("token");
+    // navigate("/home");
+    // window.location.reload(true);
   };
   const loginHandle = () => {
     navigate("/sign-in");
@@ -50,6 +63,7 @@ const HeaderCommon = () => {
                 <Avatar />
               </Col>
               <Col>
+                {tokenPayload.name}
                 <Button
                   onClick={() => logoutHandle()}>
                   Logout
