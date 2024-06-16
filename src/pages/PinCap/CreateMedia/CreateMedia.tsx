@@ -64,7 +64,7 @@ const CreateMedia = () => {
     const valueAPI = {
       ...valueForm,
       mediaOwner_id: tokenPayload.id,
-      medias: fileList,
+      medias: fileList[0]["originFileObj"],
       mediaName: formValue.mediaName,
       description: formValue.description,
       privacy: formValue.privacy,

@@ -1,20 +1,13 @@
-import axios from "axios";
-const baseUrl = "http://localhost:80";
+import apiClient from './apiClient';
 
-export const createImageAI = async (request: any) => {
-  const token = localStorage.getItem("token");
-  const config = {
-    method: "get",
-    url: `${baseUrl}/api/media/createAI/image?prompt=${request.prompt}&size=${request.size}`,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  };
+// Example API function to fetch user data
+export const createAIImage = async (data: any) => {
   try {
-    const res = await axios(config);
-    return res.data.imageURL;
+    const response = await apiClient.post("/api/medias/createAI/image", data);
+    return response.data;
   } catch (error) {
-    console.log(error);
+    // Handle errors
+    console.error('Tạo k được:', error);
+    throw error;
   }
 };

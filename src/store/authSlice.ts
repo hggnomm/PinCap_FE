@@ -10,7 +10,6 @@ interface IAuth {
   isAuthenticated: boolean,
 }
 const tokenInfo: any =  decodedToken(localStorage.getItem('token')); 
-// const tokenInfo: any =  decodedToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgxL2FwaS9hdXRoL2xvZ2luIiwiaWF0IjoxNzEzMDAxODE0LCJleHAiOjE3MTM2MDY2MTQsIm5iZiI6MTcxMzAwMTgxNCwianRpIjoiWW1RMllDUEgwdXk1QThzbSIsInN1YiI6IjViMWYyMjUxLTcwNWEtNDAyZC05ZmNkLTdhY2VkZmY2YTE3YSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJlbWFpbCI6ImxlZHV5dGFuMTc3MjAwM0BnbWFpbC5jb20iLCJuYW1lIjoiTGUgVGFuIiwicm9sZSI6IkFETUlOIiwiaWQiOiI1YjFmMjI1MS03MDVhLTQwMmQtOWZjZC03YWNlZGZmNmExN2EifQ.2PMC3Afjh3dpB01a7AuBpIyyGj557djwGTAPXQmB13Y"); 
 
 const initialState: IAuth = {
   id: tokenInfo?.id || "",
@@ -21,12 +20,6 @@ const initialState: IAuth = {
 
 };
 
-export const login = createAsyncThunk(
-  "auth/login",
-  async (userData, thunkAPI) => {
-    
-  }
-)
 export const authSlice = createSlice({
   name: "auth",
   initialState,

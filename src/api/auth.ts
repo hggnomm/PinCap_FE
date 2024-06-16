@@ -1,7 +1,8 @@
 import axios from "axios"
-const baseUrl = "http://localhost:80";
+const baseUrl = import.meta.env.VITE_BASE_API;
 
 export const login = async (data: any) => {
+
     var config = {
         method: 'post',
         url: `${baseUrl}/api/auth/login`,
@@ -17,4 +18,23 @@ export const login = async (data: any) => {
       } catch (error) {
         console.log(error);
       }
+}
+
+export const register = async (data: any) => {
+  const config = {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json', 
+      },          
+      data: data,
+      url: `${baseUrl}/api/Account/register`
+    };
+  
+    try {
+      const response = await axios(config);
+      console.log(response.data);
+    } catch (error) {
+      console.log('error', error);
+
+    }
 }

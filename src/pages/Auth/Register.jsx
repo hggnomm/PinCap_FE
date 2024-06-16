@@ -1,7 +1,7 @@
 import { LockOutlined, MailOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Col, Form, Input, notification } from 'antd';
 import axios from 'axios';
-import { register } from '../../api';
+import { register } from '../../api/auth';
 
 
 

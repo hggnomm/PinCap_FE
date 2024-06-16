@@ -8,14 +8,18 @@ import Image4 from "../../../assets/img/ImagesAI/image4.jpg";
 import "./index.less";
 import { Button, Col, Form, Input, Radio, Row, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { createImageAI } from "../../../api/ai";
+import { createAIImage } from "../../../api/ai";
 
 const { Text, Title } = Typography;
 const ImageAi = () => {
   const [form] = Form.useForm();
   const [valueForm, setValueForm] = useState({
-    size: "",
+    size: {
+      height: 512,
+      width: 512,
+    },
     prompt: "",
+    style_preset: "photographic"
   });
   const [isGenerate, setIsGenerate] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
@@ -26,18 +30,43 @@ const ImageAi = () => {
       createImage(valueForm);
     }
   }, [valueForm]);
+
   const createImage = async (valueForm: any) => {
-    const data = await createImageAI(valueForm);
+    var requestGenerateAI = {
+      prompt: valueForm.prompt,
+      style_preset: valueForm.style_preset,
+      height: valueForm.size.height,
+      width: valueForm.size.width,
+    };
+
+    if(imageAI) {
+      requestGenerateAI = {
+        ...requestGenerateAI,
+        imageUrl: imageAI
+      }
+    } 
+    const data = await createAIImage(requestGenerateAI);
+
     if (data) {
       setIsGenerate(true);
-      setimageAI(data);
+      setimageAI(data?.imageUrl);
     }
+
+
     return data;
   };
 
   const handleGenerateClick = () => {
     const value = form.getFieldsValue(valueForm);
-    setValueForm(value);
+    setValueForm({
+      ...valueForm,
+      prompt: value.prompt
+    })
+
+    // setValueForm({
+    //   ...,
+    //   value
+    // });
     setIsSearch(true);
   };
 
