@@ -1,10 +1,8 @@
 .App {
   text-align: center;
-
   .main-container {
     margin-top: 70px;
   }
-  
 }
 
 .App-logo {
@@ -34,22 +32,29 @@
 
 body {
   margin: 0;
-  font-family: BeVietnamRegular !important;
+  font-family: "Roboto", sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', BeVietnamRegular;
+  font-family: "Roboto", Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 @font-face {
-  font-family: BeVietnamRegular;
-  src: local("BeVietnam-Regular.ttf"), url("./assets/fonts/BeVietnam-Regular.ttf") format("opentype");
+  font-family: "Roboto";
+  font-weight: 400;
+  src: local("Roboto Regular"),
+    url("https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf")
+      format("truetype");
 }
 
 @font-face {
-  font-family: BeVietnamBold;
-  src: local("BeVietnam-Bold.ttf"), url("./assets/fonts/BeVietnam-Bold.ttf") format("opentype");
+  font-family: "Roboto";
+  font-weight: 700;
+  src: local("Roboto Bold"),
+    url("https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc9.ttf")
+      format("truetype");
 }
 
 @keyframes App-logo-float {
@@ -72,4 +77,3 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-

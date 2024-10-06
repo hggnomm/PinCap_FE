@@ -2,7 +2,7 @@ import apiClient from './apiClient'; // Đường dẫn tới tệp apiClient
 
 export const getAllMedias = async () => {
   try {
-    const res = await apiClient.get('/api/medias');
+    const res = await apiClient.get('/api/medias/all');
     return res.data;
   } catch (error) {
     console.log(error);

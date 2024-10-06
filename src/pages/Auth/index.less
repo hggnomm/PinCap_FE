@@ -1,10 +1,115 @@
-.btn-login-icon {
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    
-    img {
-        height: 100%;
-    }
+@text-color: #525252;
+@dirt-pink: #a25772;
+@background-color: #eef5ff;
+.main-container {
+  margin-top: 0;
+  background-color: @background-color;
 }
+.main-page {
+  .left-login {
+    img {
+      height: 100vh;
+      width: 100%;
+      // object-fit: cover;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+  .right-login {
+    padding: 0.5rem 1.5rem;
+    .form-header {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      margin: 0.5rem 0;
+    }
+    .text-header {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      color: @text-color !important;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .form {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      gap: 3px;
+      
+      .form-field {
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        color: #828282;
+        font-weight: 500;
+        span {
+          align-self: flex-start;
+        }
+      }
+  
+      .action {
+        width: 80%;
+        margin-top: 0.2rem;
+        height: 100%;
+        margin-bottom: none;
+        .ant-form-item-control-input-content {
+          display: flex;
+        }
+        .checkbox-container {
+          display: flex;
+          align-items: center; /* Center vertically */
+          .ant-checkbox-checked .ant-checkbox-inner {
+            background-color: #7f265b;
+            border-color: @dirt-pink;
+          }
+        }
+    
+        span {
+          font-size: 0.8em;
+          font-weight: 500;
+          color: #7f265b;
+          float: right;
+        }
+      }
+      .field-btn {
+        width: 80%;
+        margin: 1rem 0;
+        height: 100%;
+        .button {
+          margin-top: 0.5rem;
+          height: 35px;
+          font-weight: 500;
+          font-size: 0.8em;
+        }
+        .submit-btn {
+          background-color: @dirt-pink;
+          width: 100%;
+        }
+        .btn-login-icon {
+          width: 100%;
+          align-items: center;
+          justify-content: center;
+          display: flex;
+          color: #828282;
+          img {
+            height: 100%;
+          }
+        }
+      }
+      .register-field {
+        span {
+          color: #7f265b;
+          font-weight: 600;
+          cursor: pointer;
+        }
+        span:hover {
+          color: @dirt-pink;
+        }
+      }
+    }
+  }
+}
+

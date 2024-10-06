@@ -1,4 +1,4 @@
-import { Account, Home } from "./pages";
+import { Account, Home, Register } from "./pages";
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -26,62 +26,56 @@ const App = () => {
       if (tokenPayload.exp < Date.now() / 1000) {
         localStorage.removeItem("token");
         navigate("/sign-in");
+      } else {
+        navigate("/");
+        setIsLogin(true);
       }
-      navigate("/");
-      setIsLogin(true);
     } else {
       navigate("/home");
-
       setIsLogin(false);
     }
   }, [tokenPayload.email]);
-  return (
-    <ConfigProvider
-      theme={{
-        token: {
-          fontFamily: "BeVietnamRegular"
-        }
-      }}
-    >
-      <div className="App">
-        <>
-          {
-            pathname === "/sign-in" ? "" : <HeaderCommon />
-          }
-          <Layout className="main-container" style={{ minHeight: "100vh" }}>
-            {isLogin ? (
-              <>
-                <SiderCommon />
-                <Content >
-                  <Routes>
-                    <Route path="/" element={<PinCap />} />
-                    <Route path="/create-media" element={<CreateMedia />} />
-                    <Route path="/ai" element={<ImageAi />} />
-                    <Route path="/media/:id" element={<DetailMedia />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/dashboard/album" element={<Album />} />
-                    <Route path="/dashboard/album/:id" element={<AlbumDetail />} />
-                    {/* <Route
-                  path="/dashboard/mediaReport"
-                  element={<MediaReport />}
-                /> */}
-                  </Routes>
-                </Content>
-              </>
-            ) : (
-              <Content>
-                <Routes>
-                  <Route path="/sign-in" element={<Account />} />
-                  <Route path="/home" element={<Home />} />
-                </Routes>
-              </Content>
-            )}
-          </Layout>
-        </>
 
+  return (
+    <ConfigProvider>
+      <div className="App">
+        <Routes>
+          <Route path="/sign-in" element={<Account />} />
+          <Route path="/sign-up" element={<Register />} />
+
+          <Route
+            path="*"
+            element={
+              <Layout className="main-container" style={{ minHeight: "100vh" }}>
+                {pathname === "/sign-in" ? "" : <HeaderCommon />}
+                {isLogin ? (
+                  <>
+                    <SiderCommon />
+                    <Content>
+                      <Routes>
+                        <Route path="/" element={<PinCap />} />
+                        <Route path="/create-media" element={<CreateMedia />} />
+                        <Route path="/ai" element={<ImageAi />} />
+                        <Route path="/media/:id" element={<DetailMedia />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/dashboard/album" element={<Album />} />
+                        <Route path="/dashboard/album/:id" element={<AlbumDetail />} />
+                      </Routes>
+                    </Content>
+                  </>
+                ) : (
+                  <Content>
+                    <Routes>
+                      <Route path="/home" element={<Home />} />
+                    </Routes>
+                  </Content>
+                )}
+              </Layout>
+            }
+          />
+        </Routes>
       </div>
     </ConfigProvider>
-
   );
 };
 

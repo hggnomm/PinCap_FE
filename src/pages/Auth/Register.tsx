@@ -1,0 +1,129 @@
+import { Button, Col, Form, Input, notification, Row } from "antd";
+import { register } from "../../api/auth";
+import React from "react";
+import Title from "antd/es/typography/Title";
+import RegisterImage from "../../assets/img/PinCap/register_page_image.jpg";
+import { LogoIcon } from "../../assets/img";
+import GoogleIcon from "../../assets/img/PinCap/googleIcon.png";
+import { useNavigate } from "react-router-dom";
+const Register = () => {
+  const [api, contextHolder] = notification.useNotification();
+  const navigate = useNavigate();
+
+  const onSwitchLogin = () => {
+    navigate("/sign-in");
+  };
+  const onFinish = async (values: any) => {
+    console.log("Register:", values);
+
+    try {
+      const response = await register(values);
+      console.log(response.data);
+      notification.success({
+        message: response.message,
+        description: "Please check your email for a confirmation link to verify your account."
+      });
+    } catch (error) {
+      console.log("error", error);
+      api.open({
+        message: "Can't register",
+      });
+    }
+  };
+  return (
+    <Row className="main-page">
+      <Col xs={24} md={10} className="right-login">
+        <Row className="form-header">
+          <img src={LogoIcon} style={{ width: "10%" }}></img>
+        </Row>
+        <Row className="text-header">
+          <Title level={2} style={{ margin: 0, color: "#525252" }}>
+            Create an account
+          </Title>
+          <span>Step into a world of opportunities with PinCap today!</span>
+        </Row>
+        {contextHolder}
+        <Form name="register_form" className="form" onFinish={onFinish}>
+          <Row className="form-field">
+            <span>First name</span>
+            <Form.Item
+              name="first_name"
+              rules={[{ required: true}]}
+              noStyle
+            >
+              <Input />
+            </Form.Item>
+          </Row>
+          <Row className="form-field">
+            <span>Last name</span>
+            <Form.Item
+              name="last_name"
+              rules={[{ required: true}]}
+              noStyle
+            >
+              <Input />
+            </Form.Item>
+          </Row>
+          <Row className="form-field">
+            <span>Email</span>
+            <Form.Item
+              name="email"
+              rules={[{ required: true}]}
+              noStyle
+            >
+              <Input />
+            </Form.Item>
+          </Row>
+
+          <Row className="form-field">
+            <span>Password</span>
+            <Form.Item
+              name="password"
+              rules={[{ required: true}]}
+              noStyle
+            >
+              <Input.Password />
+            </Form.Item>
+          </Row>
+
+          <Row className="form-field">
+            <span>Confirm Password</span>
+            <Form.Item
+              name="password_confirmation"
+              rules={[{ required: true}]}
+              noStyle
+            >
+              <Input.Password />
+            </Form.Item>
+          </Row>
+
+          <div className="field-btn">
+            <Button
+              className="button submit-btn"
+              type="primary"
+              htmlType="submit"
+            >
+              Register
+            </Button>
+            {/* another choice */}
+            {/* <Button className="button btn-login-icon">
+              <img src={GoogleIcon} alt="" />
+              <span>Continue with Google</span>
+            </Button> */}
+          </div>
+          <Row className="register-field">
+            <div>
+              Have An Account Yet?{" "}
+              <span onClick={onSwitchLogin}>Login an account</span>
+            </div>
+          </Row>
+        </Form>
+      </Col>
+      <Col xs={0} md={14} className="left-login">
+        <img src={RegisterImage} alt="Login Page" />  
+      </Col>
+    </Row>
+  );
+};
+
+export default Register;

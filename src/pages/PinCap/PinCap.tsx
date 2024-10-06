@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import "./index.less";
-import { Layout } from "antd";
 import PinMedia from "./PinMedia/Pin";
 import { getAllMedias } from "../../api/media";
 
@@ -17,8 +15,8 @@ const PinCap = () => {
   const getListMedias = async () => {
     try {
       const data = await getAllMedias();
-      if (data?.listMedia) {
-        setListMedia(data?.listMedia.data);
+      if (data) {
+        setListMedia(data?.data);
       }
     } catch (error) {
       console.log("Lỗi khi lấy list media, " + error)
@@ -27,7 +25,7 @@ const PinCap = () => {
   return (
     <div className="pincap-container">
       {listMedia?.map((media: any, index: any) => (
-        <PinMedia key={index} srcUrl={media?.mediaURL} data={media}></PinMedia>
+        <PinMedia key={index} srcUrl={media?.media_url} data={media}></PinMedia>
       ))}
     </div>
   );

@@ -21,20 +21,19 @@ export const login = async (data: any) => {
 }
 
 export const register = async (data: any) => {
+  
   const config = {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json', 
       },          
       data: data,
-      url: `${baseUrl}/api/Account/register`
+      url: `${baseUrl}/api/auth/register`
     };
-  
     try {
       const response = await axios(config);
-      console.log(response.data);
+      return response.data
     } catch (error) {
       console.log('error', error);
-
     }
 }

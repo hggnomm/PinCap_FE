@@ -47,7 +47,6 @@ const Notification = () => {
 
   const onShowDropdown = () => {
     console.log("test")
-    debugger
     setIsComponentVisible(!isComponentVisible);
   };
 
