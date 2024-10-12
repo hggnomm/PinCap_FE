@@ -1,4 +1,4 @@
-import { Account, Home, Register } from "./pages";
+import { Login, Home, Register } from "./pages";
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -40,7 +40,7 @@ const App = () => {
     <ConfigProvider>
       <div className="App">
         <Routes>
-          <Route path="/sign-in" element={<Account />} />
+          <Route path="/sign-in" element={<Login />} />
           <Route path="/sign-up" element={<Register />} />
 
           <Route

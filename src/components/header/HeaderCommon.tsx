@@ -1,5 +1,5 @@
 import { Avatar, Button, Col, Row } from "antd";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./index.less";
 import { LogoIcon, TextIcon } from "../../assets/img";
@@ -22,9 +22,6 @@ const HeaderCommon = () => {
     localStorage.removeItem("token");
     navigate("/home");
     window.location.reload();
-  };
-  const loginHandle = () => {
-    navigate("/sign-in");
   };
   return (
     <Row className="main-header">
@@ -57,23 +54,22 @@ const HeaderCommon = () => {
               </Col>
 
             </Col>
-
             :
-            <>
+            <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9, offset: 0 }}>
               <Button
-                onClick={() => loginHandle()}
+                onClick={() => navigate("/sign-in")}
                 className="button-auth-sign-in"
               >
                 Sign in
               </Button>
 
               <Button
-                onClick={() => loginHandle()}
+                onClick={() => navigate("/sign-up")}
                 className="button-auth-sign-up"
               >
                 Sign up
               </Button>
-            </>
+            </Col>
 
         }
       </Col>

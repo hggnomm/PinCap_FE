@@ -21,7 +21,8 @@ const Register = () => {
       console.log(response.data);
       notification.success({
         message: response.message,
-        description: "Please check your email for a confirmation link to verify your account."
+        description:
+          "Please check your email for a confirmation link to verify your account.",
       });
     } catch (error) {
       console.log("error", error);
@@ -34,7 +35,11 @@ const Register = () => {
     <Row className="main-page">
       <Col xs={24} md={10} className="right-login">
         <Row className="form-header">
-          <img src={LogoIcon} style={{ width: "10%" }}></img>
+          <img
+            src={LogoIcon}
+            style={{ width: "10%", cursor: "pointer" }}
+            onClick={() => navigate("/home")}
+          ></img>
         </Row>
         <Row className="text-header">
           <Title level={2} style={{ margin: 0, color: "#525252" }}>
@@ -46,42 +51,26 @@ const Register = () => {
         <Form name="register_form" className="form" onFinish={onFinish}>
           <Row className="form-field">
             <span>First name</span>
-            <Form.Item
-              name="first_name"
-              rules={[{ required: true}]}
-              noStyle
-            >
+            <Form.Item name="first_name" rules={[{ required: true }]} noStyle>
               <Input />
             </Form.Item>
           </Row>
           <Row className="form-field">
             <span>Last name</span>
-            <Form.Item
-              name="last_name"
-              rules={[{ required: true}]}
-              noStyle
-            >
+            <Form.Item name="last_name" rules={[{ required: true }]} noStyle>
               <Input />
             </Form.Item>
           </Row>
           <Row className="form-field">
             <span>Email</span>
-            <Form.Item
-              name="email"
-              rules={[{ required: true}]}
-              noStyle
-            >
+            <Form.Item name="email" rules={[{ required: true }]} noStyle>
               <Input />
             </Form.Item>
           </Row>
 
           <Row className="form-field">
             <span>Password</span>
-            <Form.Item
-              name="password"
-              rules={[{ required: true}]}
-              noStyle
-            >
+            <Form.Item name="password" rules={[{ required: true }]} noStyle>
               <Input.Password />
             </Form.Item>
           </Row>
@@ -90,7 +79,7 @@ const Register = () => {
             <span>Confirm Password</span>
             <Form.Item
               name="password_confirmation"
-              rules={[{ required: true}]}
+              rules={[{ required: true }]}
               noStyle
             >
               <Input.Password />
@@ -105,11 +94,6 @@ const Register = () => {
             >
               Register
             </Button>
-            {/* another choice */}
-            {/* <Button className="button btn-login-icon">
-              <img src={GoogleIcon} alt="" />
-              <span>Continue with Google</span>
-            </Button> */}
           </div>
           <Row className="register-field">
             <div>
@@ -120,7 +104,7 @@ const Register = () => {
         </Form>
       </Col>
       <Col xs={0} md={14} className="left-login">
-        <img src={RegisterImage} alt="Login Page" />  
+        <img src={RegisterImage} alt="Login Page" />
       </Col>
     </Row>
   );
