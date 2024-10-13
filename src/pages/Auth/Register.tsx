@@ -4,8 +4,9 @@ import React from "react";
 import Title from "antd/es/typography/Title";
 import RegisterImage from "../../assets/img/PinCap/register_page_image.jpg";
 import { LogoIcon } from "../../assets/img";
-import GoogleIcon from "../../assets/img/PinCap/googleIcon.png";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 const Register = () => {
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
@@ -35,11 +36,14 @@ const Register = () => {
     <Row className="main-page">
       <Col xs={24} md={10} className="right-login">
         <Row className="form-header">
-          <img
+          <motion.img
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
             src={LogoIcon}
             style={{ width: "10%", cursor: "pointer" }}
             onClick={() => navigate("/home")}
-          ></img>
+          />
         </Row>
         <Row className="text-header">
           <Title level={2} style={{ margin: 0, color: "#525252" }}>
@@ -104,7 +108,13 @@ const Register = () => {
         </Form>
       </Col>
       <Col xs={0} md={14} className="left-login">
-        <img src={RegisterImage} alt="Login Page" />
+        <motion.img
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, ease: "easeInOut" }}
+          src={RegisterImage}
+          alt="Login Page"
+        />
       </Col>
     </Row>
   );

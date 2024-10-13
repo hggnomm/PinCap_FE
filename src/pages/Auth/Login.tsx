@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../../api/auth";
 import { addToken } from "../../store/authSlice";
 import React from "react";
+import { motion } from "framer-motion";
 import "./index.less";
 
 const Login = () => {
@@ -41,16 +42,25 @@ const Login = () => {
   return (
     <Row className="main-page">
       <Col xs={0} md={14} className="left-login">
-        <img src={LoginImage} alt="Login Page" />
+        <motion.img
+          src={LoginImage}
+          alt="Login Page"
+          initial={{ opacity: 0, x: -100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, ease: "easeInOut" }}
+        />
       </Col>
 
       <Col xs={24} md={10} className="right-login">
         <Row className="form-header">
-          <img
+          <motion.img
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
             src={LogoIcon}
             style={{ width: "10%", cursor: "pointer" }}
             onClick={() => navigate("/home")}
-          ></img>
+          />
         </Row>
         <Row className="text-header">
           <Title level={2} style={{ margin: 0, color: "#525252" }}>

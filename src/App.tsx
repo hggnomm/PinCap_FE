@@ -31,7 +31,7 @@ const App = () => {
         setIsLogin(true);
       }
     } else {
-      navigate("/home");
+      // navigate("/home");
       setIsLogin(false);
     }
   }, [tokenPayload.email]);
