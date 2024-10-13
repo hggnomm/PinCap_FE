@@ -1,31 +1,53 @@
+.text-title,
+.text-description {
+  background: linear-gradient(
+    270deg,
+    #e13f7a,
+    #54b4fd,
+    #2c4970
+  ); /* Gradient màu */
+  background-size: 200% 200%; /* Tạo không gian cho gradient */
+  -webkit-background-clip: text; /* Clip nền cho chữ */
+  -webkit-text-fill-color: transparent; /* Ẩn màu chữ để chỉ hiện gradient */
+  animation: gradient-animation 3s ease infinite; /* Thêm animation */
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%; /* Bắt đầu ở đầu gradient */
+  }
+  100% {
+    background-position: 100% 50%; /* Kết thúc ở cuối gradient */
+  }
+}
+
 .main-layout {
   height: 100%;
   width: 100%;
 
   .home-layout {
-
     .element {
+      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      overflow: hidden;
+
+      video {
+        width: 100%;
+        object-fit: cover;
+      }
 
       .overlay {
         position: absolute;
-        left: 0;
-        right: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+        z-index: 1;
       }
-      video {
-        width: 84%;
-        height: 100%;
-        object-fit: cover;
-      }
+
       .content {
         position: absolute;
         width: 100%;
@@ -34,8 +56,8 @@
         top: -10rem;
         align-items: center;
         justify-content: center;
-        margin-top: 70px;
         flex-direction: column;
+        z-index: 2;
 
         .text-title {
           color: white;
@@ -48,8 +70,7 @@
         .text-description {
           color: #ccc;
           font-size: 1.5em;
-          font-weight: normal;
-          opacity: 0.5;
+          font-weight: 500;
         }
       }
 
@@ -75,17 +96,16 @@
           display: flex;
           justify-content: space-between;
           flex-direction: column;
-          
+
           .content-banner-title {
-            font-weight: 800;
-            font-size: 3em;
+            font-weight: 700;
+            font-size: 2.5em;
             width: 70%;
           }
           .content-banner-description {
             font-size: 1.5em;
             width: 70%;
             margin-left: 40%;
-
           }
           .content-banner-button {
             float: right;
@@ -100,7 +120,6 @@
             margin-left: 80%;
           }
         }
-       
       }
 
       // Video
@@ -124,7 +143,6 @@
           }
         }
 
-
         .content-banner {
           height: 75vh;
           width: 30%;
@@ -132,19 +150,17 @@
           display: flex;
           justify-content: space-between;
           flex-direction: column;
-          
+
           .content-banner-title-reverse {
-            font-weight: 800;
-            font-size: 3em;
+            font-weight: 700;
+            font-size: 2.5em;
             width: 70%;
             margin-left: 50%;
-
           }
           .content-banner-description-reverse {
             font-size: 1.5em;
             width: 70%;
             margin-left: 40%;
-
           }
           .content-banner-button-reverse {
             float: right;
@@ -157,48 +173,9 @@
             align-items: center;
             border: 3px solid #077979;
             margin-left: 20%;
-
           }
         }
-       
       }
-    }
-
-    .banner-end {
-      background: rgba(124, 147, 195, 1);
-      height: 100vh;
-      font-size: 4vw;
-      font-weight: bold;
-      color: var(--white);
-    }
-    .banner-end-title {
-      padding: 5% 15%;
-      text-align: center;
-    }
-    .banner-end-content {
-      margin: auto 5%;
-      font-size: 2vw;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .content-banner-text {
-      margin: 20px auto;
-      padding-left: 2%;
-      border-left: solid 3px var(--white);
-    }
-    .banner-end-media {
-      width: 80vh;
-      height: 50vh;
-      border-radius: 20px;
-    }
-
-    #image-text:hover {
-      opacity: 0.5;
-    }
-
-    #video-text:hover {
-      opacity: 0.5;
     }
   }
 }
