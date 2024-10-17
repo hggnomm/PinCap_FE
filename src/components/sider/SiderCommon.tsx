@@ -17,8 +17,8 @@ const CreateMediaBtn = styled(Menu.Item)`
   color: #fff !important;
 
   &:hover {
-    background-color: #902a55 !important; 
-    opacity: 0.9 !important
+    background-color: #902a55 !important;
+    opacity: 0.9 !important;
   }
   &.ant-menu-item-selected {
     background-color: #902a55 !important;
@@ -74,11 +74,19 @@ const SiderCommon = () => {
         <Menu.Item key="2" icon={<SignatureOutlined />}>
           <Link to="/album">My Album</Link>
         </Menu.Item>
-        <Menu.SubMenu key="my-media" icon={<ProductOutlined />} title="My Media">
+        <Menu.SubMenu
+          key="my-media"
+          icon={<ProductOutlined />}
+          title="My Media"
+        >
           <Menu.Item key="images">Images</Menu.Item>
           <Menu.Item key="videos">Videos</Menu.Item>
         </Menu.SubMenu>
-        <Menu.SubMenu key="dashboard" icon={<DashboardOutlined />} title="Dashboard">
+        <Menu.SubMenu
+          key="dashboard"
+          icon={<DashboardOutlined />}
+          title="Dashboard"
+        >
           <Menu.Item key="dashHome">
             <Link to="/dashboard">Home</Link>
           </Menu.Item>
@@ -89,7 +97,7 @@ const SiderCommon = () => {
             <Link to="/dashboard/mediaReport">Media Report</Link>
           </Menu.Item>
         </Menu.SubMenu>
-        <AIToolBtn key="3">
+        <AIToolBtn key="3" title={null}>
           <img
             src={iconAI}
             alt="AI Tool"
