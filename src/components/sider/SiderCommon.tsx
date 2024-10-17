@@ -1,11 +1,8 @@
 import {
-  DashboardFilled,
   DashboardOutlined,
-  PlaySquareFilled,
   PlusOutlined,
-  ProductFilled,
   ProductOutlined,
-  VideoCameraOutlined,
+  SignatureOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
@@ -74,7 +71,7 @@ const SiderCommon = () => {
         <CreateMediaBtn key="1" icon={<PlusOutlined />}>
           <Link to="/create-media">Create Media</Link>
         </CreateMediaBtn>
-        <Menu.Item key="2" icon={<VideoCameraOutlined />}>
+        <Menu.Item key="2" icon={<SignatureOutlined />}>
           <Link to="/album">My Album</Link>
         </Menu.Item>
         <Menu.SubMenu key="my-media" icon={<ProductOutlined />} title="My Media">

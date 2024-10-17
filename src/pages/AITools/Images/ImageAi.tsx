@@ -8,6 +8,7 @@ import Image2 from "../../../assets/img/ImagesAI/img2.png";
 import Image3 from "../../../assets/img/ImagesAI/img3.png";
 import Image4 from "../../../assets/img/ImagesAI/img4.png";
 import Image5 from "../../../assets/img/ImagesAI/img5.png";
+import { motion } from "framer-motion";
 
 interface IRequest {
   textInput: string;
@@ -35,7 +36,16 @@ const ImageAi = () => {
   };
 
   return (
-    <div className="container">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: { opacity: 1 },
+      }}
+      transition={{ duration: 1 }}
+      className="container"
+    >
       <Row className="main-page" justify="space-between">
         <Col className="left-side" span={10}>
           <Form
@@ -127,7 +137,7 @@ const ImageAi = () => {
           </Row>
         </Col>
       </Row>
-    </div>
+    </motion.div>
   );
 };
 
