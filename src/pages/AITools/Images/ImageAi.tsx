@@ -1,145 +1,133 @@
-import React, { useEffect, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode, Pagination } from "swiper/modules";
-import Image1 from "../../../assets/img/ImagesAI/image1.jpg";
-import Image2 from "../../../assets/img/ImagesAI/images2.jpg";
-import Image3 from "../../../assets/img/ImagesAI/image3.jpg";
-import Image4 from "../../../assets/img/ImagesAI/image4.jpg";
+import { Button, Col, Divider, Form, FormProps, Input, Row } from "antd";
+import React, { useState } from "react";
 import "./index.less";
-import { Button, Col, Form, Input, Radio, Row, Typography } from "antd";
-import TextArea from "antd/es/input/TextArea";
-import { createAIImage } from "../../../api/ai";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, FreeMode, Pagination } from "swiper/modules";
+import Image1 from "../../../assets/img/ImagesAI/img1.png";
+import Image2 from "../../../assets/img/ImagesAI/img2.png";
+import Image3 from "../../../assets/img/ImagesAI/img3.png";
+import Image4 from "../../../assets/img/ImagesAI/img4.png";
+import Image5 from "../../../assets/img/ImagesAI/img5.png";
 
-const { Text, Title } = Typography;
+interface IRequest {
+  textInput: string;
+  style_preset: string;
+  timeCurrent: string;
+  size: number;
+}
+
+const ImageList = [Image1, Image2, Image3, Image4, Image5];
+
+type FieldType = IRequest;
+
 const ImageAi = () => {
-  const [form] = Form.useForm();
-  const [valueForm, setValueForm] = useState({
-    size: {
-      height: 512,
-      width: 512,
-    },
-    prompt: "",
-    style_preset: "photographic"
-  });
-  const [isGenerate, setIsGenerate] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
-  const [imageAI, setimageAI] = useState("");
-
-  useEffect(() => {
-    if (isSearch) {
-      createImage(valueForm);
-    }
-  }, [valueForm]);
-
-  const createImage = async (valueForm: any) => {
-    var requestGenerateAI = {
-      prompt: valueForm.prompt,
-      style_preset: valueForm.style_preset,
-      height: valueForm.size.height,
-      width: valueForm.size.width,
-    };
-
-    if(imageAI) {
-      requestGenerateAI = {
-        ...requestGenerateAI,
-        imageUrl: imageAI
-      }
-    } 
-    const data = await createAIImage(requestGenerateAI);
-
-    if (data) {
-      setIsGenerate(true);
-      setimageAI(data?.imageUrl);
-    }
-
-
-    return data;
+  const [selectedOptions, setSelectedOptions] = useState<any>({});
+  const [isLoad, setIsLoad] = useState<boolean>(false);
+  const [isDoneGenerate, setIsDoneGenerate] = useState<boolean>(false);
+  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
+    console.log("Success:", values);
   };
 
-  const handleGenerateClick = () => {
-    const value = form.getFieldsValue(valueForm);
-    setValueForm({
-      ...valueForm,
-      prompt: value.prompt
-    })
-
-    // setValueForm({
-    //   ...,
-    //   value
-    // });
-    setIsSearch(true);
+  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
+    errorInfo
+  ) => {
+    console.log("Failed:", errorInfo);
   };
 
   return (
-    <Col className="create-ai-image">
-      <div>
-        <Title>Create Images From Text</Title>
-        <Text type="secondary">
-          Use suggestions to create your own AI photo
-        </Text>
-      </div>
-      <Col className="image-review">
-        {!isGenerate ? (
-          <Swiper
-            slidesPerView={3}
-            spaceBetween={10}
-            freeMode={true}
-            pagination={{
-              clickable: true,
-            }}
-            modules={[FreeMode, Pagination]}
-            className="swiper-images"
+    <div className="container">
+      <Row className="main-page" justify="space-between">
+        <Col className="left-side" span={10}>
+          <Form
+            name="basic"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
+            className="form"
           >
-            <SwiperSlide className="image-item">
-              <img src={Image1} alt="" />
-            </SwiperSlide>
-            <SwiperSlide className="image-item">
-              <img src={Image2} alt="" />
-            </SwiperSlide>
-            <SwiperSlide className="image-item">
-              <img src={Image3} alt="" />
-            </SwiperSlide>
-            <SwiperSlide className="image-item">
-              <img src={Image4} alt="" />
-            </SwiperSlide>
-          </Swiper>
-        ) : (
-          <>
-            <img src={imageAI} alt="" />
-          </>
-        )}
-      </Col>
-      <div className="create-image-container">
-        <Form className="form-create-image" form={form}>
-          <Form.Item name="size">
-            <Radio.Group optionType="button" className="radio-size-image">
-              <Radio className="item-size" value={"1024x1024"}>
-                Large
-              </Radio>
-              <Radio className="item-size" value={"512x512"}>
-                Medium
-              </Radio>
-              <Radio className="item-size" value={"256x256"}>
-                Small
-              </Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Row className="field-button-generate">
-            <Col span={18}>
-              <Form.Item name="prompt">
-                <TextArea
-                  placeholder="Enter text description..."
-                  className="input-text"
+            <Row className="field-input">
+              <span>Create an image from text prompt</span>
+              <Form.Item<FieldType>
+                name="textInput"
+                rules={[{ required: true }]}
+                style={{ width: "100%", margin: 0 }}
+                noStyle
+              >
+                <Input.TextArea
+                  rows={2}
+                  placeholder="Enter your prompt"
+                  autoSize={{ minRows: 2, maxRows: 4 }}
                 />
               </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Button onClick={() => handleGenerateClick()}>Generate</Button>
-            </Col>
+              <Divider style={{ margin: "12px 0" }} />
+            </Row>
+            <Row className="field-input">
+              <span>Choose a style</span>
+              <Form.Item<FieldType>
+                name="style_preset"
+                rules={[{ required: true }]}
+                style={{ width: "100%", margin: 0 }}
+                noStyle
+              >
+                {/* <StyleOptions />
+                 */}
+                <Input defaultValue="cc" />
+              </Form.Item>
+              <Divider style={{ margin: "12px 0" }} />
+            </Row>
+            <Row className="field-input">
+              <span>Choose a size</span>
+              <Form.Item<FieldType>
+                name="style_preset"
+                rules={[{ required: true }]}
+                style={{ width: "100%", margin: 0 }}
+                noStyle
+              >
+                {/* <StyleOptions />
+                 */}
+                <Input defaultValue="cc" />
+              </Form.Item>
+              <Divider style={{ margin: "12px 0" }} />
+            </Row>
+            <Form.Item>
+              <Button className="btn-generate" type="primary" htmlType="submit">
+                Generate
+              </Button>
+            </Form.Item>
+          </Form>
+        </Col>
+        <Col className="right-side" span={14}>
+          <Row>
+            {!isDoneGenerate ? (
+              <Swiper
+                slidesPerView={1}
+                spaceBetween={10}
+                modules={[Autoplay, FreeMode, Pagination]}
+                autoplay={{
+                  delay: 2500,
+                  disableOnInteraction: false,
+                }}
+                pagination={true}
+                className="swiper-images"
+              >
+                {ImageList.map((image, index) => (
+                  <SwiperSlide key={index} className="image-item">
+                    <img src={image} alt="" />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <Swiper className="swiper-images">
+                <SwiperSlide className="image-item">
+                  <img src={Image5} alt="" />
+                </SwiperSlide>
+              </Swiper>
+            )}
           </Row>
-        </Form>
-      </div>
-    </Col>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

@@ -21,7 +21,7 @@ const CreateMediaBtn = styled(Menu.Item)`
 
   &:hover {
     background-color: #902a55 !important; 
-    opacity: 0.9; !important
+    opacity: 0.9 !important
   }
   &.ant-menu-item-selected {
     background-color: #902a55 !important;
@@ -42,12 +42,12 @@ const AIToolBtn = styled(Menu.Item)`
   border: 2px solid transparent;
   justify-content: start;
   transition: background 0.3s ease;
+  margin-bottom: 1rem;
 
-  /* Thêm trạng thái hover */
   &:hover {
     background: linear-gradient(#fff, #fff) padding-box,
-      linear-gradient(60deg, #ff00ff, #00c0ff) border-box; /* Có thể thay đổi màu sắc hover */
-    cursor: pointer; /* Hiển thị con trỏ tay khi hover */
+      linear-gradient(60deg, #ff00ff, #00c0ff) border-box;
+    cursor: pointer;
   }
 `;
 
@@ -77,11 +77,11 @@ const SiderCommon = () => {
         <Menu.Item key="2" icon={<VideoCameraOutlined />}>
           <Link to="/album">My Album</Link>
         </Menu.Item>
-        <Menu.SubMenu icon={<ProductOutlined />} title="My Media">
+        <Menu.SubMenu key="my-media" icon={<ProductOutlined />} title="My Media">
           <Menu.Item key="images">Images</Menu.Item>
           <Menu.Item key="videos">Videos</Menu.Item>
         </Menu.SubMenu>
-        <Menu.SubMenu icon={<DashboardOutlined />} title="Dashboard">
+        <Menu.SubMenu key="dashboard" icon={<DashboardOutlined />} title="Dashboard">
           <Menu.Item key="dashHome">
             <Link to="/dashboard">Home</Link>
           </Menu.Item>
