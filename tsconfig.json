@@ -14,7 +14,7 @@
     },
     "typeRoots": [
       "./node_modules/@types",                      /* Include type definitions from node_modules. */
-      "./images.d.ts"                                 /* Include custom type definitions. */
+      "src/images.d.ts"                                 /* Include custom type definitions. */
     ],
     "resolveJsonModule": true,                     /* Allow importing .json files. */
     "noEmitOnError": true                          /* Do not emit outputs if there are type errors. */
