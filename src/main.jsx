@@ -5,7 +5,6 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from 'react-redux';
 import HttpsRedirect from "react-https-redirect";
 import { store } from './store/store.ts';
-import './index.css';
 
 import "swiper/css";
 import "swiper/css/free-mode";

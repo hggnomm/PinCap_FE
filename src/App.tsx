@@ -46,9 +46,9 @@ const App = () => {
           <Route
             path="*"
             element={
-              <Layout className="main-container" style={{ minHeight: "100vh" }}>
+              <Layout className="main-container">
                 {pathname === "/sign-in" ? "" : <HeaderCommon />}
-                {isLogin ? (
+                {!isLogin ? (
                   <>
                     <SiderCommon />
                     <Content>

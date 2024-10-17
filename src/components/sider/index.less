@@ -1,3 +1,80 @@
-.sidebar {
-  height: 100vh;
+@blue-main: #9EB8D9;
+@dirt-pink: #a25772;
+@background-color: #eef5ff;
+
+.siderbar {
+  background-color: @background-color;
+  border-right: 3px solid @blue-main;
+
+  &-collapsed {
+    .ant-menu-item .anticon {
+      display: flex;
+    }
+
+    .ant-menu-item {
+      text-align: center; /* Canh giữa icon */
+      padding: 0; /* Loại bỏ padding để tránh cắt xén */
+    }
+
+    /* Đảm bảo menu không hiển thị text khi sider collapse */
+    .ant-menu-item .ant-menu-item-only-child {
+      display: none;
+    }
+  }
+
+  /* Tùy chỉnh menu bên trong sider */
+  .ant-menu {
+    background-color: transparent;
+
+    /* Tùy chỉnh item trong menu */
+    .ant-menu-item {
+      text-align: left;
+      gap: 14px;
+      padding: 15px 20px;
+      font-weight: 500;
+      font-size: 14px;
+
+      /* Tùy chỉnh khi được chọn */
+      &.ant-menu-item-selected {
+        background-color: @blue-main;
+        color: #000;
+      }
+ 
+      /* Tùy chỉnh icon */
+      .anticon {
+        display: flex;
+        justify-content: center;
+        font-size: 14px; /* Kích thước icon ban đầu */
+      }
+    }
+
+    /* Tùy chỉnh submenu */
+    .ant-menu-submenu-title {
+      color: #000;
+      gap: 14px;
+
+      font-weight: 500;
+      font-size: 14px;
+
+      .ant-menu-submenu-arrow {
+        color: #b0b0b0;
+      }
+    }
+
+    /* Tùy chỉnh khi SubMenu mở */
+    .ant-menu-submenu-open {
+      .ant-menu-sub {
+        background-color: @background-color;
+      }
+    }
+
+    /* Khi SubMenu đóng */
+    .ant-menu-submenu:not(.ant-menu-submenu-open) {
+      .ant-menu-item {
+        background-color: @background-color; /* Đặt lại màu nền về mặc định */
+        color: #000; /* Đặt lại màu chữ về mặc định */
+      }
+    }
+  }
 }
+
