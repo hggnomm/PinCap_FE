@@ -1,4 +1,12 @@
-import { PlusOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import {
+  DashboardFilled,
+  DashboardOutlined,
+  PlaySquareFilled,
+  PlusOutlined,
+  ProductFilled,
+  ProductOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import React, { useEffect, useState } from "react";
@@ -32,19 +40,14 @@ const AIToolBtn = styled(Menu.Item)`
   color: #000 !important;
   border-radius: 16px !important;
   border: 2px solid transparent;
-  justify-content: center;
+  justify-content: start;
   transition: background 0.3s ease;
-  padding: 0 !important;
 
- /* Thêm trạng thái hover */
+  /* Thêm trạng thái hover */
   &:hover {
     background: linear-gradient(#fff, #fff) padding-box,
       linear-gradient(60deg, #ff00ff, #00c0ff) border-box; /* Có thể thay đổi màu sắc hover */
     cursor: pointer; /* Hiển thị con trỏ tay khi hover */
-  }
-
-  .ant-menu-title-content {
-    margin-left: 1.1rem;
   }
 `;
 
@@ -74,11 +77,11 @@ const SiderCommon = () => {
         <Menu.Item key="2" icon={<VideoCameraOutlined />}>
           <Link to="/album">My Album</Link>
         </Menu.Item>
-        <Menu.SubMenu icon={<VideoCameraOutlined />} title="My Media">
+        <Menu.SubMenu icon={<ProductOutlined />} title="My Media">
           <Menu.Item key="images">Images</Menu.Item>
           <Menu.Item key="videos">Videos</Menu.Item>
         </Menu.SubMenu>
-        <Menu.SubMenu icon={<VideoCameraOutlined />} title="Dashboard">
+        <Menu.SubMenu icon={<DashboardOutlined />} title="Dashboard">
           <Menu.Item key="dashHome">
             <Link to="/dashboard">Home</Link>
           </Menu.Item>
@@ -93,7 +96,7 @@ const SiderCommon = () => {
           <img
             src={iconAI}
             alt="AI Tool"
-            style={{ width: "16px", marginRight: "1.75rem" }}
+            style={{ width: "16px", marginRight: "1.5rem" }}
           />
           <Link to="/ai">AI Tool</Link>
         </AIToolBtn>
