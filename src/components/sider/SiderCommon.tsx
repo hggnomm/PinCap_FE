@@ -66,7 +66,7 @@ const SiderCommon = () => {
   }, []);
 
   return (
-    <Sider collapsible={!isMobile} className="siderbar" width="13%">
+    <Sider collapsible={!isMobile} className="siderbar" width="16%">
       <Menu mode="inline" style={{ padding: "0.5rem" }}>
         <CreateMediaBtn key="1" icon={<PlusOutlined />}>
           <Link to="/create-media">Create Media</Link>

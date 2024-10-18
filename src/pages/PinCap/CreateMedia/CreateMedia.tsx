@@ -1,12 +1,25 @@
 import React, { useEffect, useState } from "react";
 import "./index.less";
-import { Alert, Button, Col, Form, Input, Row, Select, Spin, Upload, UploadFile, UploadProps, Image } from "antd";
+import {
+  Alert,
+  Button,
+  Col,
+  Form,
+  Input,
+  Row,
+  Select,
+  Spin,
+  Upload,
+  UploadFile,
+  UploadProps,
+  Image,
+} from "antd";
 import Title from "antd/es/typography/Title";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { createMedia } from "../../../api/media";
 import { GetProps, useSelector } from "react-redux";
 
-type FileType = Parameters<GetProps<UploadProps, 'beforeUpload'>>[0];
+type FileType = Parameters<GetProps<UploadProps, "beforeUpload">>[0];
 
 const getBase64 = (file: FileType): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -22,10 +35,10 @@ const CreateMedia = () => {
   const [isLoad, setIsLoad] = useState<boolean>(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
-  // ANTD 
+  // ANTD
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
-  const [previewImage, setPreviewImage] = useState<string>('');
-  const [previewMp4, setPreviewMp4] = useState<string>('');
+  const [previewImage, setPreviewImage] = useState<string>("");
+  const [previewMp4, setPreviewMp4] = useState<string>("");
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -36,12 +49,12 @@ const CreateMedia = () => {
     setPreviewOpen(true);
   };
 
-  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     setFileList(newFileList);
-  }
+  };
 
   const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
+    <button style={{ border: 0, background: "none" }} type="button">
       <PlusOutlined />
       <div style={{ marginTop: 8 }}>Upload</div>
     </button>
@@ -55,7 +68,7 @@ const CreateMedia = () => {
     mediaOwner_id: "",
     type: "1",
     tagName: [],
-    isCreated: 0
+    isCreated: 0,
   });
 
   const handleGenerateClick = () => {
@@ -69,8 +82,8 @@ const CreateMedia = () => {
       description: formValue.description,
       privacy: formValue.privacy,
       tagName: "",
-      isCreated: 1
-    }
+      isCreated: 1,
+    };
 
     createNewMedia(valueAPI);
     setIsLoad(true);
@@ -82,9 +95,7 @@ const CreateMedia = () => {
       if (response) {
         setIsLoad(false);
       }
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
   return (
     <div className="create-media-container">
@@ -103,13 +114,16 @@ const CreateMedia = () => {
       </Row>
 
       <Row className="field-form-create-media">
-        {isLoad &&
+        {isLoad && (
           <div className="publish-loading">
-            <Spin tip="Loading..." >
-            </Spin>
+            <Spin tip="Loading..."></Spin>
           </div>
-        }
-        <Form className={`form-create-media ${isLoad ? 'set-opacity' : ""}`} form={form} disabled={isLoad}>
+        )}
+        <Form
+          className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
+          form={form}
+          disabled={isLoad}
+        >
           <Col span={10} className="upload-image">
             <Form.Item
               name="medias"
@@ -138,11 +152,12 @@ const CreateMedia = () => {
 
               {previewImage && (
                 <Image
-                  wrapperStyle={{ display: 'none' }}
+                  wrapperStyle={{ display: "none" }}
                   preview={{
                     visible: previewOpen,
                     onVisibleChange: (visible) => setPreviewOpen(visible),
-                    afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                    afterOpenChange: (visible) =>
+                      !visible && setPreviewImage(""),
                   }}
                   src={previewImage}
                 />

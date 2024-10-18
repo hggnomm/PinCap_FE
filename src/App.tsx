@@ -48,7 +48,7 @@ const App = () => {
             element={
               <Layout className="main-container">
                 {pathname === "/sign-in" ? "" : <HeaderCommon />}
-                {isLogin ? (
+                {!isLogin ? (
                   <>
                     <SiderCommon />
                     <Content>
