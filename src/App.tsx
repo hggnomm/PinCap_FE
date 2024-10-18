@@ -27,11 +27,11 @@ const App = () => {
         localStorage.removeItem("token");
         navigate("/sign-in");
       } else {
-        navigate("/");
         setIsLogin(true);
       }
     } else {
-      // navigate("/home");
+      if (pathname == "/sign-in" || pathname == "/sign-up") return;
+      navigate("/home");
       setIsLogin(false);
     }
   }, [tokenPayload.email]);
@@ -48,7 +48,7 @@ const App = () => {
             element={
               <Layout className="main-container">
                 {pathname === "/sign-in" ? "" : <HeaderCommon />}
-                {!isLogin ? (
+                {isLogin ? (
                   <>
                     <SiderCommon />
                     <Content>
@@ -59,7 +59,10 @@ const App = () => {
                         <Route path="/media/:id" element={<DetailMedia />} />
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/dashboard/album" element={<Album />} />
-                        <Route path="/dashboard/album/:id" element={<AlbumDetail />} />
+                        <Route
+                          path="/dashboard/album/:id"
+                          element={<AlbumDetail />}
+                        />
                       </Routes>
                     </Content>
                   </>
