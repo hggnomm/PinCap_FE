@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./index.less";
 import {
-  Alert,
   Button,
   Col,
   Form,
@@ -15,7 +14,10 @@ import {
   Image,
 } from "antd";
 import Title from "antd/es/typography/Title";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  ArrowUpOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { createMedia } from "../../../api/media";
 import { GetProps, useSelector } from "react-redux";
 
@@ -101,7 +103,9 @@ const CreateMedia = () => {
     <div className="create-media-container">
       <Row className="field-create-media">
         <Col>
-          <Title level={4}>Create Media</Title>
+          <Title style={{ margin: 0 }} level={4}>
+            Create Media
+          </Title>
         </Col>
         <Col>
           <Button
@@ -147,7 +151,16 @@ const CreateMedia = () => {
                 onChange={handleChange}
                 className="input-upload-media"
               >
-                {fileList.length >= 1 ? null : uploadButton}
+                {fileList.length >= 1 ? null : (
+                  <div className="before-upload-media">
+                    <ArrowUpOutlined style={{ fontSize: "40px" }} />
+                    <p>Upload file</p>
+                    <p className="note">
+                      Bạn nên sử dụng tập tin .jpg chất lượng cao có kích thước
+                      dưới 20 MB
+                    </p>
+                  </div>
+                )}
               </Upload>
 
               {previewImage && (
