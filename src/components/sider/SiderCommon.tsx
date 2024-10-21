@@ -51,7 +51,6 @@ const AIToolBtn = styled(Menu.Item)`
 const SiderCommon = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [collapsed, setCollapsed] = useState<boolean>(true);
-
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
@@ -59,6 +58,7 @@ const SiderCommon = () => {
         setCollapsed(true);
       } else {
         setIsMobile(false);
+        setCollapsed(false);
       }
     };
 
@@ -71,8 +71,10 @@ const SiderCommon = () => {
     <Sider
       collapsible={true}
       collapsed={collapsed}
+      onCollapse={setCollapsed}
       className="siderbar"
       width="16%"
+      trigger={isMobile ? null : undefined}
     >
       <Menu mode="inline" style={{ padding: "0.5rem" }}>
         <CreateMediaBtn key="1" icon={<PlusOutlined />}>
