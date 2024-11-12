@@ -140,7 +140,12 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
     h3: ({ node, ...props }: any) => (
       <h3 style={{ fontSize: "1.17em", fontWeight: "bold" }} {...props} />
     ),
-
+    // Add custom rendering for <li> elements to remove list markers
+    li: ({ node, children, ...props }: any) => (
+      <li style={{ listStyleType: "none", marginBottom: "0.5em" }} {...props}>
+        {children}
+      </li>
+    ),
   };
 
   return (
