@@ -5,46 +5,37 @@ import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { addMessage, setTyping } from "../../store/chatSlice";
 import "./index.less";
 
-interface Message {
-  sender: "user" | "ai";
-  text: string;
-  isGenerating?: boolean;
-}
 
-// Props cho Chatbot
 interface ChatbotProps {
   toggleChatbot: () => void;
   isOpen: boolean;
 }
 
-// Tạo kết nối với Google Generative AI
+// Initialize connection with Google Generative AI
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
 const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    // { sender: "user", text: "" },
-    {
-      sender: "ai",
-      text: "Describe more clearly what you would like them to do to help you create a high-quality photo prompt?",
-    },
-  ]);
+  const dispatch = useDispatch();
+  const messages = useSelector((state: RootState) => state.chat.messages);
+  const isTyping = useSelector((state: RootState) => state.chat.isTyping);
   const [input, setInput] = useState<string>("");
-  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [currentResponse, setCurrentResponse] = useState<string>(""); // Local state for intermediate stream
   const messageEndRef = useRef<HTMLDivElement | null>(null);
   const chatSessionRef = useRef<ChatSession | null>(null);
 
-  // Cuộn xuống cuối mỗi khi có tin nhắn mới
   const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
     scrollToBottom();
-
-    // Khởi tạo session chat nếu chưa có
+  
     if (!chatSessionRef.current) {
       chatSessionRef.current = model.startChat({
         generationConfig: {
@@ -56,54 +47,50 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
         history: [],
       });
     }
-  }, [messages]);
+  }, [messages, currentResponse]); // Trigger scroll when messages or currentResponse updates
 
-  // Hàm gửi tin nhắn
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    setMessages((prev) => [...prev, { sender: "user", text: input }]);
+    // Dispatch the user's message immediately to Redux
+    dispatch(addMessage({ sender: "user", text: input }));
     setInput("");
-    setIsTyping(true);
+    dispatch(setTyping(true));
 
     try {
       let fullResponse = "";
       const result = await chatSessionRef.current!.sendMessageStream(input);
 
-      // Cập nhật tin nhắn "AI đang xử lý"
-      setMessages((prev) => [
-        ...prev,
-        { sender: "ai", text: "", isGenerating: true },
-      ]);
+      setCurrentResponse(""); // Reset current streaming response
 
-      // Xử lý stream trả về và cập nhật tin nhắn AI
+      // Process the stream and update local state, only saving final response to Redux
       for await (const chunk of result.stream) {
         const chunkText = chunk.text();
         fullResponse += chunkText;
-
-        setMessages((prev) => [
-          ...prev.slice(0, -1),
-          { sender: "ai", text: fullResponse, isGenerating: true },
-        ]);
+        setCurrentResponse(fullResponse); // Update local state to display stream
       }
 
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { sender: "ai", text: fullResponse, isGenerating: false },
-      ]);
-      setIsTyping(false);
+      // When streaming is done, dispatch the final message to Redux
+      dispatch(
+        addMessage({
+          sender: "ai",
+          text: fullResponse,
+          isGenerating: false,
+        })
+      );
+      setCurrentResponse(""); // Clear the local state
+      dispatch(setTyping(false));
     } catch (error) {
       console.error(error);
-      setIsTyping(false);
-      setMessages((prev) => [
-        ...prev,
-        {
+      dispatch(setTyping(false));
+      dispatch(
+        addMessage({
           sender: "ai",
           text: "Sorry, there was an error",
           isGenerating: false,
-        },
-      ]);
+        })
+      );
     }
   };
 
@@ -140,7 +127,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
     h3: ({ node, ...props }: any) => (
       <h3 style={{ fontSize: "1.17em", fontWeight: "bold" }} {...props} />
     ),
-    // Add custom rendering for <li> elements to remove list markers
     li: ({ node, children, ...props }: any) => (
       <li style={{ listStyleType: "none", marginBottom: "0.5em" }} {...props}>
         {children}
@@ -150,10 +136,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 100 }} // Đặt vị trí ban đầu ở dưới và ẩn
-      animate={{ opacity: 1, y: 0 }} // Kéo lên vị trí ban đầu và hiển thị
-      exit={{ opacity: 0, y: 100 }} // Đẩy ra ngoài khi đóng
-      transition={{ duration: 0.3 }} // Thời gian hiệu ứng
+      initial={{ opacity: 0, y: 100 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 100 }}
+      transition={{ duration: 0.3 }}
       className="chatbot-window"
     >
       <div className="chatbot-header">
@@ -192,11 +178,20 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
             </div>
           ))}
 
-          {isTyping && (
+          {/* Render the streaming response if AI is typing */}
+          {isTyping && currentResponse && (
             <div className="message ai-message">
-              <div className="message-box ai-box">Typing...</div>
+              <div className="message-box ai-box">
+                <Markdown
+                  className="markdown typing-animation"
+                  components={MarkdownComponent}
+                >
+                  {currentResponse}
+                </Markdown>
+              </div>
             </div>
           )}
+
           <div ref={messageEndRef} />
         </div>
 
