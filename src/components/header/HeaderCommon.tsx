@@ -7,6 +7,7 @@ import {
   MenuProps,
   Row,
   Space,
+  Tooltip,
 } from "antd";
 import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
@@ -16,8 +17,15 @@ import { LogoIcon, TextIcon } from "../../assets/img";
 import { useSelector } from "react-redux";
 import Notification from "../notification";
 import { isBrowser } from "react-device-detect";
+import iconChatbot from "../../assets/img/PinCap/chatbot.png";
+import Chatbot from "../chatbot";
 
 const HeaderCommon = () => {
+  const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
+
+  const toggleChatbot = () => {
+    setIsChatbotOpen(!isChatbotOpen);
+  };
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -85,9 +93,23 @@ const HeaderCommon = () => {
             xs={{ span: 16 }}
             lg={{ span: 9, offset: 0 }}
           >
+            <Tooltip title="Pinbot: Virtual Assistants" placement="bottom">
+              <div className="chatbot-btn" onClick={toggleChatbot}>
+                <img
+                  src={iconChatbot}
+                  alt="Chatbot"
+                  style={{ width: "16px" }}
+                />
+              </div>
+            </Tooltip>
+
+            {/* Màn hình Chatbot mini */}
+            {isChatbotOpen && <Chatbot toggleChatbot={toggleChatbot} isOpen={isChatbotOpen} />}
+
             <Col className="menu-notification">
               <Notification />
             </Col>
+
             <Space direction="vertical" className="logo-avatar">
               <Dropdown
                 menu={{ items }}

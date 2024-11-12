@@ -49,12 +49,27 @@
     .action-header {
       display: flex;
       align-items: center;
+      gap: 4px;
 
-      .menu-notification {
-        position: relative;
+      .chatbot-btn {
         display: flex;
         align-items: center;
-        justify-content: center;
+        background: linear-gradient(#fff, #fff) padding-box,
+          linear-gradient(60deg, #00f, #00e8ff, #ff00ff) border-box;
+        color: #000 !important;
+        border-radius: 100px !important;
+        border: 2px solid transparent;
+        justify-content: start;
+        transition: background 0.3s ease;
+        padding: 0.5rem;
+
+        &:hover {
+          background: linear-gradient(#fff, #fff) padding-box,
+            linear-gradient(60deg, #ff00ff, #00c0ff) border-box;
+          cursor: pointer;
+        }
+      }
+      .menu-notification {
         margin-left: 0.5rem;
       }
       .logo-avatar {
