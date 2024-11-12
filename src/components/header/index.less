@@ -13,7 +13,7 @@
 
   .left-header {
     cursor: pointer;
-    display: flex;  
+    display: flex;
     height: 80%;
     align-items: center;
 
@@ -55,20 +55,28 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-left: 0.5rem;      
+        margin-left: 0.5rem;
       }
       .logo-avatar {
         margin: 0 1rem;
+        cursor: pointer;
+
+        .avatar {
+          &:hover {
+            outline: 3px solid rgba(195, 150, 247, 0.3);
+          }
+        }
       }
 
-      .button-auth-sign-in, .button-auth-sign-up {
+      .button-auth-sign-in,
+      .button-auth-sign-up {
         border-radius: 20px;
         margin: 0 5px;
         border: 0.5px solid #ccc;
       }
 
       .button-auth-sign-in {
-        background: #A25772;
+        background: #a25772;
         color: white;
       }
 
@@ -79,7 +87,7 @@
       }
 
       .button-auth-sign-up {
-        background: #CFE2FC; 
+        background: #cfe2fc;
       }
 
       .button-auth-sign-up:hover {

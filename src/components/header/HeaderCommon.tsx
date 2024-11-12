@@ -21,11 +21,23 @@ const HeaderCommon = () => {
   const items: MenuProps["items"] = [
     {
       key: "1",
-      label: <Button>Profile</Button>,
+      label: (
+        <div style={{ padding: "2px 8px", minWidth: 200 }}>
+          <div style={{ fontWeight: "bold" }}>Trần Hoàng Nam</div>
+          <div>@hggnomm</div>
+        </div>
+      ),
     },
     {
-      key: "2",
-      label: <Button onClick={() => logoutHandle()}>Logout</Button>,
+      type: "divider", // Gạch kẻ chia
+    },
+    {
+      key: "3",
+      label: (
+        <div style={{ padding: "2px 8px" }}>
+          <div onClick={() => logoutHandle()}>Sign out</div>
+        </div>
+      ),
     },
   ];
 
@@ -77,9 +89,17 @@ const HeaderCommon = () => {
               <Notification />
             </Col>
             <Space direction="vertical" className="logo-avatar">
-              <Dropdown menu={{ items }} placement="bottomRight">
+              <Dropdown
+                menu={{ items }}
+                placement="bottomRight"
+                trigger={["click"]}
+                className="dropdown_item"
+              >
                 <Space>
-                  <Avatar src="https://imagedelivery.net/LBWXYQ-XnKSYxbZ-NuYGqQ/543c6373-55ce-4fb2-b282-dbb0e43c1500/avatarhd" />
+                  <Avatar
+                    className="avatar"
+                    src="https://imagedelivery.net/LBWXYQ-XnKSYxbZ-NuYGqQ/543c6373-55ce-4fb2-b282-dbb0e43c1500/avatarhd"
+                  />
                   <DownOutlined style={{ fontSize: "12px" }} />
                 </Space>
               </Dropdown>
