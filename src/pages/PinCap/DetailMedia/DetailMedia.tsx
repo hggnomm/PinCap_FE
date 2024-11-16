@@ -52,76 +52,74 @@ const DetailMedia = () => {
   };
 
   return (
-    <>
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0 },
-          visible: { opacity: 1 },
-        }}
-        transition={{ duration: 1 }}
-        className="detail-media-container"
-      >
-        <div className="detail-media">
-          <div className="left-view">
-            {demo_detail_media.type == "IMAGE" ? (
-              <img src={demo_detail_media.media_url} alt="" />
-            ) : (
-              <video src=""></video>
-            )}
-          </div>
-          <div className="right-view">
-            <div className="action">
-              <div className="action-left">
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <button>
-                    <img src={black_heart} alt="" />
-                  </button>
-                  <span>{demo_detail_media.reaction_user_count}</span>
-                </div>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: { opacity: 1 },
+      }}
+      transition={{ duration: 1 }}
+      className="detail-media-container"
+    >
+      <div className="detail-media">
+        <div className="left-view">
+          {demo_detail_media.type == "IMAGE" ? (
+            <img src={demo_detail_media.media_url} alt="" />
+          ) : (
+            <video src=""></video>
+          )}
+        </div>
+        <div className="right-view">
+          <div className="action">
+            <div className="action-left">
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <button>
+                  <img src={black_heart} alt="" />
+                </button>
+                <span>{demo_detail_media.reaction_user_count}</span>
+              </div>
 
-                <button>
-                  <img src={download} alt="" />
-                </button>
-                <button>
-                  <img src={more} alt="" />
-                </button>
-              </div>
-              <div className="action-right">
-                <button className="album">
-                  Album
-                  <DownOutlined
-                    style={{ marginLeft: "10px", fontWeight: "600" }}
-                  />
-                </button>
-                <button className="save">Save</button>
-              </div>
+              <button>
+                <img src={download} alt="" />
+              </button>
+              <button>
+                <img src={more} alt="" />
+              </button>
             </div>
-            <div className="comment">
-              <div className="user_owner">
-                <div className="user">
-                  <img src={demo_detail_media.ownerUser.avatar} alt="" />
-                  <div className="info">
-                    <span style={{ fontWeight: "bold" }}>
-                      {demo_detail_media.ownerUser.first_name}
-                    </span>
-                    <span>{demo_detail_media.numberUserFollowers}</span>
-                  </div>
+            <div className="action-right">
+              <button className="album">
+                Album
+                <DownOutlined
+                  style={{ marginLeft: "10px", fontWeight: "600" }}
+                />
+              </button>
+              <button className="save">Save</button>
+            </div>
+          </div>
+          <div className="comment">
+            <div className="user_owner">
+              <div className="user">
+                <img src={demo_detail_media.ownerUser.avatar} alt="" />
+                <div className="info">
+                  <span style={{ fontWeight: "bold" }}>
+                    {demo_detail_media.ownerUser.first_name}
+                  </span>
+                  <span>{demo_detail_media.numberUserFollowers}</span>
                 </div>
-                <button className="follow">Follow</button>
               </div>
+              <button className="follow">Follow</button>
             </div>
           </div>
         </div>
-      </motion.div>
-    </>
+      </div>
+    </motion.div>
   );
 };
 
