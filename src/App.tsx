@@ -53,7 +53,7 @@ const App = () => {
                     <SiderCommon />
                     <Content>
                       <Routes>
-                        <Route path="/" element={<PinCap />} />
+                        <Route path="/home" element={<PinCap />} />
                         <Route path="/create-media" element={<CreateMedia />} />
                         <Route path="/ai" element={<ImageAi />} />
                         <Route path="/media/:id" element={<DetailMedia />} />

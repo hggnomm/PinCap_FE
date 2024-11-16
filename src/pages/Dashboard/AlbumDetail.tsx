@@ -18,7 +18,7 @@ const AlbumDetail = () => {
   const [medias, setMedias] = useState({
     id: "",
     mediaURL: "",
-    mediaName: "",
+    media_name: "",
     privacy: "",
     type: "",
     description: "",
@@ -48,8 +48,8 @@ const AlbumDetail = () => {
     },
     {
       title: "Album name",
-      dataIndex: "mediaName",
-      key: "mediaName",
+      dataIndex: "media_name",
+      key: "media_name",
     },
     {
       title: "Privacy",

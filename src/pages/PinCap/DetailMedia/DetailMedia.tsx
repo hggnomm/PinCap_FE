@@ -26,7 +26,7 @@ const DetailMedia = () => {
           <img src={media?.media?.mediaURL} alt="" />
         </Col>
         <Col className="detail-infor">
-          <h1 style={{ marginBottom: "1rem" }}>{media?.media?.mediaName}</h1>
+          <h1 style={{ marginBottom: "1rem" }}>{media?.media?.media_name}</h1>
           <h3 style={{ marginBottom: "3rem" }}>{media?.media?.description}</h3>
           <h3>
             {media?.media?.user_owner?.firstName}
