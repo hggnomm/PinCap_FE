@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { addMessage, setTyping } from "../../store/chatSlice";
 import "./index.less";
-
+import { CloseCircleOutlined } from "@ant-design/icons";
 
 interface ChatbotProps {
   toggleChatbot: () => void;
@@ -35,7 +35,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
 
   useEffect(() => {
     scrollToBottom();
-  
+
     if (!chatSessionRef.current) {
       chatSessionRef.current = model.startChat({
         generationConfig: {
@@ -139,13 +139,13 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
       initial={{ opacity: 0, y: 100 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 100 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.5 }}
       className="chatbot-window"
     >
       <div className="chatbot-header">
-        <span>Pinbot</span>
+        <span style={{ fontWeight: 500 }}>Pinbot: Virtual Assistant</span>
         <button className="close-btn" onClick={toggleChatbot}>
-          X
+          <CloseCircleOutlined />{" "}
         </button>
       </div>
       <div className="chatbot-body">
@@ -205,7 +205,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
               onChange={(e) => setInput(e.target.value)}
             />
             <button className="send-btn">
-              <Send size={16} />
+              <Send size={20} />
             </button>
           </div>
         </form>

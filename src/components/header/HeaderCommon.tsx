@@ -93,7 +93,7 @@ const HeaderCommon = () => {
             xs={{ span: 16 }}
             lg={{ span: 9, offset: 0 }}
           >
-            <Tooltip title="Pinbot: Virtual Assistants" placement="bottom">
+            <Tooltip title="Pinbot: Virtual Assistant" placement="bottom">
               <div className="chatbot-btn" onClick={toggleChatbot}>
                 <img
                   src={iconChatbot}
