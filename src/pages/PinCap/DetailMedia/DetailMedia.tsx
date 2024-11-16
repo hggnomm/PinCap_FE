@@ -21,7 +21,7 @@ const demo_detail_media = {
   media_name: "Songoku",
   media_url:
     "https://i.pinimg.com/736x/85/35/48/853548d3d29162e4a6f98e30b79e8e62.jpg",
-  numberUserFollowers: 0,
+  numberUserFollowers: 6969,
   ownerUser: {
     id: "9bd27d1e-ee34-4246-9239-625f2fdfa817",
     first_name: "tan",
@@ -102,6 +102,20 @@ const DetailMedia = () => {
                   />
                 </button>
                 <button className="save">Save</button>
+              </div>
+            </div>
+            <div className="comment">
+              <div className="user_owner">
+                <div className="user">
+                  <img src={demo_detail_media.ownerUser.avatar} alt="" />
+                  <div className="info">
+                    <span style={{ fontWeight: "bold" }}>
+                      {demo_detail_media.ownerUser.first_name}
+                    </span>
+                    <span>{demo_detail_media.numberUserFollowers}</span>
+                  </div>
+                </div>
+                <button className="follow">Follow</button>
               </div>
             </div>
           </div>
