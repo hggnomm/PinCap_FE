@@ -78,16 +78,18 @@ const HeaderCommon = () => {
       </Col>
 
       {/* Middle Search Bar */}
-      <Col className="middle-header">
-        <Input
-          className="search-bar"
-          placeholder="Search..."
-          suffix={<SearchOutlined />}
-        />
-      </Col>
+      {tokenPayload?.id && (
+        <Col className="middle-header">
+          <Input
+            className="search-bar"
+            placeholder="Search..."
+            suffix={<SearchOutlined />}
+          />
+        </Col>
+      )}
 
       <Col className="right-header">
-        {!tokenPayload?.id ? (
+        {tokenPayload?.id ? (
           <Col
             className="action-header"
             xs={{ span: 16 }}
@@ -104,7 +106,9 @@ const HeaderCommon = () => {
             </Tooltip>
 
             {/* Màn hình Chatbot mini */}
-            {isChatbotOpen && <Chatbot toggleChatbot={toggleChatbot} isOpen={isChatbotOpen} />}
+            {isChatbotOpen && (
+              <Chatbot toggleChatbot={toggleChatbot} isOpen={isChatbotOpen} />
+            )}
 
             <Col className="menu-notification">
               <Notification />
