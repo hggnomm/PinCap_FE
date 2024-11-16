@@ -3,6 +3,38 @@ import "./index.less";
 import { useParams } from "react-router-dom";
 import { getDetailMedia } from "../../../api/media";
 import { Col, Row } from "antd";
+import black_heart from "../../../assets/img/PinCap/black-heart.png";
+import heart from "../../../assets/img/PinCap/heart.png";
+import more from "../../../assets/img/PinCap/more.png";
+import download from "../../../assets/img/PinCap/download.png";
+import {
+  DownloadOutlined,
+  DownOutlined,
+  EllipsisOutlined,
+} from "@ant-design/icons";
+import { motion } from "framer-motion";
+
+const demo_detail_media = {
+  id: "9bf85bd0-fe9f-4220-8842-43965d31e2f1",
+  is_comment: false,
+  is_created: true,
+  media_name: "Songoku",
+  media_url:
+    "https://i.pinimg.com/736x/85/35/48/853548d3d29162e4a6f98e30b79e8e62.jpg",
+  numberUserFollowers: 0,
+  ownerUser: {
+    id: "9bd27d1e-ee34-4246-9239-625f2fdfa817",
+    first_name: "tan",
+    last_name: "nat",
+    email: "leduytan177@gmail.com",
+    avatar:
+      "https://i.pinimg.com/736x/17/82/08/17820871f8d3369d1579b2840697a13a.jpg",
+    privacy: "PUBLIC",
+  },
+  reaction_user_count: 15,
+  type: "IMAGE",
+  userComments: null,
+};
 
 const DetailMedia = () => {
   const [media, setMedia] = useState({});
@@ -21,20 +53,60 @@ const DetailMedia = () => {
 
   return (
     <>
-      <Row className="detail-media-container">
-        <Col className="media-url">
-          <img src={media?.media?.mediaURL} alt="" />
-        </Col>
-        <Col className="detail-infor">
-          <h1 style={{ marginBottom: "1rem" }}>{media?.media?.media_name}</h1>
-          <h3 style={{ marginBottom: "3rem" }}>{media?.media?.description}</h3>
-          <h3>
-            {media?.media?.user_owner?.firstName}
-            {media?.media?.user_owner?.lastName}
-          </h3>
-          <h3></h3>
-        </Col>
-      </Row>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1 },
+        }}
+        transition={{ duration: 1 }}
+        className="detail-media-container"
+      >
+        <div className="detail-media">
+          <div className="left-view">
+            {demo_detail_media.type == "IMAGE" ? (
+              <img src={demo_detail_media.media_url} alt="" />
+            ) : (
+              <video src=""></video>
+            )}
+          </div>
+          <div className="right-view">
+            <div className="action">
+              <div className="action-left">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <button>
+                    <img src={black_heart} alt="" />
+                  </button>
+                  <span>{demo_detail_media.reaction_user_count}</span>
+                </div>
+
+                <button>
+                  <img src={download} alt="" />
+                </button>
+                <button>
+                  <img src={more} alt="" />
+                </button>
+              </div>
+              <div className="action-right">
+                <button className="album">
+                  Album
+                  <DownOutlined
+                    style={{ marginLeft: "10px", fontWeight: "600" }}
+                  />
+                </button>
+                <button className="save">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </>
   );
 };
