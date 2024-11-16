@@ -1,8 +1,13 @@
-import apiClient from './apiClient'; // Đường dẫn tới tệp apiClient
+import apiClient from "./apiClient"; // Đường dẫn tới tệp apiClient
 
 export const getAllMedias = async () => {
   try {
-    const res = await apiClient.get('/api/medias/all');
+    const res = await apiClient.get("/api/medias/all", {
+      params: {
+        per_page: 10,
+        page: 1,
+      },
+    });
     return res.data;
   } catch (error) {
     console.log(error);
@@ -11,7 +16,7 @@ export const getAllMedias = async () => {
 
 export const createMedia = async (request: any) => {
   try {
-    const res = await apiClient.post('/api/medias', request, {
+    const res = await apiClient.post("/api/medias", request, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
