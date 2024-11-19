@@ -27,6 +27,7 @@ const Login = () => {
       if (data) {
         dispatch(addToken(data.token));
         localStorage.setItem("token", data.token);
+        navigate("/home");
         window.location.reload();
       } else {
         console.log("Dang Nhap that bai");

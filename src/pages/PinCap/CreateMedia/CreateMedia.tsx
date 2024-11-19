@@ -14,22 +14,11 @@ import {
   Image,
 } from "antd";
 import Title from "antd/es/typography/Title";
-import {
-  ArrowUpOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { ArrowUpOutlined, PlusOutlined } from "@ant-design/icons";
 import { createMedia } from "../../../api/media";
 import { GetProps, useSelector } from "react-redux";
 
 type FileType = Parameters<GetProps<UploadProps, "beforeUpload">>[0];
-
-const getBase64 = (file: FileType): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
 
 const CreateMedia = () => {
   const [form] = Form.useForm();
@@ -41,26 +30,6 @@ const CreateMedia = () => {
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const [previewImage, setPreviewImage] = useState<string>("");
   const [previewMp4, setPreviewMp4] = useState<string>("");
-
-  const handlePreview = async (file: UploadFile) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj as FileType);
-    }
-
-    setPreviewImage(file.url || (file.preview as string));
-    setPreviewOpen(true);
-  };
-
-  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-  };
-
-  const uploadButton = (
-    <button style={{ border: 0, background: "none" }} type="button">
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </button>
-  );
 
   const [valueForm, setValueForm] = useState<any>({
     medias: [],
@@ -134,48 +103,7 @@ const CreateMedia = () => {
               getValueFromEvent={(e) => {
                 return e?.fileList;
               }}
-            >
-              <Upload
-                beforeUpload={(file) => {
-                  return new Promise((resolve, reject) => {
-                    if (file.size > 2) {
-                      reject("File size exceeded");
-                    } else {
-                      resolve("success");
-                    }
-                  });
-                }}
-                listType="picture-card"
-                fileList={fileList}
-                onPreview={handlePreview}
-                onChange={handleChange}
-                className="input-upload-media"
-              >
-                {fileList.length >= 1 ? null : (
-                  <div className="before-upload-media">
-                    <ArrowUpOutlined style={{ fontSize: "40px" }} />
-                    <p>Upload file</p>
-                    <p className="note">
-                      Bạn nên sử dụng tập tin .jpg chất lượng cao có kích thước
-                      dưới 20 MB
-                    </p>
-                  </div>
-                )}
-              </Upload>
-
-              {previewImage && (
-                <Image
-                  wrapperStyle={{ display: "none" }}
-                  preview={{
-                    visible: previewOpen,
-                    onVisibleChange: (visible) => setPreviewOpen(visible),
-                    afterOpenChange: (visible) =>
-                      !visible && setPreviewImage(""),
-                  }}
-                  src={previewImage}
-                />
-              )}
-            </Form.Item>
+            ></Form.Item>
           </Col>
           <Col span={14} className="field-input">
             <div className="field-item">
