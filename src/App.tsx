@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard/Home";
 import Album from "./pages/Dashboard/Album";
 import AlbumDetail from "./pages/Dashboard/AlbumDetail";
 import { ConfigProvider } from "antd";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   const tokenPayload = useSelector((state: any) => state.auth);
@@ -38,6 +39,7 @@ const App = () => {
 
   return (
     <ConfigProvider>
+      <ToastContainer />
       <div className="App">
         <Routes>
           <Route path="/sign-in" element={<Login />} />

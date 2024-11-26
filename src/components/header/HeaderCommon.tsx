@@ -20,61 +20,67 @@ import { isBrowser } from "react-device-detect";
 import iconChatbot from "../../assets/img/PinCap/chatbot.png";
 import Chatbot from "../chatbot";
 
+// Type for user information
+interface UserInfo {
+  name: string;
+  email: string;
+}
+
 const HeaderCommon = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
-
-  const toggleChatbot = () => {
-    setIsChatbotOpen(!isChatbotOpen);
-  };
-  const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: (
-        <div style={{ padding: "2px 8px", minWidth: 200 }}>
-          <div style={{ fontWeight: "bold" }}>Trần Hoàng Nam</div>
-          <div>@hggnomm</div>
-        </div>
-      ),
-    },
-    {
-      type: "divider", // Gạch kẻ chia
-    },
-    {
-      key: "3",
-      label: (
-        <div style={{ padding: "2px 8px" }}>
-          <div onClick={() => logoutHandle()}>Sign out</div>
-        </div>
-      ),
-    },
-  ];
-
-  const [, setName] = useState("");
+  const [userInfor, setUserInfor] = useState<UserInfo>({ name: "", email: "" });
   const tokenPayload = useSelector((state: any) => state.auth);
   const navigate = useNavigate();
 
+  // Set user info when tokenPayload changes
   useEffect(() => {
     if (tokenPayload) {
-      setName(tokenPayload.name);
+      setUserInfor({
+        name: tokenPayload.name,
+        email: tokenPayload.email,
+      });
     }
   }, [tokenPayload]);
 
+  // Toggle chatbot visibility
+  const toggleChatbot = () => {
+    setIsChatbotOpen((prevState) => !prevState);
+  };
+
+  // Handle user logout
   const logoutHandle = () => {
     localStorage.removeItem("token");
     navigate("/home");
     window.location.reload();
   };
 
+  // Define menu items for the dropdown
+  const menuItems: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <div style={{ padding: "2px 8px", minWidth: 200 }}>
+          <div style={{ fontWeight: "bold" }}>{userInfor.name}</div>
+          <div>{userInfor.email}</div>
+        </div>
+      ),
+    },
+    { type: "divider" },
+    {
+      key: "3",
+      label: (
+        <div style={{ padding: "5px 8px" }} onClick={logoutHandle}>
+          <div>Sign out</div>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <Row className="main-header">
-      <Col
-        className="left-header"
-        onClick={() => {
-          navigate("/home");
-        }}
-      >
-        <img className="logo-icon" src={LogoIcon} />
-        {isBrowser && <img className="text-icon" src={TextIcon} />}
+      <Col className="left-header" onClick={() => navigate("/home")}>
+        <img className="logo-icon" src={LogoIcon} alt="Logo" />
+        {isBrowser && <img className="text-icon" src={TextIcon} alt="Text" />}
       </Col>
 
       {/* Middle Search Bar */}
@@ -90,11 +96,8 @@ const HeaderCommon = () => {
 
       <Col className="right-header">
         {tokenPayload?.id ? (
-          <Col
-            className="action-header"
-            xs={{ span: 16 }}
-            lg={{ span: 9, offset: 0 }}
-          >
+          <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
+            {/* Chatbot Button */}
             <Tooltip title="Pinbot: Virtual Assistant" placement="bottom">
               <div className="chatbot-btn" onClick={toggleChatbot}>
                 <img
@@ -105,18 +108,20 @@ const HeaderCommon = () => {
               </div>
             </Tooltip>
 
-            {/* Màn hình Chatbot mini */}
+            {/* Chatbot mini screen */}
             {isChatbotOpen && (
               <Chatbot toggleChatbot={toggleChatbot} isOpen={isChatbotOpen} />
             )}
 
+            {/* Notification Section */}
             <Col className="menu-notification">
               <Notification />
             </Col>
 
+            {/* User Avatar and Dropdown */}
             <Space direction="vertical" className="logo-avatar">
               <Dropdown
-                menu={{ items }}
+                menu={{ items: menuItems }}
                 placement="bottomRight"
                 trigger={["click"]}
                 className="dropdown_item"
@@ -132,18 +137,13 @@ const HeaderCommon = () => {
             </Space>
           </Col>
         ) : (
-          <Col
-            className="action-header"
-            xs={{ span: 16 }}
-            lg={{ span: 9, offset: 0 }}
-          >
+          <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
             <Button
               onClick={() => navigate("/sign-in")}
               className="button-auth-sign-in"
             >
               Sign in
             </Button>
-
             <Button
               onClick={() => navigate("/sign-up")}
               className="button-auth-sign-up"

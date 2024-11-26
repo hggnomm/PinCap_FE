@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import "./index.less";
-import { Button, Col, Form, Input, Row, Select, Spin, UploadFile } from "antd";
+import { Button, Col, Form, Input, Row, Select, Spin } from "antd";
 import Title from "antd/es/typography/Title";
 import { createMedia } from "../../../api/media";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import styles
 
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -23,13 +25,29 @@ registerPlugin(
   FilePondPluginMediaPreview
 );
 
-const CreateMedia = () => {
-  const [form] = Form.useForm();
-  const tokenPayload = useSelector((state: any) => state.auth);
-  const [isLoad, setIsLoad] = useState<boolean>(false);
-  const [fileList, setFileList] = useState<any>([]);
+// Types
+interface TokenPayload {
+  id: string;
+}
 
-  const [valueForm, setValueForm] = useState<any>({
+interface MediaFormValues {
+  medias: File[];
+  mediaName: string;
+  description: string;
+  privacy: string;
+  mediaOwner_id: string;
+  type: string;
+  tagName: string[];
+  isCreated: number;
+}
+
+const CreateMedia: React.FC = () => {
+  const [form] = Form.useForm();
+  const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
+  const [isLoad, setIsLoad] = useState<boolean>(false);
+  const [fileList, setFileList] = useState<File[]>([]);
+
+  const [valueForm, setValueForm] = useState<MediaFormValues>({
     medias: [],
     mediaName: "",
     description: "",
@@ -41,16 +59,16 @@ const CreateMedia = () => {
   });
 
   const handleGenerateClick = () => {
-    const formValue = form.getFieldsValue(valueForm);
+    const formValue = form.getFieldsValue(true);
 
-    const valueAPI = {
+    const valueAPI: MediaFormValues = {
       ...valueForm,
       mediaOwner_id: tokenPayload.id,
-      medias: fileList[0]["originFileObj"],
+      medias: [fileList[0]],
       mediaName: formValue.mediaName,
       description: formValue.description,
       privacy: formValue.privacy,
-      tagName: "",
+      tagName: [],
       isCreated: 1,
     };
 
@@ -58,14 +76,23 @@ const CreateMedia = () => {
     setIsLoad(true);
   };
 
-  const createNewMedia = async (valueForm: any) => {
+  const createNewMedia = async (valueForm: MediaFormValues) => {
     try {
       const response = await createMedia(valueForm);
       if (response) {
         setIsLoad(false);
+        toast.success("Media created successfully!");
       }
-    } catch (error) {}
+    } catch (error: any) {
+      console.error("Error creating media:", error);
+      setIsLoad(false);
+      // Thông báo lỗi chi tiết
+      toast.error(
+        `Error: ${error?.message || "An unexpected error occurred."}`
+      );
+    }
   };
+
   return (
     <div className="create-media-container">
       <Row className="field-create-media">
@@ -75,10 +102,7 @@ const CreateMedia = () => {
           </Title>
         </Col>
         <Col>
-          <Button
-            onClick={() => handleGenerateClick()}
-            className="btn-publish-media"
-          >
+          <Button onClick={handleGenerateClick} className="btn-publish-media">
             Publish
           </Button>
         </Col>
@@ -87,7 +111,7 @@ const CreateMedia = () => {
       <Row className="field-form-create-media">
         {isLoad && (
           <div className="publish-loading">
-            <Spin tip="Loading..."></Spin>
+            <Spin tip="Loading..." />
           </div>
         )}
         <Form
@@ -96,19 +120,19 @@ const CreateMedia = () => {
           disabled={isLoad}
         >
           <Col span={10} className="upload-image">
-            <Form.Item
-              name="medias"
-              getValueFromEvent={(e) => {
-                return e?.fileList;
-              }}
-            >
+            <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
               <FilePond
-                files={fileList}
-                onupdatefiles={setFileList}
-                allowMultiple={false} // Chỉ cho phép upload một file duy nhất
-                maxFileSize="50MB" // Giới hạn kích thước tối đa
-                acceptedFileTypes={["image/*", "video/*"]} // Chỉ nhận file ảnh hoặc video
-                allowFileTypeValidation={true} // Kích hoạt kiểm tra loại file
+                files={fileList.map((file) => ({
+                  source: file,
+                  options: { type: "local" },
+                }))}
+                onupdatefiles={(fileItems) =>
+                  setFileList(fileItems.map((fileItem) => fileItem.file))
+                }
+                allowMultiple={false}
+                maxFileSize="50MB"
+                acceptedFileTypes={["image/*", "video/*"]}
+                allowFileTypeValidation={true}
                 labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
               />
             </Form.Item>

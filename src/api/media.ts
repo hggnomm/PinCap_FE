@@ -1,16 +1,17 @@
 import apiClient from "./apiClient"; // Đường dẫn tới tệp apiClient
 
-export const getAllMedias = async () => {
+export const getAllMedias = async (page: number) => {
   try {
     const res = await apiClient.get("/api/medias/all", {
       params: {
         per_page: 10,
-        page: 1,
+        page, // Dynamic page
       },
     });
     return res.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
