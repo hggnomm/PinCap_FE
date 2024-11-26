@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import IconNotification from "../../assets/img/PinCap/icon_notification.svg";
 import "./index.less";
-import Loading from "../loading/index.tsx";
+import Loading from "../loading/Loading";
 
 const useComponentVisible = (initialIsVisible: boolean) => {
   const ref = useRef<any>(null);

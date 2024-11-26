@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./index.less";
 import PinMedia from "./PinMedia/Pin";
 import { getAllMedias } from "../../api/media";
-import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import Loading from "../../components/Loading/Loading";
 
 const PinCap = () => {
   const [listMedia, setListMedia] = useState<any[]>([]);
@@ -29,20 +29,20 @@ const PinCap = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [page]); // Đảm bảo re-render khi `page` thay đổi
+  }, [page]);
 
   const getListMedias = async (currentPage: number) => {
     if (loading || !hasMore) return;
 
     setLoading(true);
-    setError(null); // Reset lỗi mỗi lần gọi API
+    setError(null); 
     try {
       const data = await getAllMedias(currentPage);
       if (data?.data.length) {
         setListMedia((prevList) => [...prevList, ...data.data]);
         setSuccessMessage("Dữ liệu đã được tải thành công!");
       } else {
-        setHasMore(false); // Nếu không có thêm dữ liệu, ngừng gọi API
+        setHasMore(false); 
       }
     } catch (error) {
       setError("Lỗi khi lấy list media: " + error);
@@ -58,19 +58,13 @@ const PinCap = () => {
   };
 
   return (
-    <LoadingSpinner
-      isLoading={loading}
-      error={error}
-      isOpenSuccess={!!successMessage} // Mở thông báo thành công khi có successMessage
-      successMessage={successMessage}
-    >
+    <Loading isLoading={loading} error={error}>
       <div className="pincap-container">
         {listMedia?.map((media: any, index: any) => (
           <PinMedia key={index} srcUrl={media?.media_url} data={media} />
         ))}
-        {loading && <p>Đang tải...</p>}
       </div>
-    </LoadingSpinner>
+    </Loading>
   );
 };
 

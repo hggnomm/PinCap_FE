@@ -1,4 +1,3 @@
-import { Login, Home, Register } from "./pages";
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -15,10 +14,15 @@ import Album from "./pages/Dashboard/Album";
 import AlbumDetail from "./pages/Dashboard/AlbumDetail";
 import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner"; // Import LoadingSpinner component
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+import Home from "./pages/Home/Home";
 
 const App = () => {
   const tokenPayload = useSelector((state: any) => state.auth);
   const [isLogin, setIsLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // State to control loading spinner
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -31,54 +35,62 @@ const App = () => {
         setIsLogin(true);
       }
     } else {
-      if (pathname == "/sign-in" || pathname == "/sign-up") return;
+      if (pathname === "/sign-in" || pathname === "/sign-up") return;
       navigate("/home");
       setIsLogin(false);
     }
-  }, [tokenPayload.email]);
+    setIsLoading(false); // Hide loading spinner after login check
+  }, [tokenPayload.email, pathname, navigate]);
 
   return (
     <ConfigProvider>
       <ToastContainer />
       <div className="App">
-        <Routes>
-          <Route path="/sign-in" element={<Login />} />
-          <Route path="/sign-up" element={<Register />} />
+        <LoadingSpinner isLoading={isLoading}>
+          {" "}
+          {/* Display the loading spinner when isLoading is true */}
+          <Routes>
+            <Route path="/sign-in" element={<Login />} />
+            <Route path="/sign-up" element={<Register />} />
 
-          <Route
-            path="*"
-            element={
-              <Layout className="main-container">
-                {pathname === "/sign-in" ? "" : <HeaderCommon />}
-                {isLogin ? (
-                  <>
-                    <SiderCommon />
+            <Route
+              path="*"
+              element={
+                <Layout className="main-container">
+                  {pathname === "/sign-in" ? "" : <HeaderCommon />}
+                  {isLogin ? (
+                    <>
+                      <SiderCommon />
+                      <Content>
+                        <Routes>
+                          <Route path="/home" element={<PinCap />} />
+                          <Route
+                            path="/create-media"
+                            element={<CreateMedia />}
+                          />
+                          <Route path="/ai" element={<ImageAi />} />
+                          <Route path="/media/:id" element={<DetailMedia />} />
+                          <Route path="/dashboard" element={<Dashboard />} />
+                          <Route path="/dashboard/album" element={<Album />} />
+                          <Route
+                            path="/dashboard/album/:id"
+                            element={<AlbumDetail />}
+                          />
+                        </Routes>
+                      </Content>
+                    </>
+                  ) : (
                     <Content>
                       <Routes>
-                        <Route path="/home" element={<PinCap />} />
-                        <Route path="/create-media" element={<CreateMedia />} />
-                        <Route path="/ai" element={<ImageAi />} />
-                        <Route path="/media/:id" element={<DetailMedia />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/dashboard/album" element={<Album />} />
-                        <Route
-                          path="/dashboard/album/:id"
-                          element={<AlbumDetail />}
-                        />
+                        <Route path="/home" element={<Home />} />
                       </Routes>
                     </Content>
-                  </>
-                ) : (
-                  <Content>
-                    <Routes>
-                      <Route path="/home" element={<Home />} />
-                    </Routes>
-                  </Content>
-                )}
-              </Layout>
-            }
-          />
-        </Routes>
+                  )}
+                </Layout>
+              }
+            />
+          </Routes>
+        </LoadingSpinner>
       </div>
     </ConfigProvider>
   );
