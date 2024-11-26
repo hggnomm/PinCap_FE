@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./index.less";
 import PinMedia from "./PinMedia/Pin";
 import { getAllMedias } from "../../api/media";
@@ -9,13 +9,38 @@ const PinCap = () => {
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null); // Thêm state lỗi
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Thêm state thông báo thành công
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Dùng useRef để kiểm tra việc API đang được gọi
+  const isFetching = useRef(false);
+  const fetchData = async () => {
+    if (isFetching.current || !hasMore) return; // Kiểm tra nếu đang fetching hoặc không có dữ liệu mới
+
+    isFetching.current = true; // Đặt trạng thái fetching thành true
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await getAllMedias(page);
+      if (data?.data.length) {
+        setListMedia((prevList) => [...prevList, ...data.data]);
+        setSuccessMessage("Dữ liệu đã được tải thành công!");
+      } else {
+        setHasMore(false); // Nếu không có thêm dữ liệu, ngừng gọi API
+      }
+    } catch (error) {
+      setError("Lỗi khi lấy list media: " + error);
+    } finally {
+      setLoading(false);
+      isFetching.current = false; 
+    }
+  };
 
   useEffect(() => {
-    getListMedias(page);
+    fetchData();
 
-    // Lắng nghe sự kiện scroll
+    // scroll
     const handleScroll = () => {
       if (
         window.innerHeight + document.documentElement.scrollTop >=
@@ -29,31 +54,11 @@ const PinCap = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [page]);
-
-  const getListMedias = async (currentPage: number) => {
-    if (loading || !hasMore) return;
-
-    setLoading(true);
-    setError(null); 
-    try {
-      const data = await getAllMedias(currentPage);
-      if (data?.data.length) {
-        setListMedia((prevList) => [...prevList, ...data.data]);
-        setSuccessMessage("Dữ liệu đã được tải thành công!");
-      } else {
-        setHasMore(false); 
-      }
-    } catch (error) {
-      setError("Lỗi khi lấy list media: " + error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [page]); 
 
   const loadMore = () => {
     if (!loading && hasMore) {
-      setPage((prevPage) => prevPage + 1); // Tăng page lên 1
+      setPage((prevPage) => prevPage + 1);
     }
   };
 
