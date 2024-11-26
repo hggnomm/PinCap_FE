@@ -51,7 +51,7 @@ const CreateMedia: React.FC = () => {
     medias: [],
     mediaName: "",
     description: "",
-    privacy: "",
+    privacy: "0", // Mặc định là private
     mediaOwner_id: "",
     type: "1",
     tagName: [],
@@ -61,13 +61,24 @@ const CreateMedia: React.FC = () => {
   const handleGenerateClick = () => {
     const formValue = form.getFieldsValue(true);
 
+    // Kiểm tra nếu không có ảnh hoặc tên thì thông báo lỗi
+    if (fileList.length === 0) {
+      toast.error("Please upload an image or media file.");
+      return;
+    }
+
+    if (!formValue.mediaName) {
+      toast.error("Please provide a name for the media.");
+      return;
+    }
+
     const valueAPI: MediaFormValues = {
       ...valueForm,
       mediaOwner_id: tokenPayload.id,
       medias: [fileList[0]],
       mediaName: formValue.mediaName,
       description: formValue.description,
-      privacy: formValue.privacy,
+      privacy: formValue.privacy || "0",
       tagName: [],
       isCreated: 1,
     };
@@ -155,6 +166,7 @@ const CreateMedia: React.FC = () => {
               <span className="text-label">Privacy</span>
               <Form.Item name="privacy">
                 <Select
+                  defaultValue="0" // Mặc định là private
                   options={[
                     { value: "1", label: "Public" },
                     { value: "0", label: "Private" },
