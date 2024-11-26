@@ -1,35 +1,33 @@
 import React, { useState } from "react";
 import "./index.less";
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Spin,
-  Upload,
-  UploadFile,
-  UploadProps,
-  Image,
-} from "antd";
+import { Button, Col, Form, Input, Row, Select, Spin, UploadFile } from "antd";
 import Title from "antd/es/typography/Title";
-import { ArrowUpOutlined, PlusOutlined } from "@ant-design/icons";
 import { createMedia } from "../../../api/media";
-import { GetProps, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
-type FileType = Parameters<GetProps<UploadProps, "beforeUpload">>[0];
+import { FilePond, registerPlugin } from "react-filepond";
+import "filepond/dist/filepond.min.css";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import "filepond-plugin-media-preview/dist/filepond-plugin-media-preview.min.css";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginImageEdit from "filepond-plugin-image-edit";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
+
+registerPlugin(
+  FilePondPluginImagePreview,
+  FilePondPluginImageExifOrientation,
+  FilePondPluginFileValidateSize,
+  FilePondPluginImageEdit,
+  FilePondPluginMediaPreview
+);
 
 const CreateMedia = () => {
   const [form] = Form.useForm();
   const tokenPayload = useSelector((state: any) => state.auth);
   const [isLoad, setIsLoad] = useState<boolean>(false);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-
-  // ANTD
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const [previewMp4, setPreviewMp4] = useState<string>("");
+  const [fileList, setFileList] = useState<any>([]);
 
   const [valueForm, setValueForm] = useState<any>({
     medias: [],
@@ -103,7 +101,17 @@ const CreateMedia = () => {
               getValueFromEvent={(e) => {
                 return e?.fileList;
               }}
-            ></Form.Item>
+            >
+              <FilePond
+                files={fileList}
+                onupdatefiles={setFileList}
+                allowMultiple={false} // Chỉ cho phép upload một file duy nhất
+                maxFileSize="50MB" // Giới hạn kích thước tối đa
+                acceptedFileTypes={["image/*", "video/*"]} // Chỉ nhận file ảnh hoặc video
+                allowFileTypeValidation={true} // Kích hoạt kiểm tra loại file
+                labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
+              />
+            </Form.Item>
           </Col>
           <Col span={14} className="field-input">
             <div className="field-item">
