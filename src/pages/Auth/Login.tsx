@@ -124,7 +124,7 @@ const Login = () => {
           </div>
           <Row className="register-field">
             <div>
-              Not Registered Yet?{" "}
+              Not Registered Yet?
               <span onClick={onSwitchCreate}>Create an account</span>
             </div>
           </Row>

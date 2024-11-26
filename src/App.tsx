@@ -47,7 +47,6 @@ const App = () => {
       <ToastContainer />
       <div className="App">
         <LoadingSpinner isLoading={isLoading}>
-          {" "}
           {/* Display the loading spinner when isLoading is true */}
           <Routes>
             <Route path="/sign-in" element={<Login />} />

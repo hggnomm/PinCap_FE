@@ -145,7 +145,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
       <div className="chatbot-header">
         <span style={{ fontWeight: 500 }}>Pinbot: Virtual Assistant</span>
         <button className="close-btn" onClick={toggleChatbot}>
-          <CloseCircleOutlined />{" "}
+          <CloseCircleOutlined />
         </button>
       </div>
       <div className="chatbot-body">
