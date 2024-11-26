@@ -31,14 +31,14 @@ interface TokenPayload {
 }
 
 interface MediaFormValues {
-  medias: File[];
+  media: File | null;
   mediaName: string;
   description: string;
   privacy: string;
   mediaOwner_id: string;
   type: string;
   tagName: string[];
-  isCreated: number;
+  is_created: number;
 }
 
 const CreateMedia: React.FC = () => {
@@ -48,14 +48,14 @@ const CreateMedia: React.FC = () => {
   const [fileList, setFileList] = useState<File[]>([]);
 
   const [valueForm, setValueForm] = useState<MediaFormValues>({
-    medias: [],
+    media: null,
     mediaName: "",
     description: "",
-    privacy: "0", // Mặc định là private
+    privacy: "0", // default private
     mediaOwner_id: "",
     type: "1",
     tagName: [],
-    isCreated: 0,
+    is_created: 1,
   });
 
   const handleGenerateClick = () => {
@@ -71,17 +71,17 @@ const CreateMedia: React.FC = () => {
       toast.error("Please provide a name for the media.");
       return;
     }
-
     const valueAPI: MediaFormValues = {
       ...valueForm,
       mediaOwner_id: tokenPayload.id,
-      medias: [fileList[0]],
+      media: fileList[0],
       mediaName: formValue.mediaName,
       description: formValue.description,
       privacy: formValue.privacy || "0",
       tagName: [],
-      isCreated: 1,
+      is_created: 1,
     };
+    console.log(valueAPI);
 
     createNewMedia(valueAPI);
     setIsLoad(true);

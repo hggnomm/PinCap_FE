@@ -36,7 +36,6 @@ const App = () => {
       }
     } else {
       if (pathname === "/sign-in" || pathname === "/sign-up") return;
-      navigate("/home");
       setIsLogin(false);
     }
     setIsLoading(false); // Hide loading spinner after login check
@@ -44,17 +43,22 @@ const App = () => {
 
   return (
     <ConfigProvider>
-      <ToastContainer />
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        closeOnClick={true}
+        pauseOnHover={true}
+      />
       <div className="App">
-        <LoadingSpinner isLoading={isLoading}>
-          {/* Display the loading spinner when isLoading is true */}
-          <Routes>
-            <Route path="/sign-in" element={<Login />} />
-            <Route path="/sign-up" element={<Register />} />
+        {/* Display the loading spinner when isLoading is true */}
+        <Routes>
+          <Route path="/sign-in" element={<Login />} />
+          <Route path="/sign-up" element={<Register />} />
 
-            <Route
-              path="*"
-              element={
+          <Route
+            path="*"
+            element={
+              <LoadingSpinner isLoading={isLoading}>
                 <Layout className="main-container">
                   {pathname === "/sign-in" ? "" : <HeaderCommon />}
                   {isLogin ? (
@@ -81,15 +85,15 @@ const App = () => {
                   ) : (
                     <Content>
                       <Routes>
-                        <Route path="/home" element={<Home />} />
+                        <Route path="/" element={<Home />} />
                       </Routes>
                     </Content>
                   )}
                 </Layout>
-              }
-            />
-          </Routes>
-        </LoadingSpinner>
+              </LoadingSpinner>
+            }
+          />
+        </Routes>
       </div>
     </ConfigProvider>
   );

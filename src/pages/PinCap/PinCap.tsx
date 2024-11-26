@@ -2,7 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import "./index.less";
 import PinMedia from "./PinMedia/Pin";
 import { getAllMedias } from "../../api/media";
-import Loading from "../../components/Loading/Loading";
+import Loading from "../../components/loading/Loading";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const PinCap = () => {
   const [listMedia, setListMedia] = useState<any[]>([]);
@@ -33,7 +35,7 @@ const PinCap = () => {
       setError("Lỗi khi lấy list media: " + error);
     } finally {
       setLoading(false);
-      isFetching.current = false; 
+      isFetching.current = false;
     }
   };
 
@@ -54,7 +56,7 @@ const PinCap = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [page]); 
+  }, [page]);
 
   const loadMore = () => {
     if (!loading && hasMore) {

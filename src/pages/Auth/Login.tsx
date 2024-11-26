@@ -28,9 +28,11 @@ const Login = () => {
         dispatch(addToken(data.token));
         localStorage.setItem("token", data.token);
         navigate("/home");
-        window.location.reload();
       } else {
-        console.log("Dang Nhap that bai");
+        api.open({
+          message: "Login Failed",
+          onClose: close,
+        });
       }
     } catch (e) {
       api.open({

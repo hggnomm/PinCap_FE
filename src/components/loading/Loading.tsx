@@ -5,11 +5,11 @@ import "react-toastify/dist/ReactToastify.css"; // Import styles
 
 interface LoadingSpinnerProps {
   isLoading: boolean;
-  error?: string;
+  error?: string | null;
   children: ReactNode;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
+const Loading: React.FC<LoadingSpinnerProps> = ({
   isLoading,
   error,
   children,
@@ -56,4 +56,4 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   );
 };
 
-export default LoadingSpinner;
+export default Loading;

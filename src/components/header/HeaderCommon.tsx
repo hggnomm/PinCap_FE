@@ -50,7 +50,6 @@ const HeaderCommon = () => {
   // Handle user logout
   const logoutHandle = () => {
     localStorage.removeItem("token");
-    navigate("/home");
     window.location.reload();
   };
 
