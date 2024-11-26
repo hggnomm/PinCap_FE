@@ -50,7 +50,6 @@ const App = () => {
         pauseOnHover={true}
       />
       <div className="App">
-        {/* Display the loading spinner when isLoading is true */}
         <Routes>
           <Route path="/sign-in" element={<Login />} />
           <Route path="/sign-up" element={<Register />} />

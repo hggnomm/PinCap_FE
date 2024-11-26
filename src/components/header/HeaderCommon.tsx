@@ -50,6 +50,7 @@ const HeaderCommon = () => {
   // Handle user logout
   const logoutHandle = () => {
     localStorage.removeItem("token");
+    navigate("/");
     window.location.reload();
   };
 
@@ -77,7 +78,10 @@ const HeaderCommon = () => {
 
   return (
     <Row className="main-header">
-      <Col className="left-header" onClick={() => navigate("/home")}>
+      <Col
+        className="left-header"
+        onClick={() => (tokenPayload.email ? navigate("/home") : navigate("/"))}
+      >
         <img className="logo-icon" src={LogoIcon} alt="Logo" />
         {isBrowser && <img className="text-icon" src={TextIcon} alt="Text" />}
       </Col>
