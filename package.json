@@ -42,7 +42,8 @@
     "react-syntax-highlighter": "^15.6.1",
     "react-toastify": "^10.0.6",
     "styled-components": "^6.1.13",
-    "swiper": "^11.0.5"
+    "swiper": "^11.0.5",
+    "unidecode": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",

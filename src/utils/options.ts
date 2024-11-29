@@ -144,6 +144,5 @@ export const sizeOptions = [
     label: "16:9",
     image: img169,
   },
-  // Các tùy chọn khác nếu cần
 ];
 

@@ -9,6 +9,7 @@ import Image3 from "../../../assets/img/ImagesAI/img3.png";
 import Image4 from "../../../assets/img/ImagesAI/img4.png";
 import Image5 from "../../../assets/img/ImagesAI/img5.png";
 import { motion } from "framer-motion";
+import { options, sizeOptions } from "../../../utils/options";
 
 interface IRequest {
   textInput: string;
@@ -73,33 +74,48 @@ const ImageAi = () => {
               <Divider style={{ margin: "12px 0" }} />
             </Row>
             <Row className="field-input">
-              <span>Choose a style</span>
-              <Form.Item<FieldType>
-                name="style_preset"
-                rules={[{ required: true }]}
-                style={{ width: "100%", margin: 0 }}
-                noStyle
-              >
-                {/* <StyleOptions />
-                 */}
-                <Input defaultValue="cc" />
+              <span>Choose a size</span>
+              <Form.Item<FieldType> name="size" rules={[{ required: true }]}>
+                <div className="options">
+                  {sizeOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setSelectedOptions(option)}
+                      className={`options-item ${
+                        selectedOptions?.label === option.label
+                          ? "selected"
+                          : ""
+                      }`}
+                    >
+                      <img src={option.image} alt={option.label} />
+                    </div>
+                  ))}
+                </div>
               </Form.Item>
               <Divider style={{ margin: "12px 0" }} />
             </Row>
             <Row className="field-input">
-              <span>Choose a size</span>
-              <Form.Item<FieldType>
-                name="style_preset"
-                rules={[{ required: true }]}
-                style={{ width: "100%", margin: 0 }}
-                noStyle
-              >
-                {/* <StyleOptions />
-                 */}
-                <Input defaultValue="cc" />
+              <span>Choose a style</span>
+              <Form.Item<FieldType> name="size" rules={[{ required: true }]}>
+                <div className="options">
+                  {options.map((option, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setSelectedOptions(option)}
+                      className={`options-item ${
+                        selectedOptions?.label === option.label
+                          ? "selected"
+                          : ""
+                      }`}
+                    >
+                      <img src={option.image} alt={option.label} />
+                    </div>
+                  ))}
+                </div>
               </Form.Item>
               <Divider style={{ margin: "12px 0" }} />
             </Row>
+
             <Form.Item>
               <Button className="btn-generate" type="primary" htmlType="submit">
                 Generate

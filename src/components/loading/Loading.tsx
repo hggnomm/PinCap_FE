@@ -28,7 +28,7 @@ const Loading: React.FC<LoadingSpinnerProps> = ({
             position: "absolute",
             top: 0,
             left: 0,
-            width: "100%",
+            maxWidth: "100%",
             height: "100%",
             backgroundColor: "rgba(255, 255, 255, 0.7)", 
             backdropFilter: "blur(5px)",

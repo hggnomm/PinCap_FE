@@ -1,37 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getDetailMedia } from "../../../api/media"; // Assuming you have this API function to fetch album data
+import { getDetailMedia } from "../../../api/media";
 import { DownOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import black_heart from "../../../assets/img/PinCap/black-heart.png";
 import download from "../../../assets/img/PinCap/download.png";
 import more from "../../../assets/img/PinCap/more.png";
-import { Dropdown, Menu } from "antd"; // Import Menu from Ant Design
-import Loading from "../../../components/Loading/Loading"; // Import Loading component
+import { Dropdown, Input, Menu } from "antd";
+import Loading from "../../../components/loading/Loading";
 
 import "./index.less";
 import { getAlbumData } from "../../../api/album";
+import { unidecode } from "unidecode"; // Import thư viện unidecode
 
 const DetailMedia = () => {
   const [media, setMedia] = useState<Media | null>(null);
-  const [albumData, setAlbumData] = useState<Album[]>([]); // Store album data
-  const [loading, setLoading] = useState<boolean>(false); // State to track loading status
-  const [error, setError] = useState<string | null>(null); // State to track error messages
+  const [albumData, setAlbumData] = useState<Album[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     const fetchMediaDetail = async (idMedia: string) => {
-      setLoading(true); // Set loading to true when fetching data
-      setError(null); // Reset error message
+      setLoading(true);
+      setError(null);
       try {
         const detail = await getDetailMedia(idMedia);
         if (detail) {
           setMedia(detail);
         }
       } catch (error) {
-        setError("Lỗi khi lấy chi tiết media: " + error); // Set error if fetch fails
+        setError("Lỗi khi lấy chi tiết media: " + error);
       } finally {
-        setLoading(false); // Set loading to false after fetch is done
+        setLoading(false);
       }
     };
 
@@ -47,11 +49,32 @@ const DetailMedia = () => {
     }
   };
 
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+
+    // Loại bỏ dấu tiếng Việt để tìm kiếm không phân biệt dấu
+    const normalizedSearchTerm = unidecode(value.toLowerCase()); // Chuyển thành chữ thường và bỏ dấu
+
+    // Lọc album theo tên album (cũng bỏ dấu để so sánh)
+    const filteredAlbums = albumData.filter(
+      (album) =>
+        unidecode(album.album_name.toLowerCase()).includes(normalizedSearchTerm) // So sánh không phân biệt dấu
+    );
+    setAlbumData(filteredAlbums); // Cập nhật albumData với kết quả lọc
+  };
   const albumMenu = (
     <div className="menu-album">
       <div className="top-menu-album">
         <span>Album</span>
       </div>
+      <Input
+        placeholder="Search album..."
+        allowClear
+        onSearch={handleSearch} // Khi nhấn Enter
+        onChange={(e) => handleSearch(e.target.value)} // Khi gõ trực tiếp
+        className="search-album"
+        value={searchTerm} // Đồng bộ hóa giá trị tìm kiếm
+      />
       <Menu className="list-album">
         {albumData.map((album) => (
           <Menu.Item className="item-album" key={album.id}>
@@ -131,6 +154,9 @@ const DetailMedia = () => {
 
                 <button className="save">Save</button>
               </div>
+            </div>
+            <div className="description">
+              <span>test</span>
             </div>
             <div className="comment">
               <div className="user_owner">
