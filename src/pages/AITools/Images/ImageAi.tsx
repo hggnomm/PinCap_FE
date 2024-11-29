@@ -7,6 +7,8 @@ import {
   Input,
   notification,
   Row,
+  Dropdown,
+  Menu,
 } from "antd";
 import React, { useState } from "react";
 import "./index.less";
@@ -68,6 +70,28 @@ const ImageAi = () => {
     console.log("Failed:", errorInfo);
   };
 
+  // Menu cho dropdown
+  const menu = (
+    <Menu>
+      {options.slice(4).map((option, index) => (
+        <Menu.Item key={index} onClick={() => handleMenuClick(option)}>
+          <img
+            src={option.image}
+            alt={option.label}
+            style={{ width: 20, marginRight: 10 }}
+          />
+          {option.label}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  // Xử lý khi người dùng chọn item từ dropdown
+  const handleMenuClick = (option: any) => {
+    setSelectedStyle(option);
+    form.setFieldsValue({ style_preset: option.label });
+  };
+
   return (
     <motion.div
       initial="hidden"
@@ -102,7 +126,6 @@ const ImageAi = () => {
                   autoSize={{ minRows: 2, maxRows: 4 }}
                 />
               </Form.Item>
-              <Divider style={{ margin: "12px 0" }} />
             </Row>
 
             <Row className="field-input">
@@ -117,7 +140,6 @@ const ImageAi = () => {
                       key={index}
                       onClick={() => {
                         setSelectedOptions(option);
-                        // Cập nhật giá trị vào form
                         form.setFieldsValue({ size: option.label });
                       }}
                       className={`options-item ${
@@ -140,12 +162,12 @@ const ImageAi = () => {
                 rules={[{ required: true, message: "Please choose a style!" }]}
               >
                 <div className="options">
-                  {options.map((option, index) => (
+                  {/* Hiển thị 4 item đầu tiên */}
+                  {options.slice(0, 4).map((option, index) => (
                     <div
                       key={index}
                       onClick={() => {
                         setSelectedStyle(option);
-                        // Cập nhật giá trị vào form
                         form.setFieldsValue({ style_preset: option.label });
                       }}
                       className={`options-item ${
@@ -155,7 +177,17 @@ const ImageAi = () => {
                       <img src={option.image} alt={option.label} />
                     </div>
                   ))}
+                  {/* Dropdown hiển thị các item còn lại */}
                 </div>
+                <Dropdown
+                  overlay={menu}
+                  trigger={["click"]}
+                  className="more-styles"
+                >
+                  <Button>
+                    {selectedStyle ? selectedStyle.label : "More"}
+                  </Button>
+                </Dropdown>
               </Form.Item>
             </Row>
 
@@ -180,10 +212,7 @@ const ImageAi = () => {
                 slidesPerView={1}
                 spaceBetween={10}
                 modules={[Autoplay, FreeMode, Pagination]}
-                autoplay={{
-                  delay: 2500,
-                  disableOnInteraction: false,
-                }}
+                autoplay={{ delay: 2500, disableOnInteraction: false }}
                 pagination={true}
                 className="swiper-images"
               >
