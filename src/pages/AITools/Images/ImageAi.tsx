@@ -72,13 +72,19 @@ const ImageAi = () => {
 
   // Menu cho dropdown
   const menu = (
-    <Menu>
+    <Menu
+      style={{
+        maxHeight: "300px", // Set the desired maximum width
+        overflowX: "auto", // Allow horizontal scrolling if items overflow
+        whiteSpace: "nowrap", // Prevent text from wrapping to the next line
+      }}
+    >
       {options.slice(4).map((option, index) => (
         <Menu.Item key={index} onClick={() => handleMenuClick(option)}>
           <img
             src={option.image}
             alt={option.label}
-            style={{ width: 20, marginRight: 10 }}
+            style={{ width: 40, marginRight: 13 }}
           />
           {option.label}
         </Menu.Item>
