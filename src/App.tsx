@@ -37,6 +37,7 @@ const App = () => {
     } else {
       if (pathname === "/sign-in" || pathname === "/sign-up") return;
       setIsLogin(false);
+      navigate("/")
     }
     setIsLoading(false); // Hide loading spinner after login check
   }, [tokenPayload.email, pathname, navigate]);
