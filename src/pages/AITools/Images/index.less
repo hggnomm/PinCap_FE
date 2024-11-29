@@ -1,39 +1,59 @@
 .container {
   display: flex;
   justify-content: center;
-  padding: 5rem 0;
-
+  min-height: 100vh;
+  align-items: center;
+  margin-top: -50px;
   .main-page {
+    display: flex;
     width: 60%;
     height: 100%;
     border: 1px solid #ccc;
     border-radius: 20px;
     background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     .left-side {
+      width: 40%;
       .form {
         margin: 1rem 1.5rem;
 
         .field-input {
-          max-width: 100%;
+          min-width: 100%;
           display: flex;
-          justify-content: start;
+          flex-direction: column; /* Bố trí dạng cột */
           text-align: left;
+          overflow: hidden;
 
           .options {
             display: flex;
+            flex-wrap: nowrap;
             width: 100%;
-            gap: 5px;
+            overflow-x: auto;
+            gap: 8px;
+            cursor: grab; /* Con trỏ khi di chuyển */
+
             .options-item {
+              display: flex;
+              justify-content: center;
               padding: 4px;
               border: 1px solid #d2d0d0;
               border-radius: 4px;
+              flex-shrink: 0;
+
 
               img {
-                width: 55px;
-                height: 100%;
+                width: 49px;
                 border-radius: 4px;
+                object-fit: cover;
+
+                &:hover {
+                  transform: scale(1.05);
+                }
               }
+            }
+            .selected {
+              background: red;
             }
           }
 
@@ -53,8 +73,9 @@
       }
     }
     .right-side {
+      width: 60%;
       .swiper-images {
-        margin: 1.5rem;
+        // padding: 1.5rem;
         width: 100%;
         height: 100%;
         border-radius: 16px;

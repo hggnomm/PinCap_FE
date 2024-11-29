@@ -1,4 +1,13 @@
-import { Button, Col, Divider, Form, FormProps, Input, Row } from "antd";
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  FormProps,
+  Input,
+  notification,
+  Row,
+} from "antd";
 import React, { useState } from "react";
 import "./index.less";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -22,17 +31,40 @@ const ImageList = [Image1, Image2, Image3, Image4, Image5];
 
 type FieldType = IRequest;
 
+interface IRequestCreateAIImage {
+  textInput: string;
+  style_preset: string;
+  timeCurrent: string;
+  size: string;
+}
+
 const ImageAi = () => {
-  const [selectedOptions, setSelectedOptions] = useState<any>({});
-  const [isLoad, setIsLoad] = useState<boolean>(false);
+  const [form] = Form.useForm();
+  const [selectedOptions, setSelectedOptions] = useState<any>(null);
+  const [selectedStyle, setSelectedStyle] = useState<any>(null);
   const [isDoneGenerate, setIsDoneGenerate] = useState<boolean>(false);
+
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    console.log("Success:", values);
+    const currentTime = new Date().toLocaleString();
+    const updatedRequest: IRequestCreateAIImage = {
+      textInput: values.textInput,
+      style_preset: selectedStyle?.label || "",
+      timeCurrent: currentTime,
+      size: selectedOptions?.label || "",
+    };
+
+    setIsDoneGenerate(true);
+
+    console.log("Generated Values:", updatedRequest);
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
     errorInfo
   ) => {
+    notification.error({
+      message: "Form submission failed",
+      description: "Please check the form fields and try again.",
+    });
     console.log("Failed:", errorInfo);
   };
 
@@ -47,9 +79,10 @@ const ImageAi = () => {
       transition={{ duration: 1 }}
       className="container"
     >
-      <Row className="main-page" justify="space-between">
-        <Col className="left-side" span={10}>
+      <div className="main-page">
+        <div className="left-side">
           <Form
+            form={form}
             name="basic"
             initialValues={{ remember: true }}
             onFinish={onFinish}
@@ -61,9 +94,7 @@ const ImageAi = () => {
               <span>Create an image from text prompt</span>
               <Form.Item<FieldType>
                 name="textInput"
-                rules={[{ required: true }]}
-                style={{ width: "100%", margin: 0 }}
-                noStyle
+                rules={[{ required: true, message: "Please enter text!" }]}
               >
                 <Input.TextArea
                   rows={2}
@@ -73,14 +104,22 @@ const ImageAi = () => {
               </Form.Item>
               <Divider style={{ margin: "12px 0" }} />
             </Row>
+
             <Row className="field-input">
               <span>Choose a size</span>
-              <Form.Item<FieldType> name="size" rules={[{ required: true }]}>
+              <Form.Item<FieldType>
+                name="size"
+                rules={[{ required: true, message: "Please choose a size!" }]}
+              >
                 <div className="options">
                   {sizeOptions.map((option, index) => (
                     <div
                       key={index}
-                      onClick={() => setSelectedOptions(option)}
+                      onClick={() => {
+                        setSelectedOptions(option);
+                        // Cập nhật giá trị vào form
+                        form.setFieldsValue({ size: option.label });
+                      }}
                       className={`options-item ${
                         selectedOptions?.label === option.label
                           ? "selected"
@@ -92,20 +131,25 @@ const ImageAi = () => {
                   ))}
                 </div>
               </Form.Item>
-              <Divider style={{ margin: "12px 0" }} />
             </Row>
+
             <Row className="field-input">
               <span>Choose a style</span>
-              <Form.Item<FieldType> name="size" rules={[{ required: true }]}>
+              <Form.Item<FieldType>
+                name="style_preset"
+                rules={[{ required: true, message: "Please choose a style!" }]}
+              >
                 <div className="options">
                   {options.map((option, index) => (
                     <div
                       key={index}
-                      onClick={() => setSelectedOptions(option)}
+                      onClick={() => {
+                        setSelectedStyle(option);
+                        // Cập nhật giá trị vào form
+                        form.setFieldsValue({ style_preset: option.label });
+                      }}
                       className={`options-item ${
-                        selectedOptions?.label === option.label
-                          ? "selected"
-                          : ""
+                        selectedStyle?.label === option.label ? "selected" : ""
                       }`}
                     >
                       <img src={option.image} alt={option.label} />
@@ -113,7 +157,6 @@ const ImageAi = () => {
                   ))}
                 </div>
               </Form.Item>
-              <Divider style={{ margin: "12px 0" }} />
             </Row>
 
             <Form.Item>
@@ -122,10 +165,17 @@ const ImageAi = () => {
               </Button>
             </Form.Item>
           </Form>
-        </Col>
-        <Col className="right-side" span={14}>
+        </div>
+
+        <div className="right-side">
           <Row>
-            {!isDoneGenerate ? (
+            {isDoneGenerate ? (
+              <Swiper className="swiper-images">
+                <SwiperSlide className="image-item">
+                  <img src={Image5} alt="Generated Image" />
+                </SwiperSlide>
+              </Swiper>
+            ) : (
               <Swiper
                 slidesPerView={1}
                 spaceBetween={10}
@@ -143,16 +193,10 @@ const ImageAi = () => {
                   </SwiperSlide>
                 ))}
               </Swiper>
-            ) : (
-              <Swiper className="swiper-images">
-                <SwiperSlide className="image-item">
-                  <img src={Image5} alt="" />
-                </SwiperSlide>
-              </Swiper>
             )}
           </Row>
-        </Col>
-      </Row>
+        </div>
+      </div>
     </motion.div>
   );
 };

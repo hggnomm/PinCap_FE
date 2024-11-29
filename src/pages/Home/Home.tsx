@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./index.less";
 import { Button, Layout, Row } from "antd";
 import { motion } from "framer-motion";
 import VideoLandingPage from "../../assets/videos/VideoPinCapAI.mp4";
 import Preloader from "../../components/preloader/Preloader";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const waveEffect = {
   hidden: { y: 0 },
@@ -19,6 +21,15 @@ const waveEffect = {
 };
 
 const Home = () => {
+  const tokenPayload = useSelector((state: any) => state.auth);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (tokenPayload.email) {
+      navigate("/home");
+    }
+  }, [tokenPayload.email, pathname]);
   return (
     <>
       <Preloader />
