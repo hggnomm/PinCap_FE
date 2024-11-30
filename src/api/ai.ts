@@ -1,13 +1,11 @@
-import apiClient from './apiClient';
+import apiClient from "./apiClient";
 
-// Example API function to fetch user data
 export const createAIImage = async (data: any) => {
   try {
-    const response = await apiClient.post("/api/medias/createAI/image", data);
+    const response = await apiClient.post("/api/medias/ai", data);
     return response.data;
   } catch (error) {
-    // Handle errors
-    console.error('Tạo k được:', error);
+    console.error("Tạo không được:", error);
     throw error;
   }
 };

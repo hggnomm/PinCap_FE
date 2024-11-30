@@ -21,6 +21,8 @@ import Image4 from "../../../assets/img/ImagesAI/img4.png";
 import Image5 from "../../../assets/img/ImagesAI/img5.png";
 import { motion } from "framer-motion";
 import { options, sizeOptions } from "../../../utils/options";
+import { createAIImage } from "../../../api/ai";
+import Loading from "../../../components/loading/Loading";
 
 interface IRequest {
   textInput: string;
@@ -34,10 +36,12 @@ const ImageList = [Image1, Image2, Image3, Image4, Image5];
 type FieldType = IRequest;
 
 interface IRequestCreateAIImage {
-  textInput: string;
+  prompt: string;
   style_preset: string;
-  timeCurrent: string;
-  size: string;
+  width: number;
+  height: number;
+  imageUrl?: string | null;
+  imageData?: string | null;
 }
 
 const ImageAi = () => {
@@ -45,19 +49,36 @@ const ImageAi = () => {
   const [selectedOptions, setSelectedOptions] = useState<any>(null);
   const [selectedStyle, setSelectedStyle] = useState<any>(null);
   const [isDoneGenerate, setIsDoneGenerate] = useState<boolean>(false);
+  const [urlImageAi, setUrlImageAI] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    const currentTime = new Date().toLocaleString();
-    const updatedRequest: IRequestCreateAIImage = {
-      textInput: values.textInput,
-      style_preset: selectedStyle?.label || "",
-      timeCurrent: currentTime,
-      size: selectedOptions?.label || "",
-    };
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    setLoading(true); // Bắt đầu trạng thái tải
+    setError(null); // Xóa lỗi cũ nếu có
 
-    setIsDoneGenerate(true);
+    try {
+      const updatedRequest: IRequestCreateAIImage = {
+        prompt: values.textInput,
+        style_preset: selectedStyle?.value || "",
+        width: selectedOptions?.value.width,
+        height: selectedOptions?.value.height,
+      };
 
-    console.log("Generated Values:", updatedRequest);
+      const response = await createAIImage(updatedRequest);
+
+      if (response.status === "succeeded") {
+        setUrlImageAI(response.imageUrl);
+        setIsDoneGenerate(true);
+      } else {
+        throw new Error("Failed to generate image. Please try again.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "An error occurred while generating the image.");
+    } finally {
+      setLoading(false); // Kết thúc trạng thái tải
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -204,7 +225,12 @@ const ImageAi = () => {
             </div>
 
             <Form.Item>
-              <Button className="btn-generate" type="primary" htmlType="submit">
+              <Button
+                className="btn-generate"
+                type="primary"
+                htmlType="submit"
+                loading={loading} // Thêm loading vào nút
+              >
                 Generate
               </Button>
             </Form.Item>
@@ -214,27 +240,29 @@ const ImageAi = () => {
         <div className="right-side">
           <Row>
             {isDoneGenerate ? (
-              <Swiper className="swiper-images">
-                <SwiperSlide className="image-item">
-                  <img src={Image5} alt="Generated Image" />
-                </SwiperSlide>
-              </Swiper>
+              <Loading isLoading={loading} error={error}>
+                <img
+                  src={urlImageAi}
+                  alt="Generated AI Image"
+                  className="image-ai"
+                />
+              </Loading>
             ) : (
               <Swiper
                 slidesPerView={1}
                 spaceBetween={10}
                 modules={[Autoplay, FreeMode, Pagination]}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
-                pagination={true}
+                pagination={{ clickable: true }}
                 className="swiper-images"
               >
                 {ImageList.map((image, index) => (
                   <SwiperSlide key={index} className="image-item">
-                    <img src={image} alt="" />
+                    <img src={image} alt={`Image ${index + 1}`} />
                   </SwiperSlide>
                 ))}
               </Swiper>
-            )}
+            )}  
           </Row>
         </div>
       </div>
