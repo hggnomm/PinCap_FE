@@ -49,6 +49,7 @@ const ImageAi = () => {
   const [selectedOptions, setSelectedOptions] = useState<any>(null);
   const [selectedStyle, setSelectedStyle] = useState<any>(null);
   const [isDoneGenerate, setIsDoneGenerate] = useState<boolean>(false);
+  const [isGenerate, setIsGenerate] = useState<boolean>(false);
   const [urlImageAi, setUrlImageAI] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +57,7 @@ const ImageAi = () => {
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     setLoading(true); // Bắt đầu trạng thái tải
     setError(null); // Xóa lỗi cũ nếu có
-
+    setIsGenerate(true);
     try {
       const updatedRequest: IRequestCreateAIImage = {
         prompt: values.textInput,
@@ -70,6 +71,7 @@ const ImageAi = () => {
       if (response.status === "succeeded") {
         setUrlImageAI(response.imageUrl);
         setIsDoneGenerate(true);
+        setIsGenerate(false);
       } else {
         throw new Error("Failed to generate image. Please try again.");
       }
@@ -238,15 +240,13 @@ const ImageAi = () => {
         </div>
 
         <div className="right-side">
-          <Row>
-            {isDoneGenerate ? (
-              <Loading isLoading={loading} error={error}>
-                <img
-                  src={urlImageAi}
-                  alt="Generated AI Image"
-                  className="image-ai"
-                />
-              </Loading>
+          <Row className="image-ai-container">
+            {isDoneGenerate || isGenerate ? (
+              <div>
+                <Loading isLoading={loading} error={error}>
+                  <img src={urlImageAi} className="image-ai" />
+                </Loading>
+              </div>
             ) : (
               <Swiper
                 slidesPerView={1}
@@ -262,7 +262,7 @@ const ImageAi = () => {
                   </SwiperSlide>
                 ))}
               </Swiper>
-            )}  
+            )}
           </Row>
         </div>
       </div>
