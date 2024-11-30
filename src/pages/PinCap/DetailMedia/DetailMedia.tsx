@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { getDetailMedia, mediaReactions } from "../../../api/media";
 import { DownOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
-import black_heart from "../../../assets/img/PinCap/black-heart.png";
 import download from "../../../assets/img/PinCap/download.png";
 import more from "../../../assets/img/PinCap/more.png";
 import { Dropdown, Input, Menu } from "antd";
@@ -12,7 +11,7 @@ import Loading from "../../../components/loading/Loading";
 import "./index.less";
 import { getAlbumData } from "../../../api/album";
 import { unidecode } from "unidecode"; // Import thư viện unidecode
-import { relationships } from "../../../api/users";
+import { AddRelationships, DeleteRelationships } from "../../../api/users";
 import { Album, Media } from "../../../types/type";
 import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
 
@@ -67,10 +66,30 @@ const DetailMedia = () => {
   };
 
   const handleWithOwnerUser = async () => {
-    try {
-      let request = media?.ownerUser?.isFollowing ? "BLOCK" : "FOLLOWING";
+    const request = "FOLLOWING";
 
-      const response = await relationships({
+    try {
+      if (media?.ownerUser?.isFollowing) {
+        await DeleteRelationships({
+          followeeId: media?.ownerUser.id,
+          status: request,
+        });
+
+        setMedia((prevState) => {
+          if (!prevState) return null;
+          return {
+            ...prevState,
+            ownerUser: {
+              ...prevState.ownerUser,
+              isFollowing: false,
+            },
+          };
+        });
+
+        return;
+      }
+
+      const response = await AddRelationships({
         followeeId: media?.ownerUser.id,
         status: request,
       });
@@ -78,18 +97,18 @@ const DetailMedia = () => {
       if (response) {
         setMedia((prevState) => {
           if (!prevState) return null;
-
           return {
             ...prevState,
             ownerUser: {
               ...prevState.ownerUser,
-              isFollowing: !request,
+              isFollowing: true, 
             },
           };
         });
       }
     } catch (error) {
-      setError("Error when following a media!");
+      console.error(error);
+      setError("Error when following or unfollowing a media!");
     }
   };
 
