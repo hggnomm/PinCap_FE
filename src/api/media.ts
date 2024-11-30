@@ -36,3 +36,12 @@ export const getDetailMedia = async (id: any) => {
     console.log(error);
   }
 };
+
+export const mediaReactions = async (request: any) => {
+  try {
+    const res = await apiClient.post(`/api/medias/reactions`, request);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getDetailMedia } from "../../../api/media";
+import { getDetailMedia, mediaReactions } from "../../../api/media";
 import { DownOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import black_heart from "../../../assets/img/PinCap/black-heart.png";
@@ -12,6 +12,9 @@ import Loading from "../../../components/loading/Loading";
 import "./index.less";
 import { getAlbumData } from "../../../api/album";
 import { unidecode } from "unidecode"; // Import thư viện unidecode
+import { relationships } from "../../../api/users";
+import { Album, Media } from "../../../types/type";
+import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
 
 const DetailMedia = () => {
   const [media, setMedia] = useState<Media | null>(null);
@@ -21,22 +24,22 @@ const DetailMedia = () => {
   const { id } = useParams<{ id: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  useEffect(() => {
-    const fetchMediaDetail = async (idMedia: string) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const detail = await getDetailMedia(idMedia);
-        if (detail) {
-          setMedia(detail);
-        }
-      } catch (error) {
-        setError("Lỗi khi lấy chi tiết media: " + error);
-      } finally {
-        setLoading(false);
+  const fetchMediaDetail = async (idMedia: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const detail = await getDetailMedia(idMedia);
+      if (detail) {
+        setMedia(detail);
       }
-    };
+    } catch (error) {
+      setError("Lỗi khi lấy chi tiết media: " + error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (id) {
       fetchMediaDetail(id);
     }
@@ -62,6 +65,73 @@ const DetailMedia = () => {
     );
     setAlbumData(filteredAlbums); // Cập nhật albumData với kết quả lọc
   };
+
+  const handleWithOwnerUser = async () => {
+    try {
+      let request = media?.ownerUser?.isFollowing ? "BLOCK" : "FOLLOWING";
+
+      const response = await relationships({
+        followeeId: media?.ownerUser.id,
+        status: request,
+      });
+
+      if (response) {
+        setMedia((prevState) => {
+          if (!prevState) return null;
+
+          return {
+            ...prevState,
+            ownerUser: {
+              ...prevState.ownerUser,
+              isFollowing: !request,
+            },
+          };
+        });
+      }
+    } catch (error) {
+      setError("Error when following a media!");
+    }
+  };
+
+  const handleReaction = async () => {
+    try {
+      let feelingId = FeelingType.HEART; // Hiện tại chỉ có một icon
+      let newReactionCount: number;
+
+      // Tính toán số lượng phản ứng
+      if (media?.reaction?.feeling_id === feelingId) {
+        newReactionCount = (media.reaction_user_count || 0) - 1;
+      } else {
+        newReactionCount = (media?.reaction_user_count || 0) + 1;
+      }
+
+      // Gọi API để cập nhật phản ứng
+      const response = await mediaReactions({
+        mediaId: id,
+        feelingId: feelingId,
+      });
+
+      if (response) {
+        setMedia((prevState) => {
+          if (!prevState) return null;
+
+          return {
+            ...prevState,
+            reaction_user_count: Math.max(0, newReactionCount), // Đảm bảo không âm
+            reaction: {
+              ...prevState.reaction,
+              feeling_id:
+                prevState.reaction?.feeling_id === feelingId ? null : feelingId, // Cập nhật trạng thái react
+              id: prevState.reaction?.id || "", // Đảm bảo reaction.id luôn là string
+            },
+          };
+        });
+      }
+    } catch (error) {
+      setError("Error when reacting to a media!");
+    }
+  };
+
   const albumMenu = (
     <div className="menu-album">
       <div className="top-menu-album">
@@ -123,8 +193,11 @@ const DetailMedia = () => {
                     alignItems: "center",
                   }}
                 >
-                  <button>
-                    <img src={black_heart} alt="heart" />
+                  <button onClick={() => handleReaction()}>
+                    <img
+                      src={getImageReactionWithId(media?.reaction?.feeling_id)}
+                      alt="heart"
+                    />
                   </button>
                   <span>{media?.reaction_user_count}</span>
                 </div>
@@ -158,24 +231,31 @@ const DetailMedia = () => {
             <div className="description">
               <span>test</span>
             </div>
-            <div className="comment">
-              <div className="user_owner">
-                <div className="user">
-                  {media?.ownerUser && (
-                    <>
-                      <img src={media.ownerUser.avatar} alt="owner" />
-                      <div className="info">
-                        <span style={{ fontWeight: "bold" }}>
-                          {media.ownerUser.first_name}
-                        </span>
-                        <span>{media.numberUserFollowers} follower</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-                <button className="follow">Follow</button>
+            <div className="user_owner">
+              <div className="user">
+                {media?.ownerUser && (
+                  <>
+                    <img src={media.ownerUser.avatar} alt="owner" />
+                    <div className="info">
+                      <span style={{ fontWeight: "bold" }}>
+                        {media.ownerUser.first_name}
+                      </span>
+                      <span>{media.numberUserFollowers} follower</span>
+                    </div>
+                  </>
+                )}
               </div>
+              {media?.ownerUser?.isFollowing ? (
+                <button onClick={handleWithOwnerUser} className="following">
+                  Following
+                </button>
+              ) : (
+                <button onClick={handleWithOwnerUser} className="follow ">
+                  Follow
+                </button>
+              )}
             </div>
+            <div className="comment"></div>
           </div>
         </div>
       </motion.div>

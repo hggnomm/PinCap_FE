@@ -120,82 +120,88 @@ const ImageAi = () => {
             autoComplete="off"
             className="form"
           >
-            <Row className="field-input">
-              <span>Create an image from text prompt</span>
-              <Form.Item<FieldType>
-                name="textInput"
-                rules={[{ required: true, message: "Please enter text!" }]}
-              >
-                <Input.TextArea
-                  rows={2}
-                  placeholder="Enter your prompt"
-                  autoSize={{ minRows: 2, maxRows: 4 }}
-                />
-              </Form.Item>
-            </Row>
-
-            <Row className="field-input">
-              <span>Choose a size</span>
-              <Form.Item<FieldType>
-                name="size"
-                rules={[{ required: true, message: "Please choose a size!" }]}
-              >
-                <div className="options">
-                  {sizeOptions.map((option, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setSelectedOptions(option);
-                        form.setFieldsValue({ size: option.label });
-                      }}
-                      className={`options-item ${
-                        selectedOptions?.label === option.label
-                          ? "selected"
-                          : ""
-                      }`}
-                    >
-                      <img src={option.image} alt={option.label} />
-                    </div>
-                  ))}
-                </div>
-              </Form.Item>
-            </Row>
-
-            <Row className="field-input">
-              <span>Choose a style</span>
-              <Form.Item<FieldType>
-                name="style_preset"
-                rules={[{ required: true, message: "Please choose a style!" }]}
-              >
-                <div className="options">
-                  {/* Hiển thị 4 item đầu tiên */}
-                  {options.slice(0, 4).map((option, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setSelectedStyle(option);
-                        form.setFieldsValue({ style_preset: option.label });
-                      }}
-                      className={`options-item ${
-                        selectedStyle?.label === option.label ? "selected" : ""
-                      }`}
-                    >
-                      <img src={option.image} alt={option.label} />
-                    </div>
-                  ))}
-                  {/* Dropdown hiển thị các item còn lại */}
-                </div>
-                <Dropdown
-                  overlay={menu}
-                  trigger={["click"]}
-                  className="more-styles"
+            <div>
+              <Row className="field-input">
+                <span>Create an image from text prompt</span>
+                <Form.Item<FieldType>
+                  name="textInput"
+                  rules={[{ required: true, message: "Please enter text!" }]}
                 >
-                  <Button>
-                    {selectedStyle ? selectedStyle.label : "More"}
-                  </Button>
-                </Dropdown>
-              </Form.Item>
-            </Row>
+                  <Input.TextArea
+                    rows={3}
+                    placeholder="Enter your prompt"
+                    autoSize={{ minRows: 1, maxRows: 3 }}
+                  />
+                </Form.Item>
+              </Row>
+
+              <Row className="field-input">
+                <span>Choose a size</span>
+                <Form.Item<FieldType>
+                  name="size"
+                  rules={[{ required: true, message: "Please choose a size!" }]}
+                >
+                  <div className="options">
+                    {sizeOptions.map((option, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          setSelectedOptions(option);
+                          form.setFieldsValue({ size: option.label });
+                        }}
+                        className={`options-item ${
+                          selectedOptions?.label === option.label
+                            ? "selected"
+                            : ""
+                        }`}
+                      >
+                        <img src={option.image} alt={option.label} />
+                      </div>
+                    ))}
+                  </div>
+                </Form.Item>
+              </Row>
+
+              <Row className="field-input">
+                <span>Choose a style</span>
+                <Form.Item<FieldType>
+                  name="style_preset"
+                  rules={[
+                    { required: true, message: "Please choose a style!" },
+                  ]}
+                >
+                  <div className="options">
+                    {/* Hiển thị 4 item đầu tiên */}
+                    {options.slice(0, 4).map((option, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          setSelectedStyle(option);
+                          form.setFieldsValue({ style_preset: option.label });
+                        }}
+                        className={`options-item ${
+                          selectedStyle?.label === option.label
+                            ? "selected"
+                            : ""
+                        }`}
+                      >
+                        <img src={option.image} alt={option.label} />
+                      </div>
+                    ))}
+                    {/* Dropdown hiển thị các item còn lại */}
+                  </div>
+                  <Dropdown
+                    overlay={menu}
+                    trigger={["click"]}
+                    className="more-styles"
+                  >
+                    <Button>
+                      {selectedStyle ? selectedStyle.label : "More"}
+                    </Button>
+                  </Dropdown>
+                </Form.Item>
+              </Row>
+            </div>
 
             <Form.Item>
               <Button className="btn-generate" type="primary" htmlType="submit">

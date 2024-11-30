@@ -111,63 +111,68 @@
           font-size: 16px;
         }
       }
+      .user_owner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 40px 40px 0 40px;
+        background-color: #ffffff;
+
+        .user {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          .info {
+            margin-left: 0.7rem;
+            span {
+              font-size: 14px;
+              margin-bottom: 4px;
+              display: block;
+              text-align: left;
+            }
+          }
+          img {
+            border-radius: 100%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+          }
+          img:hover {
+            filter: brightness(0.9);
+          }
+        }
+        button {
+          border: none;
+          outline: none;
+          margin-left: 10px;
+          padding: 12px 24px;
+          cursor: pointer;
+          border-radius: 50px;
+          font-size: 16px;
+          font-weight: 500;
+          border: 1px solid #ccc;
+
+          &:hover {
+            background-color: #f9f7f7;
+          }
+          &:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease-in-out;
+          }
+        }
+        button.following {
+          background: #000;
+          color: #fff;
+        }
+        button.follow {
+          background: #f9f7f7;
+        }
+      }
       .comment {
         min-height: auto;
         max-height: 500px;
         overflow-y: auto;
-
-        .user_owner {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 40px 40px 0 40px;
-          background-color: #ffffff;
-
-          .user {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            .info {
-              margin-left: 0.7rem;
-              span {
-                font-size: 14px;
-                margin-bottom: 4px;
-                display: block;
-                text-align: left;
-              }
-            }
-            img {
-              border-radius: 100%;
-              width: 50px;
-              height: 50px;
-              cursor: pointer;
-            }
-            img:hover {
-              filter: brightness(0.9);
-            }
-          }
-          .follow {
-            border: none;
-            outline: none;
-            margin-left: 10px;
-            padding: 12px 24px;
-            cursor: pointer;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 500;
-            border: 1px solid #ccc;
-            background: #f9f7f7;
-
-            &:hover {
-              background-color: #f9f7f7;
-            }
-            &:active {
-              transform: scale(0.95);
-              transition: transform 0.1s ease-in-out;
-            }
-          }
-        }
       }
     }
   }
