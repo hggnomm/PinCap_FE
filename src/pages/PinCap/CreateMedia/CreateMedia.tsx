@@ -47,7 +47,6 @@ const CreateMedia: React.FC = () => {
   const [isLoad, setIsLoad] = useState(false);
   const [fileList, setFileList] = useState<File[]>([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
-
   const [tags, setTags] = useState<string[]>([]);
 
   const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -56,7 +55,7 @@ const CreateMedia: React.FC = () => {
       const newTag = input.value.trim();
       if (newTag && !tags.includes(newTag)) {
         setTags([...tags, newTag]);
-        input.value = "";
+        form.resetFields(["tagName"]);
       }
     }
   };
@@ -75,7 +74,7 @@ const CreateMedia: React.FC = () => {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
-      tagName: tagName, 
+      tagName: tagName,
       is_created: 0,
     };
 
@@ -96,6 +95,8 @@ const CreateMedia: React.FC = () => {
       );
     } finally {
       setIsLoad(false);
+      form.resetFields();
+      setFileList([]);
     }
   };
 
@@ -198,6 +199,8 @@ const CreateMedia: React.FC = () => {
                     key={index}
                     closable
                     onClose={() => setTags(tags.filter((t) => t !== tag))}
+                    color="blue"
+                    className="custom-tag"
                   >
                     {tag}
                   </Tag>
