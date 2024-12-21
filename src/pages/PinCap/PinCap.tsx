@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./index.less";
-import PinMedia from "./PinMedia/Pin";
+import PinMedia from "./PinMedia/PinMedia";
 import { getAllMedias } from "../../api/media";
 import Loading from "../../components/loading/Loading";
 import { useSelector } from "react-redux";
