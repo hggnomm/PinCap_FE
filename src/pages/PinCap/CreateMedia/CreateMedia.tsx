@@ -62,7 +62,7 @@ const CreateMedia: React.FC = () => {
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
       tagName: [],
-      is_created: 1,
+      is_created: 0,
     };
 
     try {
@@ -116,7 +116,7 @@ const CreateMedia: React.FC = () => {
         )}
         <Form
           form={form}
-          disabled={isLoad}
+          disabled={isLoad || !fileList.length}
           className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
         >
           <Col span={10} className="upload-image">
@@ -152,16 +152,28 @@ const CreateMedia: React.FC = () => {
             <div className="field-item">
               <span className="text-label">Description</span>
               <Form.Item name="description">
-                <Input placeholder="Type description" />
+                <Input.TextArea
+                  rows={5}
+                  placeholder="Type description"
+                  autoSize={{ minRows: 2, maxRows: 5 }}
+                />
               </Form.Item>
             </div>
             <div className="field-item">
               <span className="text-label">Privacy</span>
               <Form.Item name="privacy">
-                <Select defaultValue="0">
-                  <Select.Option value="1">Public</Select.Option>
-                  <Select.Option value="0">Private</Select.Option>
-                </Select>
+                <div className="my-select-container">
+                  <Select defaultValue="0" className="custom-select">
+                    <Select.Option value="1">Public</Select.Option>
+                    <Select.Option value="0">Private</Select.Option>
+                  </Select>
+                </div>
+              </Form.Item>
+            </div>
+            <div className="field-item">
+              <span className="text-label">Tags</span>
+              <Form.Item name="tagName">
+                <Input />
               </Form.Item>
             </div>
           </Col>
