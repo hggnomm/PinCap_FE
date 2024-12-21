@@ -3,7 +3,7 @@ import "./index.less";
 import PinMedia from "./PinMedia/PinMedia";
 import { getAllMedias } from "../../api/media";
 import Loading from "../../components/loading/Loading";
-import { useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion"; // Import AnimatePresence and motion
 import { toast } from "react-toastify";
 
 const PinCap = () => {
@@ -12,10 +12,9 @@ const PinCap = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Dùng useRef để kiểm tra việc API đang được gọi
   const isFetching = useRef(false);
+
   const fetchData = async () => {
     if (isFetching.current || !hasMore) return; // Kiểm tra nếu đang fetching hoặc không có dữ liệu mới
 
@@ -27,7 +26,6 @@ const PinCap = () => {
       const data = await getAllMedias(page);
       if (data?.data.length) {
         setListMedia((prevList) => [...prevList, ...data.data]);
-        setSuccessMessage("Dữ liệu đã được tải thành công!");
       } else {
         setHasMore(false); // Nếu không có thêm dữ liệu, ngừng gọi API
       }
@@ -67,9 +65,21 @@ const PinCap = () => {
   return (
     <Loading isLoading={loading} error={error}>
       <div className="pincap-container">
-        {listMedia?.map((media: any, index: any) => (
-          <PinMedia key={index} srcUrl={media?.media_url} data={media} />
-        ))}
+        <motion.div
+          className="pin-media-list"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.2 } }, // Stagger transition for children
+          }}
+        >
+          <AnimatePresence>
+            {listMedia?.map((media: any, index: any) => (
+              <PinMedia key={media?.id} srcUrl={media?.media_url} data={media} />
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </Loading>
   );
