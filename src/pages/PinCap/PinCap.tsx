@@ -3,7 +3,7 @@ import "./index.less";
 import PinMedia from "./PinMedia/PinMedia";
 import { getAllMedias } from "../../api/media";
 import Loading from "../../components/loading/Loading";
-import { motion, AnimatePresence } from "framer-motion"; // Import AnimatePresence and motion
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 
 const PinCap = () => {
@@ -16,9 +16,9 @@ const PinCap = () => {
   const isFetching = useRef(false);
 
   const fetchData = async () => {
-    if (isFetching.current || !hasMore) return; // Kiểm tra nếu đang fetching hoặc không có dữ liệu mới
+    if (isFetching.current || !hasMore) return;
 
-    isFetching.current = true; // Đặt trạng thái fetching thành true
+    isFetching.current = true;
     setLoading(true);
     setError(null);
 
@@ -27,7 +27,7 @@ const PinCap = () => {
       if (data?.data.length) {
         setListMedia((prevList) => [...prevList, ...data.data]);
       } else {
-        setHasMore(false); // Nếu không có thêm dữ liệu, ngừng gọi API
+        setHasMore(false);
       }
     } catch (error) {
       setError("Lỗi khi lấy list media: " + error);
@@ -40,7 +40,6 @@ const PinCap = () => {
   useEffect(() => {
     fetchData();
 
-    // scroll
     const handleScroll = () => {
       if (
         window.innerHeight + document.documentElement.scrollTop >=
@@ -71,11 +70,11 @@ const PinCap = () => {
           animate="visible"
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.2 } }, // Stagger transition for children
+            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
           }}
         >
           <AnimatePresence>
-            {listMedia?.map((media: any, index: any) => (
+            {listMedia.map((media: any) => (
               <PinMedia key={media?.id} srcUrl={media?.media_url} data={media} />
             ))}
           </AnimatePresence>
