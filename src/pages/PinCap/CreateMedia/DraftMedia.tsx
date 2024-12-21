@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getMyMedias } from "../../../api/media";
 import Loading from "../../../components/loading/Loading";
+import { Divider } from "antd/es";
 
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;
@@ -12,6 +13,7 @@ const DraftMedia = ({ resetFormAndCloseDrawer }: DraftMediaProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSelectedMedia, setIsSelectedMedia] = useState<any | null>(null);
 
   const isFetching = useRef(false);
 
@@ -63,8 +65,8 @@ const DraftMedia = ({ resetFormAndCloseDrawer }: DraftMediaProps) => {
   };
 
   const handleMediaClick = (media: any) => {
-    // Handle media item click (you can open the media in a modal or take any other action)
-    console.log("Media clicked:", media);
+    setIsSelectedMedia(media);
+    console.log("Selected Media:", media);
   };
 
   return (
@@ -73,14 +75,15 @@ const DraftMedia = ({ resetFormAndCloseDrawer }: DraftMediaProps) => {
         <button className="create-media-btn" onClick={resetFormAndCloseDrawer}>
           <span className="text-container">Create new</span>
         </button>
-
-        {error && <div className="error-message">{error}</div>}
+        <Divider />
 
         <div className="media-list">
-          {listMedia.map((media, index) => (
+          {listMedia.map((media) => (
             <div
-              key={index}
-              className="media-item"
+              key={media.id}
+              className={`media-item ${
+                isSelectedMedia?.id === media.id ? "selected" : ""
+              }`}
               onClick={() => handleMediaClick(media)}
             >
               <div className="media-thumbnail">
