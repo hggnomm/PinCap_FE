@@ -75,7 +75,11 @@ const PinCap = () => {
         >
           <AnimatePresence>
             {listMedia.map((media: any) => (
-              <PinMedia key={media?.id} srcUrl={media?.media_url} data={media} />
+              <PinMedia
+                key={media?.id}
+                srcUrl={media?.media_url}
+                data={media}
+              />
             ))}
           </AnimatePresence>
         </motion.div>

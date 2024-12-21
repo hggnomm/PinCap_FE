@@ -16,7 +16,7 @@ import FilePondPluginImageEdit from "filepond-plugin-image-edit";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
-import { randomColor } from "../../../utils/utils";
+import DraftMedia from "./DraftMedia";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -76,7 +76,7 @@ const CreateMedia: React.FC = () => {
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
       tagName: tagName,
-      is_created: 0,
+      is_created: 1,
     };
 
     try {
@@ -96,9 +96,15 @@ const CreateMedia: React.FC = () => {
       );
     } finally {
       setIsLoad(false);
-      form.resetFields();
-      setFileList([]);
+      resetForm();
     }
+  };
+
+  const resetForm = () => {
+    form.resetFields();
+    setFileList([]);
+    setTags([]);
+    setDrawerVisible(false);
   };
 
   return (
@@ -217,13 +223,13 @@ const CreateMedia: React.FC = () => {
       </Row>
 
       <Drawer
-        title="Drafts"
+        title={`Drafts Media (${3})`}
         placement="right"
         onClose={() => setDrawerVisible(false)}
-        visible={drawerVisible}
+        open={drawerVisible}
         width={500}
       >
-        <p>Here are your drafts.</p>
+        <DraftMedia resetFormAndCloseDrawer={resetForm} />
       </Drawer>
     </div>
   );

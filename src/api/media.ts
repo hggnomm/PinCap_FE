@@ -15,9 +15,38 @@ export const getAllMedias = async (page: number) => {
   }
 };
 
+export const getMyMedias = async (page: number, is_created: number) => {
+  try {
+    const res = await apiClient.get("/api/medias/my-media", {
+      params: {
+        per_page: 10,
+        page, 
+        is_created: is_created,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const createMedia = async (request: any) => {
   try {
     const res = await apiClient.post("/api/medias", request, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updatedMedia = async (mediaId: string, request: any) => {
+  try {
+    const res = await apiClient.put(`/api/medias?mediaId=${mediaId}`, request, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
