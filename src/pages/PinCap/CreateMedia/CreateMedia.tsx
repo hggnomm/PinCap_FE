@@ -5,7 +5,7 @@ import Title from "antd/es/typography/Title";
 import { createMedia } from "../../../api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import styles
+import "react-toastify/dist/ReactToastify.css";
 
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -44,60 +44,44 @@ interface MediaFormValues {
 const CreateMedia: React.FC = () => {
   const [form] = Form.useForm();
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
-  const [isLoad, setIsLoad] = useState<boolean>(false);
+  const [isLoad, setIsLoad] = useState(false);
   const [fileList, setFileList] = useState<File[]>([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [valueForm, setValueForm] = useState<MediaFormValues>({
-    media: null,
-    mediaName: "",
-    description: "",
-    privacy: "0", // default private
-    mediaOwner_id: "",
-    type: "1",
-    tagName: [],
-    is_created: 1,
-  });
 
-  const handleGenerateClick = () => {
+  const handleGenerateClick = async () => {
     const formValue = form.getFieldsValue(true);
 
-    // Kiểm tra nếu không có ảnh hoặc tên thì thông báo lỗi
-    if (fileList.length === 0) {
-      toast.error("Please upload an image or media file.");
-      return;
-    }
+    // Validate file and media name
+    if (!fileList.length)
+      return toast.error("Please upload an image or media file.");
+    if (!formValue.mediaName)
+      return toast.error("Please provide a name for the media.");
 
-    if (!formValue.mediaName) {
-      toast.error("Please provide a name for the media.");
-      return;
-    }
-    const valueAPI: MediaFormValues = {
-      ...valueForm,
+    const mediaData: MediaFormValues = {
+      ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
-      mediaName: formValue.mediaName,
-      description: formValue.description,
-      privacy: formValue.privacy || "0",
       tagName: [],
       is_created: 1,
     };
-    createNewMedia(valueAPI);
-    setIsLoad(true);
-  };
 
-  const createNewMedia = async (valueForm: MediaFormValues) => {
     try {
-      const response = await createMedia(valueForm);
+      setIsLoad(true);
+      const response = await createMedia(mediaData);
       if (response) {
         setIsLoad(false);
         toast.success("Media created successfully!");
+      } else {
+        toast.error(
+          `Error: Occurred while creating image, please send report to admin"`
+        );
       }
     } catch (error: any) {
-      console.error("Error creating media:", error);
-      setIsLoad(false);
       toast.error(
         `Error: ${error?.message || "An unexpected error occurred."}`
       );
+    } finally {
+      setIsLoad(false);
     }
   };
 
@@ -105,7 +89,7 @@ const CreateMedia: React.FC = () => {
     <div className="create-media-container">
       <Row className="field-create-media">
         <Col>
-          <Title style={{ margin: 0 }} level={4}>
+          <Title level={4} style={{ margin: 0 }}>
             Create Media
           </Title>
         </Col>
@@ -131,9 +115,9 @@ const CreateMedia: React.FC = () => {
           </div>
         )}
         <Form
-          className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
           form={form}
           disabled={isLoad}
+          className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
         >
           <Col span={10} className="upload-image">
             <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
@@ -143,12 +127,12 @@ const CreateMedia: React.FC = () => {
                   options: { type: "local" },
                 }))}
                 onupdatefiles={(fileItems) =>
-                  setFileList(fileItems.map((fileItem) => fileItem.file))
+                  setFileList(fileItems.map((item) => item.file))
                 }
                 allowMultiple={false}
                 maxFileSize="50MB"
                 acceptedFileTypes={["image/*", "video/*"]}
-                allowFileTypeValidation={true}
+                allowFileTypeValidation
                 labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
               />
             </Form.Item>
@@ -159,32 +143,25 @@ const CreateMedia: React.FC = () => {
               <Form.Item
                 name="mediaName"
                 rules={[
-                  {
-                    required: true,
-                    message: "Please input your media name!",
-                  },
+                  { required: true, message: "Please input your media name!" },
                 ]}
               >
-                <Input placeholder="Please input your media name" />
+                <Input placeholder="Type media name" />
               </Form.Item>
             </div>
             <div className="field-item">
               <span className="text-label">Description</span>
               <Form.Item name="description">
-                <Input placeholder="Please input description media" />
+                <Input placeholder="Type description" />
               </Form.Item>
             </div>
-
             <div className="field-item">
               <span className="text-label">Privacy</span>
               <Form.Item name="privacy">
-                <Select
-                  defaultValue="0" // Mặc định là private
-                  options={[
-                    { value: "1", label: "Public" },
-                    { value: "0", label: "Private" },
-                  ]}
-                />
+                <Select defaultValue="0">
+                  <Select.Option value="1">Public</Select.Option>
+                  <Select.Option value="0">Private</Select.Option>
+                </Select>
               </Form.Item>
             </div>
           </Col>
@@ -199,7 +176,6 @@ const CreateMedia: React.FC = () => {
         width={500}
       >
         <p>Here are your drafts.</p>
-        <p>You can display draft items or other relevant information here.</p>
       </Drawer>
     </div>
   );
