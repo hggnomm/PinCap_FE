@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./index.less";
-import { Button, Col, Form, Input, Row, Select, Spin } from "antd";
+import { Button, Col, Form, Input, Row, Select, Spin, Drawer } from "antd";
 import Title from "antd/es/typography/Title";
 import { createMedia } from "../../../api/media";
 import { useSelector } from "react-redux";
@@ -46,7 +46,7 @@ const CreateMedia: React.FC = () => {
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
   const [isLoad, setIsLoad] = useState<boolean>(false);
   const [fileList, setFileList] = useState<File[]>([]);
-
+  const [drawerVisible, setDrawerVisible] = useState(false);
   const [valueForm, setValueForm] = useState<MediaFormValues>({
     media: null,
     mediaName: "",
@@ -81,8 +81,6 @@ const CreateMedia: React.FC = () => {
       tagName: [],
       is_created: 1,
     };
-    console.log(valueAPI);
-
     createNewMedia(valueAPI);
     setIsLoad(true);
   };
@@ -97,7 +95,6 @@ const CreateMedia: React.FC = () => {
     } catch (error: any) {
       console.error("Error creating media:", error);
       setIsLoad(false);
-      // Thông báo lỗi chi tiết
       toast.error(
         `Error: ${error?.message || "An unexpected error occurred."}`
       );
@@ -113,9 +110,17 @@ const CreateMedia: React.FC = () => {
           </Title>
         </Col>
         <Col>
-          <Button onClick={handleGenerateClick} className="btn-publish-media">
-            Publish
-          </Button>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Button onClick={handleGenerateClick} className="btn-publish-media">
+              Publish
+            </Button>
+            <Button
+              onClick={() => setDrawerVisible(true)}
+              className="btn-open-draft"
+            >
+              Draft
+            </Button>
+          </div>
         </Col>
       </Row>
 
@@ -151,7 +156,15 @@ const CreateMedia: React.FC = () => {
           <Col span={14} className="field-input">
             <div className="field-item">
               <span className="text-label">Title</span>
-              <Form.Item name="mediaName">
+              <Form.Item
+                name="mediaName"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your media name!",
+                  },
+                ]}
+              >
                 <Input placeholder="Please input your media name" />
               </Form.Item>
             </div>
@@ -177,6 +190,17 @@ const CreateMedia: React.FC = () => {
           </Col>
         </Form>
       </Row>
+
+      <Drawer
+        title="Drafts"
+        placement="right"
+        onClose={() => setDrawerVisible(false)}
+        visible={drawerVisible}
+        width={500}
+      >
+        <p>Here are your drafts.</p>
+        <p>You can display draft items or other relevant information here.</p>
+      </Drawer>
     </div>
   );
 };
