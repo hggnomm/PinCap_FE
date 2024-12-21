@@ -16,6 +16,7 @@ import FilePondPluginImageEdit from "filepond-plugin-image-edit";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
+import { randomColor } from "../../../utils/utils";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -131,7 +132,7 @@ const CreateMedia: React.FC = () => {
         )}
         <Form
           form={form}
-          disabled={isLoad || !fileList.length}
+          // disabled={isLoad || !fileList.length}
           className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
         >
           <Col span={10} className="upload-image">
@@ -190,7 +191,12 @@ const CreateMedia: React.FC = () => {
               <Form.Item name="tagName">
                 <Input
                   onKeyDown={handleTagInput}
-                  placeholder="Search tags or create new"
+                  placeholder={
+                    tags.length >= 10
+                      ? "Maximum 10 cards, no more can be added"
+                      : "Search for tags or create new ones"
+                  }
+                  disabled={tags.length >= 10}
                 />
               </Form.Item>
               <div className="tags-display">
@@ -199,7 +205,6 @@ const CreateMedia: React.FC = () => {
                     key={index}
                     closable
                     onClose={() => setTags(tags.filter((t) => t !== tag))}
-                    color="blue"
                     className="custom-tag"
                   >
                     {tag}
