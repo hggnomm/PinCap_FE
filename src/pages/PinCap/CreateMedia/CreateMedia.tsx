@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./index.less";
-import { Button, Col, Form, Input, Row, Select, Spin, Drawer } from "antd";
+import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 import Title from "antd/es/typography/Title";
 import { createMedia } from "../../../api/media";
 import { useSelector } from "react-redux";
@@ -48,6 +48,19 @@ const CreateMedia: React.FC = () => {
   const [fileList, setFileList] = useState<File[]>([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
 
+  const [tags, setTags] = useState<string[]>([]);
+
+  const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const input = e.target as HTMLInputElement;
+      const newTag = input.value.trim();
+      if (newTag && !tags.includes(newTag)) {
+        setTags([...tags, newTag]);
+        input.value = "";
+      }
+    }
+  };
+
   const handleGenerateClick = async () => {
     const formValue = form.getFieldsValue(true);
 
@@ -57,11 +70,12 @@ const CreateMedia: React.FC = () => {
     if (!formValue.mediaName)
       return toast.error("Please provide a name for the media.");
 
+    const tagName = tags.filter((tag) => tag.trim() !== "");
     const mediaData: MediaFormValues = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
-      tagName: [],
+      tagName: tagName, 
       is_created: 0,
     };
 
@@ -73,7 +87,7 @@ const CreateMedia: React.FC = () => {
         toast.success("Media created successfully!");
       } else {
         toast.error(
-          `Error: Occurred while creating image, please send report to admin"`
+          "Error: Occurred while creating image, please send report to admin"
         );
       }
     } catch (error: any) {
@@ -173,8 +187,22 @@ const CreateMedia: React.FC = () => {
             <div className="field-item">
               <span className="text-label">Tags</span>
               <Form.Item name="tagName">
-                <Input />
+                <Input
+                  onKeyDown={handleTagInput}
+                  placeholder="Search tags or create new"
+                />
               </Form.Item>
+              <div className="tags-display">
+                {tags.map((tag, index) => (
+                  <Tag
+                    key={index}
+                    closable
+                    onClose={() => setTags(tags.filter((t) => t !== tag))}
+                  >
+                    {tag}
+                  </Tag>
+                ))}
+              </div>
             </div>
           </Col>
         </Form>
