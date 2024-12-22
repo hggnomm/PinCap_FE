@@ -6,11 +6,15 @@ import { Divider } from "antd/es";
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;
   onSelectMedia: (media: any) => void;
+  reloadDrafts: boolean; 
+  setReloadDrafts: (reload: boolean) => void; 
 }
 
 const DraftMedia = ({
   resetFormAndCloseDrawer,
   onSelectMedia,
+  reloadDrafts,
+  setReloadDrafts,
 }: DraftMediaProps) => {
   const [listMedia, setListMedia] = useState<any[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -18,8 +22,14 @@ const DraftMedia = ({
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isSelectedMedia, setIsSelectedMedia] = useState<any | null>(null);
-
   const isFetching = useRef(false);
+
+  useEffect(() => {
+    if (reloadDrafts) {
+      fetchData();
+      setReloadDrafts(false);
+    }
+  }, [reloadDrafts]);
 
   useEffect(() => {
     fetchData();
@@ -55,7 +65,7 @@ const DraftMedia = ({
     try {
       const data = await getMyMedias(page, 0);
       if (data?.data.length) {
-        setListMedia((prevList) => [...prevList, ...data.data]);
+        setListMedia(data.data);
       } else {
         setHasMore(false);
       }
@@ -69,11 +79,12 @@ const DraftMedia = ({
 
   const handleMediaClick = (media: any) => {
     setIsSelectedMedia(media);
+    console.log(media);
     onSelectMedia(media); // Truyền media đã chọn vào form
   };
 
   return (
-    <Loading isLoading={loading} error={error}>
+    <Loading isLoading={loading} error={error}> 
       <div className="draft-container">
         <button
           className="create-media-btn"

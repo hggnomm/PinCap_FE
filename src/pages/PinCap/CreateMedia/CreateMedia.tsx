@@ -17,6 +17,7 @@ import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
 import DraftMedia from "./DraftMedia";
+import { Media } from "type";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -39,7 +40,7 @@ interface MediaFormValues {
   privacy: string;
   mediaOwner_id: string;
   type: string;
-  tags_name: string[]; // Đảm bảo đây là mảng
+  tags_name: string[];
   is_created: number;
   is_comment: number;
 }
@@ -51,21 +52,26 @@ const CreateMedia: React.FC = () => {
   const [fileList, setFileList] = useState<File[]>([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
-  const [formData, setFormData] = useState<MediaFormValues>({
-    media_name: "",
-    description: "",
-    privacy: "0",
-    tags_name: [], // tags_name là mảng
-    media: null,
-    mediaOwner_id: tokenPayload.id,
-    type: "",
-    is_created: 0,
-    is_comment: 1,
-  });
+  const [isSelectedDraft, setIsSelectedDraft] = useState(false);
 
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
+
+  const [reloadDrafts, setReloadDrafts] = useState(false);
+  const [isFormDisabled, setIsFormDisabled] = useState(true);
+
+  const [isLoadCreateDraft, setIsLoadCreateDraft] = useState(false);
+  const [textCreateDraft, setTextCreateDraft] = useState(false);
+  const [draftId, setDraftId] = useState();
+  const [imageUrl, setImageUrl] = useState("");
+  useEffect(() => {
+    if (fileList.length > 0 || isSelectedDraft) {
+      setIsFormDisabled(false);
+    } else {
+      setIsFormDisabled(true);
+    }
+  }, [fileList, isSelectedDraft]);
 
   useEffect(() => {
     form.setFieldsValue({
@@ -86,12 +92,10 @@ const CreateMedia: React.FC = () => {
   };
 
   const handleFormChange = () => {
-    // Nếu đang đợi một thay đổi khác, xóa timeout cũ
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
 
-    // Thực hiện gọi onChangeMedia sau 1.5 giây
     const newTimeout = setTimeout(() => {
       onChangeMedia();
     }, 2500);
@@ -107,19 +111,30 @@ const CreateMedia: React.FC = () => {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
-      tags_name: tags_name, // Đảm bảo đây là mảng
+      tags_name: tags_name,
       is_created: 0,
       is_comment: 1,
     };
+    setIsLoadCreateDraft(true);
+    setTextCreateDraft(true);
     try {
       if (formValue.id) {
         delete mediaData.media;
         const response = await updatedMedia(formValue.id, mediaData);
+
+        if (response) {
+          setReloadDrafts(true);
+        }
       } else {
-        await createMedia(mediaData);
+        const response = await createMedia(mediaData);
+        if (response) {
+          setReloadDrafts(true);
+        }
       }
     } catch (error) {
       toast.error("Error while updating media.");
+    } finally {
+      setTextCreateDraft(false);
     }
   };
 
@@ -136,7 +151,7 @@ const CreateMedia: React.FC = () => {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
-      tags_name: tags_name, // Đảm bảo đây là mảng
+      tags_name: tags_name,
       is_created: 1,
       is_comment: 1,
     };
@@ -169,6 +184,7 @@ const CreateMedia: React.FC = () => {
         `Error: ${error?.message || "An unexpected error occurred."}`
       );
     } finally {
+      setReloadDrafts(true);
       setIsLoad(false);
       resetForm();
     }
@@ -178,17 +194,21 @@ const CreateMedia: React.FC = () => {
     form.resetFields();
     setFileList([]);
     setTags([]);
+    setImageUrl("");
     setDrawerVisible(false);
   };
 
-  const handleSelectMedia = (media: any) => {
+  const handleSelectMedia = (media: Media) => {
     form.setFieldsValue({
       media_name: media.media_name,
       description: media.description,
       privacy: "0",
-      tags_name: media.tags_name, // Chắc chắn tags_name là mảng
+      tags_name: media.tags_name,
       id: media.id,
     });
+    setImageUrl(media.media_url);
+    setIsSelectedDraft(true); // Đánh dấu là đã chọn draft
+    setFileList([]); // Clear file list để form không bị disabled
   };
 
   return (
@@ -200,7 +220,20 @@ const CreateMedia: React.FC = () => {
           </Title>
         </Col>
         <Col>
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {isLoadCreateDraft &&
+              (textCreateDraft ? (
+                <div className="text-draft-change">Saving changes...</div>
+              ) : (
+                <div className="text-draft-change">Changes saved!</div>
+              ))}
             <Button onClick={handleGenerateClick} className="btn-publish-media">
               Publish
             </Button>
@@ -222,24 +255,33 @@ const CreateMedia: React.FC = () => {
         )}
         <Form
           form={form}
-          disabled={!fileList.length}
+          disabled={isFormDisabled} // Disable form khi isFormDisabled = true
           className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
           onValuesChange={handleFormChange} // Gọi khi có thay đổi
         >
           <Col span={10} className="upload-image">
-            <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
-              <FilePond
-                files={fileList}
-                onupdatefiles={(fileItems) =>
-                  setFileList(fileItems.map((item) => item.file))
-                }
-                allowMultiple={false}
-                maxFileSize="50MB"
-                acceptedFileTypes={["image/*", "video/*"]}
-                labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
-              />
-            </Form.Item>
+            {imageUrl ? (
+              <div className="draft-img">
+                <img src={imageUrl} alt="" />
+              </div>
+            ) : (
+              <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
+                <FilePond
+                  files={fileList}
+                  onupdatefiles={(fileItems) =>
+                    setFileList(fileItems.map((item) => item.file))
+                  }
+                  allowMultiple={false}
+                  maxFileSize="50MB"
+                  acceptedFileTypes={["image/*", "video/*"]}
+                  labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
+                  imagePreviewMaxHeight={1000}
+                  imagePreviewMarkupShow
+                />
+              </Form.Item>
+            )}
           </Col>
+
           <Col span={14} className="field-input">
             <div className="field-item">
               <span className="text-label">Title</span>
@@ -300,7 +342,7 @@ const CreateMedia: React.FC = () => {
       </Row>
 
       <Drawer
-        title={`Drafts Media (2)`}
+        title={`Drafts Media`}
         placement="right"
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
@@ -309,6 +351,8 @@ const CreateMedia: React.FC = () => {
         <DraftMedia
           resetFormAndCloseDrawer={resetForm}
           onSelectMedia={handleSelectMedia}
+          reloadDrafts={reloadDrafts}
+          setReloadDrafts={setReloadDrafts}
         />
       </Drawer>
     </div>

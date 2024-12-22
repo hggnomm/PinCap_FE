@@ -20,6 +20,7 @@ export type Media = {
   type: "IMAGE" | "VIDEO";
   userComments: any | null;
   privacy: string;
+  tags_name: string[];
   reaction: {
     id: string;
     feeling_id: string;
@@ -33,4 +34,3 @@ export type Album = {
   description: string;
   privacy: string;
 };
-
