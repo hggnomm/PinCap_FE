@@ -1,178 +1,202 @@
 .detail-media-container {
-  width: 70%;
+  min-width: 65%;
   margin: 0 auto;
   background-color: #eef5ff !important;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   .detail-media {
     margin: 2.5rem 0;
     border-radius: 40px;
-    height: 100%;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     display: flex;
-    background-color: #fefefe;
+    background-color: rgba(255, 255, 255, 0.7);
+    max-width: 65%;
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 
     .left-view {
+      display: flex;
       height: auto;
-      width: 45%;
+      min-width: auto;
+      border-top-left-radius: 40px;
+      border-bottom-left-radius: 40px;
+      overflow: hidden; /* Thêm dòng này để cắt góc ảnh/video */
 
       img,
       video {
+        width: 100%;
+        object-fit: contain;
         max-width: 100%;
-        min-height: 100%;
-        object-fit: cover;
-        border-top-left-radius: 40px;
-        border-bottom-left-radius: 40px;
+        max-height: 80vh; /* Đảm bảo chiều cao không vượt quá 80% chiều cao viewport */
       }
     }
+
     .right-view {
-      width: 55%;
+      min-width: 55%;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: visible;
 
-      .action {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 40px 40px 0 33px;
+      .right-top-view {
+        padding: 25px 25px 0 20px;
+        width: 100%;
 
-        .action-left {
+        .action {
           display: flex;
+          justify-content: space-between;
           align-items: center;
-          justify-content: center;
-          gap: 14px;
+
+          .action-left {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+
+            button {
+              border: none;
+              outline: none;
+              background-color: inherit;
+              border-radius: 100px;
+              padding: 0.3rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              cursor: pointer;
+
+              &:active {
+                outline: 3px solid #206aa3;
+              }
+              &:hover {
+                background: #ddd;
+              }
+            }
+            img {
+              width: 24px;
+              cursor: pointer;
+            }
+            span {
+              margin-left: 0.3rem;
+              font-weight: 500;
+              font-size: 18px;
+              height: 100%;
+            }
+          }
+
+          .action-right button {
+            border: none;
+            outline: none;
+            margin-left: 10px;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 500;
+
+            &.album {
+              background-color: inherit;
+
+              &:hover {
+                background-color: #ddd;
+              }
+              &:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease-in-out;
+              }
+            }
+
+            &.save {
+              background-color: #d42364;
+              color: #fff;
+
+              &:hover {
+                background-color: #92103f;
+              }
+              &:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease-in-out;
+              }
+            }
+          }
+        }
+
+        .description {
+          text-align: left;
+
+          span {
+            font-size: 16px;
+          }
+        }
+
+        .user_owner {
+          z-index: 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background-color: #ffffff;
+
+          .user {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .info {
+              margin-left: 0.7rem;
+              span {
+                font-size: 14px;
+                margin-bottom: 4px;
+                display: block;
+                text-align: left;
+              }
+            }
+
+            img {
+              border-radius: 100%;
+              width: 50px;
+              height: 50px;
+              cursor: pointer;
+            }
+
+            img:hover {
+              filter: brightness(0.9);
+            }
+          }
 
           button {
             border: none;
             outline: none;
-            background-color: inherit;
-            border-radius: 100px;
-            padding: 0.55rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin-left: 10px;
+            padding: 12px 24px;
             cursor: pointer;
-
-            &:active {
-              outline: 3px solid #206aa3;
-            }
-            &:hover {
-              background: #ddd;
-            }
-          }
-          img {
-            width: 24px;
-            cursor: pointer;
-          }
-          span {
-            margin-left: 0.3rem;
+            border-radius: 50px;
+            font-size: 16px;
             font-weight: 500;
-            font-size: 18px;
-          }
-        }
-        .action-right button {
-          border: none;
-          outline: none;
-          margin-left: 10px;
-          padding: 12px 24px;
-          cursor: pointer;
-          border-radius: 30px;
-          font-size: 16px;
-          font-weight: 500;
-
-          &.album {
-            background-color: inherit;
+            border: 1px solid #ccc;
 
             &:hover {
-              background-color: #ddd;
+              background-color: #f9f7f7;
             }
+
             &:active {
               transform: scale(0.95);
               transition: transform 0.1s ease-in-out;
             }
           }
-          &.save {
-            background-color: #d42364;
+
+          button.following {
+            background: #000;
             color: #fff;
+          }
 
-            &:hover {
-              background-color: #92103f;
-            }
-            &:active {
-              transform: scale(0.95);
-              transition: transform 0.1s ease-in-out;
-            }
+          button.follow {
+            background: #f9f7f7;
           }
         }
-      }
-
-      .description {
-        padding: 40px 40px 0 40px;
-        text-align: left;
-
-        span {
-          font-size: 16px;
-        }
-      }
-      .user_owner {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 40px 40px 0 40px;
-        background-color: #ffffff;
-
-        .user {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-
-          .info {
-            margin-left: 0.7rem;
-            span {
-              font-size: 14px;
-              margin-bottom: 4px;
-              display: block;
-              text-align: left;
-            }
-          }
-          img {
-            border-radius: 100%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-          }
-          img:hover {
-            filter: brightness(0.9);
-          }
-        }
-        button {
-          border: none;
-          outline: none;
-          margin-left: 10px;
-          padding: 12px 24px;
-          cursor: pointer;
-          border-radius: 50px;
-          font-size: 16px;
-          font-weight: 500;
-          border: 1px solid #ccc;
-
-          &:hover {
-            background-color: #f9f7f7;
-          }
-          &:active {
-            transform: scale(0.95);
-            transition: transform 0.1s ease-in-out;
-          }
-        }
-        button.following {
-          background: #000;
-          color: #fff;
-        }
-        button.follow {
-          background: #f9f7f7;
-        }
-      }
-      .comment {
-        min-height: auto;
-        max-height: 500px;
-        overflow-y: auto;
       }
     }
   }
@@ -184,6 +208,7 @@
 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
+
   .top-menu-album {
     outline: none;
     font-weight: bold;

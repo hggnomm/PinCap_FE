@@ -13,6 +13,7 @@ export type Media = {
   is_created: boolean;
   media_name: string;
   media_url: string;
+  description: string;
   numberUserFollowers: number;
   ownerUser: User;
   reaction_user_count: number | null;

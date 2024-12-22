@@ -10,10 +10,11 @@ import Loading from "../../../components/loading/Loading";
 
 import "./index.less";
 import { getAlbumData } from "../../../api/album";
-import { unidecode } from "unidecode"; // Import thư viện unidecode
+import { unidecode } from "unidecode";
 import { AddRelationships, DeleteRelationships } from "../../../api/users";
 import { Album, Media } from "../../../types/type";
 import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
+import Comment from "./Comment/Comment";
 
 const DetailMedia = () => {
   const [media, setMedia] = useState<Media | null>(null);
@@ -54,13 +55,12 @@ const DetailMedia = () => {
   const handleSearch = (value: string) => {
     setSearchTerm(value);
 
-    const normalizedSearchTerm = unidecode(value.toLowerCase()); 
+    const normalizedSearchTerm = unidecode(value.toLowerCase());
 
-    const filteredAlbums = albumData.filter(
-      (album) =>
-        unidecode(album.album_name.toLowerCase()).includes(normalizedSearchTerm) 
+    const filteredAlbums = albumData.filter((album) =>
+      unidecode(album.album_name.toLowerCase()).includes(normalizedSearchTerm)
     );
-    setAlbumData(filteredAlbums); 
+    setAlbumData(filteredAlbums);
   };
 
   const handleWithOwnerUser = async () => {
@@ -99,7 +99,7 @@ const DetailMedia = () => {
             ...prevState,
             ownerUser: {
               ...prevState.ownerUser,
-              isFollowing: true, 
+              isFollowing: true,
             },
           };
         });
@@ -190,89 +190,97 @@ const DetailMedia = () => {
       >
         <div className="detail-media">
           <div className="left-view">
-            {media ? (
-              media.type === "IMAGE" ? (
+            <div></div>
+            {media &&
+              (media.type === "IMAGE" ? (
                 <img src={media.media_url} alt={media.media_name} />
               ) : (
                 <video src={media.media_url} controls />
-              )
-            ) : (
-              <p>Loading media...</p>
-            )}
+              ))}
           </div>
           <div className="right-view">
-            <div className="action">
-              <div className="action-left">
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <button onClick={() => handleReaction()}>
-                    <img
-                      src={getImageReactionWithId(media?.reaction?.feeling_id)}
-                      alt="heart"
-                    />
+            <div className="right-top-view">
+              <div className="action">
+                <div className="action-left">
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <button onClick={() => handleReaction()}>
+                      <img
+                        src={getImageReactionWithId(
+                          media?.reaction?.feeling_id
+                        )}
+                        alt="heart"
+                      />
+                    </button>
+                    <span>{media?.reaction_user_count}</span>
+                  </div>
+
+                  <button>
+                    <img src={download} alt="download" />
                   </button>
-                  <span>{media?.reaction_user_count}</span>
+                  <button>
+                    <img src={more} alt="more" />
+                  </button>
                 </div>
+                <div className="action-right">
+                  <Dropdown
+                    overlay={albumMenu} // Pass the dynamically fetched album data to the dropdown
+                    placement="bottom"
+                    trigger={["click"]}
+                    onVisibleChange={fetchAlbumData} // Fetch album data when the dropdown is clicked
+                    className="dropdown_item"
+                  >
+                    <button className="album">
+                      Album
+                      <DownOutlined
+                        style={{ marginLeft: "10px", fontWeight: "600" }}
+                      />
+                    </button>
+                  </Dropdown>
 
-                <button>
-                  <img src={download} alt="download" />
-                </button>
-                <button>
-                  <img src={more} alt="more" />
-                </button>
+                  <button className="save">Save</button>
+                </div>
               </div>
-              <div className="action-right">
-                <Dropdown
-                  overlay={albumMenu} // Pass the dynamically fetched album data to the dropdown
-                  placement="bottom"
-                  trigger={["click"]}
-                  onVisibleChange={fetchAlbumData} // Fetch album data when the dropdown is clicked
-                  className="dropdown_item"
-                >
-                  <button className="album">
-                    Album
-                    <DownOutlined
-                      style={{ marginLeft: "10px", fontWeight: "600" }}
-                    />
+              {media?.description && (
+                <div className="description">
+                  <span>{media.description}</span>
+                </div>
+              )}
+
+              <div className="user_owner">
+                <div className="user">
+                  {media?.ownerUser && (
+                    <>
+                      <img src={media.ownerUser.avatar} alt="owner" />
+                      <div className="info">
+                        <span style={{ fontWeight: "bold" }}>
+                          {media.ownerUser.first_name}
+                        </span>
+                        <span>{media.numberUserFollowers} follower</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {media?.ownerUser?.isFollowing ? (
+                  <button onClick={handleWithOwnerUser} className="following">
+                    Following
                   </button>
-                </Dropdown>
-
-                <button className="save">Save</button>
-              </div>
-            </div>
-            <div className="description">
-              <span>test</span>
-            </div>
-            <div className="user_owner">
-              <div className="user">
-                {media?.ownerUser && (
-                  <>
-                    <img src={media.ownerUser.avatar} alt="owner" />
-                    <div className="info">
-                      <span style={{ fontWeight: "bold" }}>
-                        {media.ownerUser.first_name}
-                      </span>
-                      <span>{media.numberUserFollowers} follower</span>
-                    </div>
-                  </>
+                ) : (
+                  <button onClick={handleWithOwnerUser} className="follow ">
+                    Follow
+                  </button>
                 )}
               </div>
-              {media?.ownerUser?.isFollowing ? (
-                <button onClick={handleWithOwnerUser} className="following">
-                  Following
-                </button>
-              ) : (
-                <button onClick={handleWithOwnerUser} className="follow ">
-                  Follow
-                </button>
-              )}
             </div>
-            <div className="comment"></div>
+            {/* Comment */}
+            <div>
+              <Comment />
+            </div>
           </div>
         </div>
       </motion.div>
