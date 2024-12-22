@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./index.less";
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 import Title from "antd/es/typography/Title";
-import { createMedia } from "../../../api/media";
+import { createMedia, updatedMedia } from "../../../api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -32,14 +32,16 @@ interface TokenPayload {
 }
 
 interface MediaFormValues {
+  id?: string;
   media: File | null;
-  mediaName: string;
+  media_name: string;
   description: string;
   privacy: string;
   mediaOwner_id: string;
   type: string;
-  tagName: string[];
+  tags_name: string[];
   is_created: number;
+  is_comment: boolean;
 }
 
 const CreateMedia: React.FC = () => {
@@ -56,39 +58,53 @@ const CreateMedia: React.FC = () => {
       const newTag = input.value.trim();
       if (newTag && !tags.includes(newTag)) {
         setTags([...tags, newTag]);
-        form.resetFields(["tagName"]);
+        form.resetFields(["tags_name"]);
       }
     }
   };
 
   const handleGenerateClick = async () => {
     const formValue = form.getFieldsValue(true);
-
-    // Validate file and media name
-    if (!fileList.length)
+    if (!fileList.length && !formValue.id)
       return toast.error("Please upload an image or media file.");
-    if (!formValue.mediaName)
+    if (!formValue.media_name)
       return toast.error("Please provide a name for the media.");
 
-    const tagName = tags.filter((tag) => tag.trim() !== "");
+    const tags_name = tags.filter((tag) => tag.trim() !== "");
+
     const mediaData: MediaFormValues = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
-      tagName: tagName,
+      tags_name: tags_name,
       is_created: 1,
+      is_comment: 1,
     };
 
     try {
       setIsLoad(true);
-      const response = await createMedia(mediaData);
-      if (response) {
-        setIsLoad(false);
-        toast.success("Media created successfully!");
+
+      if (formValue.id) {
+        delete mediaData.media;
+        console.log(mediaData);
+        const response = await updatedMedia(formValue.id, mediaData);
+        if (response) {
+          setIsLoad(false);
+          toast.success("Media updated successfully!");
+        } else {
+          toast.error("Error: Failed to update media.");
+        }
       } else {
-        toast.error(
-          "Error: Occurred while creating image, please send report to admin"
-        );
+        // Nếu không có ID, thì tạo mới
+        const response = await createMedia(mediaData);
+        if (response) {
+          setIsLoad(false);
+          toast.success("Media created successfully!");
+        } else {
+          toast.error(
+            "Error: Occurred while creating media, please send report to admin"
+          );
+        }
       }
     } catch (error: any) {
       toast.error(
@@ -105,6 +121,18 @@ const CreateMedia: React.FC = () => {
     setFileList([]);
     setTags([]);
     setDrawerVisible(false);
+  };
+
+  // Hàm xử lý khi người dùng chọn media từ DraftMedia
+  const handleSelectMedia = (media: any) => {
+    // Nếu media có id, cập nhật id vào form
+    form.setFieldsValue({
+      media_name: media.media_name,
+      description: media.description,
+      privacy: "0",
+      tags_name: [],
+      id: media.id,
+    });
   };
 
   return (
@@ -138,23 +166,18 @@ const CreateMedia: React.FC = () => {
         )}
         <Form
           form={form}
-          // disabled={isLoad || !fileList.length}
           className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
         >
           <Col span={10} className="upload-image">
             <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
               <FilePond
-                files={fileList.map((file) => ({
-                  source: file,
-                  options: { type: "local" },
-                }))}
+                files={fileList}
                 onupdatefiles={(fileItems) =>
                   setFileList(fileItems.map((item) => item.file))
                 }
                 allowMultiple={false}
                 maxFileSize="50MB"
                 acceptedFileTypes={["image/*", "video/*"]}
-                allowFileTypeValidation
                 labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
               />
             </Form.Item>
@@ -163,7 +186,7 @@ const CreateMedia: React.FC = () => {
             <div className="field-item">
               <span className="text-label">Title</span>
               <Form.Item
-                name="mediaName"
+                name="media_name"
                 rules={[
                   { required: true, message: "Please input your media name!" },
                 ]}
@@ -184,17 +207,15 @@ const CreateMedia: React.FC = () => {
             <div className="field-item">
               <span className="text-label">Privacy</span>
               <Form.Item name="privacy">
-                <div className="my-select-container">
-                  <Select defaultValue="0" className="custom-select">
-                    <Select.Option value="1">Public</Select.Option>
-                    <Select.Option value="0">Private</Select.Option>
-                  </Select>
-                </div>
+                <Select defaultValue="0" className="custom-select">
+                  <Select.Option value="1">Public</Select.Option>
+                  <Select.Option value="0">Private</Select.Option>
+                </Select>
               </Form.Item>
             </div>
             <div className="field-item">
               <span className="text-label">Tags</span>
-              <Form.Item name="tagName">
+              <Form.Item name="tags_name">
                 <Input
                   onKeyDown={handleTagInput}
                   placeholder={
@@ -223,13 +244,16 @@ const CreateMedia: React.FC = () => {
       </Row>
 
       <Drawer
-        title={`Drafts Media (${3})`}
+        title={`Drafts Media (2)`}
         placement="right"
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
         width={500}
       >
-        <DraftMedia resetFormAndCloseDrawer={resetForm} />
+        <DraftMedia
+          resetFormAndCloseDrawer={resetForm}
+          onSelectMedia={handleSelectMedia}
+        />
       </Drawer>
     </div>
   );

@@ -5,7 +5,7 @@ import "./index.less";
 
 const PinMedia = (props: any) => {
   const navigate = useNavigate();
-  const isMp4 = props.srcUrl.endsWith(".mp4");
+  const isMp4 = props.srcUrl?.endsWith(".mp4");
 
   const openDetailMedia = (id: string) => {
     navigate(`/media/${id}`);

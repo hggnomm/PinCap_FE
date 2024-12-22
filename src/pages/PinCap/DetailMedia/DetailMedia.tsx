@@ -54,15 +54,13 @@ const DetailMedia = () => {
   const handleSearch = (value: string) => {
     setSearchTerm(value);
 
-    // Loại bỏ dấu tiếng Việt để tìm kiếm không phân biệt dấu
-    const normalizedSearchTerm = unidecode(value.toLowerCase()); // Chuyển thành chữ thường và bỏ dấu
+    const normalizedSearchTerm = unidecode(value.toLowerCase()); 
 
-    // Lọc album theo tên album (cũng bỏ dấu để so sánh)
     const filteredAlbums = albumData.filter(
       (album) =>
-        unidecode(album.album_name.toLowerCase()).includes(normalizedSearchTerm) // So sánh không phân biệt dấu
+        unidecode(album.album_name.toLowerCase()).includes(normalizedSearchTerm) 
     );
-    setAlbumData(filteredAlbums); // Cập nhật albumData với kết quả lọc
+    setAlbumData(filteredAlbums); 
   };
 
   const handleWithOwnerUser = async () => {

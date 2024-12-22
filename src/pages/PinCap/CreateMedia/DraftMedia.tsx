@@ -5,9 +5,13 @@ import { Divider } from "antd/es";
 
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;
+  onSelectMedia: (media: any) => void;
 }
 
-const DraftMedia = ({ resetFormAndCloseDrawer }: DraftMediaProps) => {
+const DraftMedia = ({
+  resetFormAndCloseDrawer,
+  onSelectMedia,
+}: DraftMediaProps) => {
   const [listMedia, setListMedia] = useState<any[]>([]);
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
@@ -49,10 +53,9 @@ const DraftMedia = ({ resetFormAndCloseDrawer }: DraftMediaProps) => {
     setError(null);
 
     try {
-      const data = await getMyMedias(page, 1);
+      const data = await getMyMedias(page, 0);
       if (data?.data.length) {
         setListMedia((prevList) => [...prevList, ...data.data]);
-        console.log(data?.data);
       } else {
         setHasMore(false);
       }
@@ -66,13 +69,19 @@ const DraftMedia = ({ resetFormAndCloseDrawer }: DraftMediaProps) => {
 
   const handleMediaClick = (media: any) => {
     setIsSelectedMedia(media);
-    console.log("Selected Media:", media);
+    onSelectMedia(media); // Truyền media đã chọn vào form
   };
 
   return (
     <Loading isLoading={loading} error={error}>
       <div className="draft-container">
-        <button className="create-media-btn" onClick={resetFormAndCloseDrawer}>
+        <button
+          className="create-media-btn"
+          onClick={() => {
+            setIsSelectedMedia(null);
+            resetFormAndCloseDrawer();
+          }}
+        >
           <span className="text-container">Create new</span>
         </button>
         <Divider />

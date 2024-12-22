@@ -20,7 +20,7 @@ export const getMyMedias = async (page: number, is_created: number) => {
     const res = await apiClient.get("/api/medias/my-media", {
       params: {
         per_page: 10,
-        page, 
+        page,
         is_created: is_created,
       },
     });
@@ -46,11 +46,7 @@ export const createMedia = async (request: any) => {
 
 export const updatedMedia = async (mediaId: string, request: any) => {
   try {
-    const res = await apiClient.put(`/api/medias?mediaId=${mediaId}`, request, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const res = await apiClient.put(`/api/medias/${mediaId}`, request);
     return res.data;
   } catch (error) {
     console.log(error);
