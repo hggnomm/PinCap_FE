@@ -67,12 +67,19 @@ const CreateMedia: React.FC = () => {
     null
   );
 
+  useEffect(() => {
+    form.setFieldsValue({
+      tags_name: tags,
+    });
+    form.resetFields(["tags_name"]);
+  }, [tags, form]);
+
   const handleTagInput = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       const input = e.target as HTMLInputElement;
       const newTag = input.value.trim();
       if (newTag && !tags.includes(newTag)) {
-        setTags([...tags, newTag]);
+        setTags((prevTags) => [...prevTags, newTag]);
         form.resetFields(["tags_name"]);
       }
     }
@@ -87,7 +94,7 @@ const CreateMedia: React.FC = () => {
     // Thực hiện gọi onChangeMedia sau 1.5 giây
     const newTimeout = setTimeout(() => {
       onChangeMedia();
-    }, 1500); // 1.5 giây delay
+    }, 2500);
 
     setDebounceTimeout(newTimeout);
   };
@@ -101,20 +108,15 @@ const CreateMedia: React.FC = () => {
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
       tags_name: tags_name, // Đảm bảo đây là mảng
-      is_created: 1,
+      is_created: 0,
       is_comment: 1,
     };
     try {
-      console.log(mediaData);
       if (formValue.id) {
         delete mediaData.media;
-        console.log(mediaData);
         const response = await updatedMedia(formValue.id, mediaData);
       } else {
-        const response = await createMedia(mediaData);
-        if (response) {
-          toast.success("Media created successfully!");
-        }
+        await createMedia(mediaData);
       }
     } catch (error) {
       toast.error("Error while updating media.");
@@ -128,8 +130,7 @@ const CreateMedia: React.FC = () => {
     if (!formValue.media_name)
       return toast.error("Please provide a name for the media.");
 
-    // tags_name là mảng tags
-    const tags_name = tags; // Dùng mảng tags trực tiếp
+    const tags_name = tags;
 
     const mediaData: MediaFormValues = {
       ...formValue,
@@ -145,7 +146,6 @@ const CreateMedia: React.FC = () => {
 
       if (formValue.id) {
         delete mediaData.media;
-        console.log(mediaData);
         const response = await updatedMedia(formValue.id, mediaData);
         if (response) {
           setIsLoad(false);
