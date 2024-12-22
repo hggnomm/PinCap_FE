@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./index.less";
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 import Title from "antd/es/typography/Title";
@@ -39,9 +39,9 @@ interface MediaFormValues {
   privacy: string;
   mediaOwner_id: string;
   type: string;
-  tags_name: string[];
+  tags_name: string[]; // Đảm bảo đây là mảng
   is_created: number;
-  is_comment: boolean;
+  is_comment: number;
 }
 
 const CreateMedia: React.FC = () => {
@@ -51,8 +51,23 @@ const CreateMedia: React.FC = () => {
   const [fileList, setFileList] = useState<File[]>([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
+  const [formData, setFormData] = useState<MediaFormValues>({
+    media_name: "",
+    description: "",
+    privacy: "0",
+    tags_name: [], // tags_name là mảng
+    media: null,
+    mediaOwner_id: tokenPayload.id,
+    type: "",
+    is_created: 0,
+    is_comment: 1,
+  });
 
-  const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
+
+  const handleTagInput = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       const input = e.target as HTMLInputElement;
       const newTag = input.value.trim();
@@ -63,6 +78,49 @@ const CreateMedia: React.FC = () => {
     }
   };
 
+  const handleFormChange = () => {
+    // Nếu đang đợi một thay đổi khác, xóa timeout cũ
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Thực hiện gọi onChangeMedia sau 1.5 giây
+    const newTimeout = setTimeout(() => {
+      onChangeMedia();
+    }, 1500); // 1.5 giây delay
+
+    setDebounceTimeout(newTimeout);
+  };
+
+  const onChangeMedia = async () => {
+    const formValue = form.getFieldsValue(true);
+    const tags_name = tags;
+
+    const mediaData: MediaFormValues = {
+      ...formValue,
+      mediaOwner_id: tokenPayload.id,
+      media: fileList[0],
+      tags_name: tags_name, // Đảm bảo đây là mảng
+      is_created: 1,
+      is_comment: 1,
+    };
+    try {
+      console.log(mediaData);
+      if (formValue.id) {
+        delete mediaData.media;
+        console.log(mediaData);
+        const response = await updatedMedia(formValue.id, mediaData);
+      } else {
+        const response = await createMedia(mediaData);
+        if (response) {
+          toast.success("Media created successfully!");
+        }
+      }
+    } catch (error) {
+      toast.error("Error while updating media.");
+    }
+  };
+
   const handleGenerateClick = async () => {
     const formValue = form.getFieldsValue(true);
     if (!fileList.length && !formValue.id)
@@ -70,13 +128,14 @@ const CreateMedia: React.FC = () => {
     if (!formValue.media_name)
       return toast.error("Please provide a name for the media.");
 
-    const tags_name = tags.filter((tag) => tag.trim() !== "");
+    // tags_name là mảng tags
+    const tags_name = tags; // Dùng mảng tags trực tiếp
 
     const mediaData: MediaFormValues = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
-      tags_name: tags_name,
+      tags_name: tags_name, // Đảm bảo đây là mảng
       is_created: 1,
       is_comment: 1,
     };
@@ -95,7 +154,6 @@ const CreateMedia: React.FC = () => {
           toast.error("Error: Failed to update media.");
         }
       } else {
-        // Nếu không có ID, thì tạo mới
         const response = await createMedia(mediaData);
         if (response) {
           setIsLoad(false);
@@ -123,14 +181,12 @@ const CreateMedia: React.FC = () => {
     setDrawerVisible(false);
   };
 
-  // Hàm xử lý khi người dùng chọn media từ DraftMedia
   const handleSelectMedia = (media: any) => {
-    // Nếu media có id, cập nhật id vào form
     form.setFieldsValue({
       media_name: media.media_name,
       description: media.description,
       privacy: "0",
-      tags_name: [],
+      tags_name: media.tags_name, // Chắc chắn tags_name là mảng
       id: media.id,
     });
   };
@@ -166,7 +222,9 @@ const CreateMedia: React.FC = () => {
         )}
         <Form
           form={form}
+          disabled={!fileList.length}
           className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
+          onValuesChange={handleFormChange} // Gọi khi có thay đổi
         >
           <Col span={10} className="upload-image">
             <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
@@ -187,9 +245,7 @@ const CreateMedia: React.FC = () => {
               <span className="text-label">Title</span>
               <Form.Item
                 name="media_name"
-                rules={[
-                  { required: true, message: "Please input your media name!" },
-                ]}
+                rules={[{ required: true, message: "Please type media name!" }]}
               >
                 <Input placeholder="Type media name" />
               </Form.Item>
@@ -223,7 +279,7 @@ const CreateMedia: React.FC = () => {
                       ? "Maximum 10 cards, no more can be added"
                       : "Search for tags or create new ones"
                   }
-                  disabled={tags.length >= 10}
+                  disabled={tags.length >= 10 || !fileList.length}
                 />
               </Form.Item>
               <div className="tags-display">
