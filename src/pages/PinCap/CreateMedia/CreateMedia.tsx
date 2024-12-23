@@ -143,6 +143,11 @@ const CreateMedia: React.FC = () => {
   };
 
   const handleGenerateClick = async () => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+      setDebounceTimeout(null); 
+    }
+
     const formValue = form.getFieldsValue(true);
     if (!fileList.length && !formValue.id)
       return toast.error("Please upload an image or media file.");
