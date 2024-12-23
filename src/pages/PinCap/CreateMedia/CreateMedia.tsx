@@ -23,6 +23,7 @@ import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orien
 import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
 import DraftMedia from "./DraftMedia";
 import { Media } from "type";
+import ProgressiveImage from "react-progressive-image";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -75,6 +76,12 @@ const CreateMedia: React.FC = () => {
       fetchDrafts();
     };
   }, []);
+
+  useEffect(() => {
+    if (!form.getFieldValue("privacy")) {
+      form.setFieldsValue({ privacy: "0" });
+    }
+  }, [form]);
 
   useEffect(() => {
     const fetchDraftDetail = async () => {
@@ -147,7 +154,7 @@ const CreateMedia: React.FC = () => {
 
     const newTimeout = setTimeout(() => {
       onChangeToCreateDraft();
-    }, 2500);
+    }, 3000);
 
     setDebounceTimeout(newTimeout);
   };
@@ -172,7 +179,9 @@ const CreateMedia: React.FC = () => {
         : await createMedia(mediaData);
 
       if (response) {
-        fetchDrafts(true);
+        if (!draftId) {
+          fetchDrafts(true);
+        }
       } else {
         toast.error("An unexpected error occurred.");
       }
@@ -198,8 +207,6 @@ const CreateMedia: React.FC = () => {
     const formValue = form.getFieldsValue(true);
     if (!fileList.length && !formValue.id)
       return toast.error("Please upload an image or media file.");
-    if (!formValue.media_name)
-      return toast.error("Please provide a name for the media.");
 
     const tags_name = tags;
 
@@ -263,7 +270,7 @@ const CreateMedia: React.FC = () => {
     form.setFieldsValue({
       media_name: media.media_name,
       description: media.description,
-      privacy: media.privacy == "PUBLIC" ? 1 : 0,
+      privacy: media.privacy == "PUBLIC" ? "1" : "0",
       tags_name: media.tags_name,
       id: media.id,
     });
@@ -324,7 +331,18 @@ const CreateMedia: React.FC = () => {
           <Col span={10} className="upload-image">
             {imageUrl ? (
               <div className="draft-img">
-                <img src={imageUrl} alt="" />
+                <ProgressiveImage src={imageUrl} placeholder={imageUrl}>
+                  {(src: any, loading: any) => (
+                    <img
+                      style={{
+                        filter: loading ? "blur(20px)" : "none",
+                        transition: "filter 0.3s",
+                      }}
+                      src={src}
+                      alt="media preview"
+                    />
+                  )}
+                </ProgressiveImage>
               </div>
             ) : (
               <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
@@ -347,10 +365,7 @@ const CreateMedia: React.FC = () => {
           <Col span={14} className="field-input">
             <div className="field-item">
               <span className="text-label">Title</span>
-              <Form.Item
-                name="media_name"
-                rules={[{ required: true, message: "Please type media name!" }]}
-              >
+              <Form.Item name="media_name">
                 <Input placeholder="Type media name" />
               </Form.Item>
             </div>
@@ -366,15 +381,10 @@ const CreateMedia: React.FC = () => {
             </div>
             <div className="field-item">
               <span className="text-label">Privacy</span>
-              <Form.Item name="privacy">
-                <Select
-                  defaultValue={0}
-                  value={form.getFieldValue("privacy")}
-                  onChange={(value) => form.setFieldsValue({ privacy: value })}
-                  className="custom-select"
-                >
-                  <Select.Option value={1}>Public</Select.Option>
-                  <Select.Option value={0}>Private</Select.Option>
+              <Form.Item name="privacy" initialValue="0">
+                <Select className="custom-select">
+                  <Select.Option value="0">Private</Select.Option>
+                  <Select.Option value="1">Public</Select.Option>
                 </Select>
               </Form.Item>
             </div>
