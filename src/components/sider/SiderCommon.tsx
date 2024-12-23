@@ -7,7 +7,7 @@ import {
 import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import React, { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import "./index.less";
 import iconAI from "../../assets/img/PinCap/ai-technology-img.png";
 import styled from "styled-components";
@@ -20,10 +20,12 @@ const CreateMediaBtn = styled(Menu.Item)`
     background-color: #902a55 !important;
     opacity: 0.9 !important;
   }
+
   &.ant-menu-item-selected {
     background-color: #902a55 !important;
     color: #fff !important;
   }
+
   a {
     color: #fff !important;
   }
@@ -51,6 +53,24 @@ const AIToolBtn = styled(Menu.Item)`
 const SiderCommon = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [collapsed, setCollapsed] = useState<boolean>(true);
+  const location = useLocation();
+
+  const getSelectedKeys = () => {
+    const pathname = location.pathname;
+
+    if (pathname === "/create-media") return ["create-media"];
+    if (pathname === "/album") return ["album"];
+    if (pathname === "/my-media") return ["my-media"];
+
+    if (pathname === "/ai") return ["ai-tool"];
+    if (pathname.startsWith("/dashboard")) {
+      if (pathname === "/dashboard") return ["dashHome"];
+      if (pathname === "/dashboard/album") return ["dashAlbum"];
+      if (pathname === "/dashboard/mediaReport") return ["dashMediaReport"];
+    }
+    return [];
+  };
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
@@ -69,28 +89,34 @@ const SiderCommon = () => {
 
   return (
     <Sider
-      collapsible={true}
+      collapsible
       collapsed={collapsed}
       onCollapse={setCollapsed}
       className="siderbar"
-      width="16%"
+      width={isMobile ? "80px" : "240px"}
       trigger={isMobile ? null : undefined}
     >
-      <Menu mode="inline" style={{ padding: "0.5rem" }}>
-        <CreateMediaBtn key="1" icon={<PlusOutlined />}>
+      <Menu
+        mode="inline"
+        style={{ padding: "0.5rem" }}
+        selectedKeys={getSelectedKeys()}
+      >
+        {/* Create Media Button */}
+        <CreateMediaBtn key="create-media" icon={<PlusOutlined />}>
           <Link to="/create-media">Create Media</Link>
         </CreateMediaBtn>
-        <Menu.Item key="2" icon={<SignatureOutlined />}>
+
+        {/* Album Menu Item */}
+        <Menu.Item key="album" icon={<SignatureOutlined />}>
           <Link to="/album">My Album</Link>
         </Menu.Item>
-        <Menu.SubMenu
-          key="my-media"
-          icon={<ProductOutlined />}
-          title="My Media"
-        >
-          <Menu.Item key="images">Images</Menu.Item>
-          <Menu.Item key="videos">Videos</Menu.Item>
-        </Menu.SubMenu>
+
+        {/* My Media Menu Item */}
+        <Menu.Item key="my-media" icon={<ProductOutlined />}>
+          <Link to="/my-media">My Media</Link> {/* Fixed the link here */}
+        </Menu.Item>
+
+        {/* Dashboard Submenu */}
         <Menu.SubMenu
           key="dashboard"
           icon={<DashboardOutlined />}
@@ -106,7 +132,9 @@ const SiderCommon = () => {
             <Link to="/dashboard/mediaReport">Media Report</Link>
           </Menu.Item>
         </Menu.SubMenu>
-        <AIToolBtn key="3" title={null}>
+
+        {/* AI Tool Button */}
+        <AIToolBtn key="ai-tool">
           <img
             src={iconAI}
             alt="AI Tool"

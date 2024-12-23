@@ -16,6 +16,8 @@ import { Album, Media } from "../../../types/type";
 import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
 import Comment from "./Comment/Comment";
 import { useSelector } from "react-redux";
+import { saveAs } from "file-saver";
+import BackButton from "../../../components/backButton/BackButton";
 
 interface TokenPayload {
   id: string;
@@ -154,7 +156,11 @@ const DetailMedia = () => {
       setError("Error when reacting to a media!");
     }
   };
-  const handleDownload = () => {};
+  const handleDownload = () => {
+    if (media?.media_url) {
+      saveAs(media.media_url, media.media_name || "downloaded-file");
+    }
+  };
 
   const albumMenu = (
     <div className="menu-album">
@@ -196,6 +202,7 @@ const DetailMedia = () => {
         className="detail-media-container"
       >
         <div className="detail-media">
+          <BackButton />
           <div className="left-view">
             {media &&
               (media.type === "IMAGE" ? (

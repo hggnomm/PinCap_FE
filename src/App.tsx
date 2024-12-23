@@ -9,15 +9,13 @@ import SiderCommon from "./components/sider/SiderCommon";
 import HeaderCommon from "./components/header/HeaderCommon";
 import ImageAi from "./pages/AITools/Images/ImageAi";
 import DetailMedia from "./pages/PinCap/DetailMedia/DetailMedia";
-import Dashboard from "./pages/Dashboard/Home";
-import Album from "./pages/Dashboard/Album";
-import AlbumDetail from "./pages/Dashboard/AlbumDetail";
 import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner"; // Import LoadingSpinner component
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Home from "./pages/Home/Home";
+import MyListMedia from "./pages/PinCap/MyListMedia/MyListMedia";
 
 const App = () => {
   const tokenPayload = useSelector((state: any) => state.auth);
@@ -37,7 +35,7 @@ const App = () => {
     } else {
       if (pathname === "/sign-in" || pathname === "/sign-up") return;
       setIsLogin(false);
-      navigate("/")
+      navigate("/");
     }
     setIsLoading(false); // Hide loading spinner after login check
   }, [tokenPayload.email, pathname, navigate]);
@@ -73,12 +71,7 @@ const App = () => {
                           />
                           <Route path="/ai" element={<ImageAi />} />
                           <Route path="/media/:id" element={<DetailMedia />} />
-                          <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/dashboard/album" element={<Album />} />
-                          <Route
-                            path="/dashboard/album/:id"
-                            element={<AlbumDetail />}
-                          />
+                          <Route path="/album" element={<MyListMedia />} />
                         </Routes>
                       </Content>
                     </>

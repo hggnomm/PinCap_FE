@@ -226,7 +226,7 @@ const ImageAi = () => {
               </Row>
             </div>
 
-            <Form.Item>
+            <Form.Item style={{ display: "flex", justifyContent: "center" }}>
               <Button
                 className="btn-generate"
                 type="primary"
