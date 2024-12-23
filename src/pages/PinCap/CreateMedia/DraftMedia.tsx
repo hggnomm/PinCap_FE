@@ -7,8 +7,8 @@ import { Media } from "type";
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;
   onSelectMedia: (media: Media) => void;
-  reloadDrafts: boolean;
-  setReloadDrafts: (reload: boolean) => void;
+  drafts: Media[];
+  loadingDrafts: boolean;
 }
 
 const DraftMedia = ({
@@ -16,7 +16,7 @@ const DraftMedia = ({
   onSelectMedia,
   drafts,
   loadingDrafts,
-}: DraftMediaProps & { drafts: Media[]; loadingDrafts: boolean }) => {
+}: DraftMediaProps) => {
   const [isSelectedMedia, setIsSelectedMedia] = useState<Media | null>(null);
 
   const handleMediaClick = async (media: Media) => {

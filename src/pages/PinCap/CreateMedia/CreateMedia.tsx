@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./index.less";
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 import Title from "antd/es/typography/Title";
-import { createMedia, getMyMedias, updatedMedia } from "../../../api/media";
+import {
+  createMedia,
+  getDetailMedia,
+  getMyMedias,
+  updatedMedia,
+} from "../../../api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -71,15 +76,34 @@ const CreateMedia: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchDraftDetail = async () => {
+      if (draftId && drafts.length > 0) {
+        try {
+          const detailDraft = await getDetailMedia(draftId);
+          if (detailDraft) {
+            handleSelectMedia(detailDraft);
+          }
+        } catch (error) {
+          toast.error("Error fetching draft details: " + error);
+        }
+      }
+    };
+
+    fetchDraftDetail();
+  }, [draftId, drafts]);
+
   const fetchDrafts = async (isGenerateDraft = false) => {
     setLoadingDrafts(true);
     try {
       const draftList = await getMyMedias(1, 0);
       if (draftList?.data) {
         setDrafts(draftList.data);
-      }
-      if (isGenerateDraft) {
-        setDraftId(draftList.data[0].id)
+
+        if (isGenerateDraft && draftList.data.length > 0) {
+          setDraftId(draftList.data[0].id); 
+          handleSelectMedia(draftList.data[0]); 
+        }
       }
     } catch (error) {
       toast.error("Error fetching drafts: " + error);
@@ -218,6 +242,7 @@ const CreateMedia: React.FC = () => {
     } finally {
       setIsLoad(false);
       resetForm();
+      fetchDrafts(true);
     }
   };
 
@@ -230,6 +255,7 @@ const CreateMedia: React.FC = () => {
     setIsLoadCreateDraft(false);
     setIsFormDisabled(true);
     setIsSelectedDraft(false);
+    setDraftId("");
   };
 
   const handleSelectMedia = (media: Media) => {
