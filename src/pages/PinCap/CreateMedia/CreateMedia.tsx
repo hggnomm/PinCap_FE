@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./index.less";
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 import Title from "antd/es/typography/Title";
-import { createMedia, updatedMedia } from "../../../api/media";
+import { createMedia, getMyMedias, updatedMedia } from "../../../api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -34,7 +34,7 @@ interface TokenPayload {
 
 interface MediaFormValues {
   id?: string;
-  media: File | null;
+  media?: File | null;
   media_name: string;
   description: string;
   privacy: string;
@@ -48,25 +48,50 @@ interface MediaFormValues {
 const CreateMedia: React.FC = () => {
   const [form] = Form.useForm();
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
-  const [isLoad, setIsLoad] = useState(false);
+  const [isLoad, setIsLoad] = useState<boolean>(false);
   const [fileList, setFileList] = useState<File[]>([]);
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
-  const [isSelectedDraft, setIsSelectedDraft] = useState(false);
-
+  const [isSelectedDraft, setIsSelectedDraft] = useState<boolean>(false);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
-
-  const [reloadDrafts, setReloadDrafts] = useState(false);
-  const [isFormDisabled, setIsFormDisabled] = useState(true);
-
-  const [isLoadCreateDraft, setIsLoadCreateDraft] = useState(false);
-  const [textCreateDraft, setTextCreateDraft] = useState(false);
-  const [draftId, setDraftId] = useState();
+  const [isFormDisabled, setIsFormDisabled] = useState<boolean>(true);
+  const [isLoadCreateDraft, setIsLoadCreateDraft] = useState<boolean>(false);
+  const [textCreateDraft, setTextCreateDraft] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
+
+  const [drafts, setDrafts] = useState<any[]>([]);
+  const [loadingDrafts, setLoadingDrafts] = useState<boolean>(false);
+  const [draftId, setDraftId] = useState<string>("");
+
   useEffect(() => {
-    if (fileList.length > 0 || isSelectedDraft) {
+    return () => {
+      fetchDrafts();
+    };
+  }, []);
+
+  const fetchDrafts = async (isGenerateDraft = false) => {
+    setLoadingDrafts(true);
+    try {
+      const draftList = await getMyMedias(1, 0);
+      if (draftList?.data) {
+        setDrafts(draftList.data);
+      }
+      if (isGenerateDraft) {
+        setDraftId(draftList.data[0].id)
+      }
+    } catch (error) {
+      toast.error("Error fetching drafts: " + error);
+    } finally {
+      setLoadingDrafts(false);
+    }
+  };
+
+  useEffect(() => {
+    if (fileList.length > 0) {
+      setIsFormDisabled(false);
+    } else if (isSelectedDraft) {
       setIsFormDisabled(false);
     } else {
       setIsFormDisabled(true);
@@ -105,37 +130,35 @@ const CreateMedia: React.FC = () => {
 
   const onChangeToCreateDraft = async () => {
     const formValue = form.getFieldsValue(true);
-    const tags_name = tags;
-
     const mediaData: MediaFormValues = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
-      tags_name: tags_name,
+      tags_name: tags,
       is_created: 0,
       is_comment: 1,
     };
+
     setIsLoadCreateDraft(true);
     setTextCreateDraft(true);
-    try {
-      if (formValue.id) {
-        delete mediaData.media;
-        const response = await updatedMedia(formValue.id, mediaData);
 
-        if (response) {
-          setReloadDrafts(true);
-        } else {
-          toast.error(`Error: ${"An unexpected error occurred."}`);
-        }
+    try {
+      const response = formValue.id
+        ? await updatedMedia(formValue.id, { ...mediaData, media: undefined })
+        : await createMedia(mediaData);
+
+      if (response) {
+        fetchDrafts(true);
       } else {
-        const response = await createMedia(mediaData);
-        if (response) {
-          setReloadDrafts(true);
-        }
+        toast.error("An unexpected error occurred.");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error(
-        `Error: ${error?.message || "An unexpected error occurred."}`
+        `Error: ${
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred."
+        }`
       );
     } finally {
       setTextCreateDraft(false);
@@ -145,7 +168,7 @@ const CreateMedia: React.FC = () => {
   const handleGenerateClick = async () => {
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
-      setDebounceTimeout(null); 
+      setDebounceTimeout(null);
     }
 
     const formValue = form.getFieldsValue(true);
@@ -193,7 +216,6 @@ const CreateMedia: React.FC = () => {
         `Error: ${error?.message || "An unexpected error occurred."}`
       );
     } finally {
-      setReloadDrafts(true);
       setIsLoad(false);
       resetForm();
     }
@@ -206,6 +228,8 @@ const CreateMedia: React.FC = () => {
     setImageUrl("");
     setDrawerVisible(false);
     setIsLoadCreateDraft(false);
+    setIsFormDisabled(true);
+    setIsSelectedDraft(false);
   };
 
   const handleSelectMedia = (media: Media) => {
@@ -280,7 +304,7 @@ const CreateMedia: React.FC = () => {
                 <FilePond
                   files={fileList}
                   onupdatefiles={(fileItems) =>
-                    setFileList(fileItems.map((item) => item.file))
+                    setFileList(fileItems.map((item): any => item.file))
                   }
                   allowMultiple={false}
                   maxFileSize="50MB"
@@ -367,9 +391,8 @@ const CreateMedia: React.FC = () => {
         <DraftMedia
           resetFormAndCloseDrawer={resetForm}
           onSelectMedia={handleSelectMedia}
-          reloadDrafts={reloadDrafts}
-          setReloadDrafts={setReloadDrafts}
-          drawerVisible={drawerVisible} // Truyền prop này vào
+          drafts={drafts}
+          loadingDrafts={loadingDrafts}
         />
       </Drawer>
     </div>
