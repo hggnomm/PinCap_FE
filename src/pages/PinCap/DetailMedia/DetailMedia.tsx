@@ -190,7 +190,6 @@ const DetailMedia = () => {
       >
         <div className="detail-media">
           <div className="left-view">
-            <div></div>
             {media &&
               (media.type === "IMAGE" ? (
                 <img src={media.media_url} alt={media.media_name} />

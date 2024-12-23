@@ -97,13 +97,13 @@ const CreateMedia: React.FC = () => {
     }
 
     const newTimeout = setTimeout(() => {
-      onChangeMedia();
+      onChangeToCreateDraft();
     }, 2500);
 
     setDebounceTimeout(newTimeout);
   };
 
-  const onChangeMedia = async () => {
+  const onChangeToCreateDraft = async () => {
     const formValue = form.getFieldsValue(true);
     const tags_name = tags;
 
@@ -124,6 +124,8 @@ const CreateMedia: React.FC = () => {
 
         if (response) {
           setReloadDrafts(true);
+        } else {
+          toast.error(`Error: ${"An unexpected error occurred."}`);
         }
       } else {
         const response = await createMedia(mediaData);
@@ -132,7 +134,9 @@ const CreateMedia: React.FC = () => {
         }
       }
     } catch (error) {
-      toast.error("Error while updating media.");
+      toast.error(
+        `Error: ${error?.message || "An unexpected error occurred."}`
+      );
     } finally {
       setTextCreateDraft(false);
     }
@@ -196,19 +200,21 @@ const CreateMedia: React.FC = () => {
     setTags([]);
     setImageUrl("");
     setDrawerVisible(false);
+    setIsLoadCreateDraft(false);
   };
 
   const handleSelectMedia = (media: Media) => {
     form.setFieldsValue({
       media_name: media.media_name,
       description: media.description,
-      privacy: "0",
+      privacy: media.privacy == "PUBLIC" ? 1 : 0,
       tags_name: media.tags_name,
       id: media.id,
     });
+
     setImageUrl(media.media_url);
-    setIsSelectedDraft(true); // Đánh dấu là đã chọn draft
-    setFileList([]); // Clear file list để form không bị disabled
+    setIsSelectedDraft(true);
+    setFileList([]);
   };
 
   return (
@@ -305,9 +311,14 @@ const CreateMedia: React.FC = () => {
             <div className="field-item">
               <span className="text-label">Privacy</span>
               <Form.Item name="privacy">
-                <Select defaultValue="0" className="custom-select">
-                  <Select.Option value="1">Public</Select.Option>
-                  <Select.Option value="0">Private</Select.Option>
+                <Select
+                  defaultValue={0}
+                  value={form.getFieldValue("privacy")}
+                  onChange={(value) => form.setFieldsValue({ privacy: value })}
+                  className="custom-select"
+                >
+                  <Select.Option value={1}>Public</Select.Option>
+                  <Select.Option value={0}>Private</Select.Option>
                 </Select>
               </Form.Item>
             </div>
@@ -342,17 +353,18 @@ const CreateMedia: React.FC = () => {
       </Row>
 
       <Drawer
-        title={`Drafts Media`}
         placement="right"
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
         width={500}
+        closable={false}
       >
         <DraftMedia
           resetFormAndCloseDrawer={resetForm}
           onSelectMedia={handleSelectMedia}
           reloadDrafts={reloadDrafts}
           setReloadDrafts={setReloadDrafts}
+          drawerVisible={drawerVisible} // Truyền prop này vào
         />
       </Drawer>
     </div>

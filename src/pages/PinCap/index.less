@@ -1,11 +1,15 @@
 .pincap-container {
   min-height: 100vh;
   width: 100%;
-  margin: 20px auto;
+  // margin: 20px auto;
   columns: 4;
   column-gap: 15px;
   padding: 0 1rem;
-
+  background-image: linear-gradient(
+    to bottom,
+    #fff,
+    #dfe9f7
+  );
   .box {
     width: 100%;
     margin-bottom: 10px;
@@ -19,21 +23,27 @@
   }
 }
 
+@media (min-width: 1200px) {
+  .pincap-container {
+    columns: 7;
+  }
+}
+
 @media (max-width: 1200px) {
   .pincap-container {
     width: calc(100% - 40px);
-    columns: 3;
+    columns: 5;
   }
 }
 
 @media (max-width: 768px) {
   .pincap-container {
-    columns: 2;
+    columns: 4;
   }
 }
 
 @media (max-width: 480px) {
   .pincap-container {
-    columns: 1;
+    columns: 2;
   }
 }

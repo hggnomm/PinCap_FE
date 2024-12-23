@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getMyMedias } from "../../../api/media";
+import { getDetailMedia, getMyMedias } from "../../../api/media";
 import Loading from "../../../components/loading/Loading";
 import { Divider } from "antd/es";
+import { Media } from "type";
 
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;
-  onSelectMedia: (media: any) => void;
-  reloadDrafts: boolean; 
-  setReloadDrafts: (reload: boolean) => void; 
+  onSelectMedia: (media: Media) => void;
+  reloadDrafts: boolean;
+  setReloadDrafts: (reload: boolean) => void;
+  drawerVisible: boolean;
 }
 
 const DraftMedia = ({
@@ -15,6 +17,7 @@ const DraftMedia = ({
   onSelectMedia,
   reloadDrafts,
   setReloadDrafts,
+  drawerVisible,
 }: DraftMediaProps) => {
   const [listMedia, setListMedia] = useState<any[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -25,35 +28,14 @@ const DraftMedia = ({
   const isFetching = useRef(false);
 
   useEffect(() => {
-    if (reloadDrafts) {
+    if (reloadDrafts || drawerVisible) {
+      setListMedia([]);
+      setPage(1);
+      setHasMore(true);
       fetchData();
-      setReloadDrafts(false);
+      setReloadDrafts(false); // Reset the flag after API call
     }
-  }, [reloadDrafts]);
-
-  useEffect(() => {
-    fetchData();
-
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 100
-      ) {
-        loadMore();
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [page]);
-
-  const loadMore = () => {
-    if (!loading && hasMore) {
-      setPage((prevPage) => prevPage + 1);
-    }
-  };
+  }, [reloadDrafts, drawerVisible, setReloadDrafts]); 
 
   const fetchData = async () => {
     if (isFetching.current || !hasMore) return;
@@ -63,9 +45,9 @@ const DraftMedia = ({
     setError(null);
 
     try {
-      const data = await getMyMedias(page, 0);
+      const data = await getMyMedias(page, 0); // 0 is for draft status
       if (data?.data.length) {
-        setListMedia(data.data);
+        setListMedia((prevMedia) => [...prevMedia, ...data.data]);
       } else {
         setHasMore(false);
       }
@@ -77,14 +59,17 @@ const DraftMedia = ({
     }
   };
 
-  const handleMediaClick = (media: any) => {
+  const handleMediaClick = async (media: any) => {
     setIsSelectedMedia(media);
-    console.log(media);
-    onSelectMedia(media); // Truyền media đã chọn vào form
+    const detailMedia = await getDetailMedia(media?.id);
+
+    if (detailMedia) {
+      onSelectMedia(detailMedia);
+    }
   };
 
   return (
-    <Loading isLoading={loading} error={error}> 
+    <Loading isLoading={loading} error={error}>
       <div className="draft-container">
         <button
           className="create-media-btn"
