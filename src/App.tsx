@@ -15,7 +15,8 @@ import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner"; // Impo
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Home from "./pages/Home/Home";
-import MyListMedia from "./pages/PinCap/MyListMedia/MyListMedia";
+import MyAlbum from "./pages/PinCap/MyAlbum/MyAlbum";
+import MyMedia from "./pages/PinCap/MyMedia/MyMedia";
 
 const App = () => {
   const tokenPayload = useSelector((state: any) => state.auth);
@@ -37,7 +38,7 @@ const App = () => {
       setIsLogin(false);
       navigate("/");
     }
-    setIsLoading(false); // Hide loading spinner after login check
+    setIsLoading(false); 
   }, [tokenPayload.email, pathname, navigate]);
 
   return (
@@ -71,7 +72,9 @@ const App = () => {
                           />
                           <Route path="/ai" element={<ImageAi />} />
                           <Route path="/media/:id" element={<DetailMedia />} />
-                          <Route path="/album" element={<MyListMedia />} />
+                          <Route path="/album" element={<MyAlbum />} />
+                          {/* Dynamic route for MyMedia with email */}
+                          <Route path="/my-media/:email" element={<MyMedia />} />
                         </Routes>
                       </Content>
                     </>

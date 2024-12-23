@@ -8,6 +8,7 @@ import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import "./index.less";
 import iconAI from "../../assets/img/PinCap/ai-technology-img.png";
 import styled from "styled-components";
@@ -51,6 +52,7 @@ const AIToolBtn = styled(Menu.Item)`
 `;
 
 const SiderCommon = () => {
+  const tokenPayload = useSelector((state: any) => state.auth);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [collapsed, setCollapsed] = useState<boolean>(true);
   const location = useLocation();
@@ -106,14 +108,18 @@ const SiderCommon = () => {
           <Link to="/create-media">Create Media</Link>
         </CreateMediaBtn>
 
+        {/* My Media Menu Item */}
+        <Menu.Item key="my-media" icon={<ProductOutlined />}>
+          {tokenPayload.email ? (
+            <Link to={`/my-media/${tokenPayload.email}`}>My Media</Link>
+          ) : (
+            <span>My Media</span>
+          )}
+        </Menu.Item>
+
         {/* Album Menu Item */}
         <Menu.Item key="album" icon={<SignatureOutlined />}>
           <Link to="/album">My Album</Link>
-        </Menu.Item>
-
-        {/* My Media Menu Item */}
-        <Menu.Item key="my-media" icon={<ProductOutlined />}>
-          <Link to="/my-media">My Media</Link> {/* Fixed the link here */}
         </Menu.Item>
 
         {/* Dashboard Submenu */}
