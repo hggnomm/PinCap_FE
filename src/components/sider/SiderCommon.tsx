@@ -109,12 +109,9 @@ const SiderCommon = () => {
         </CreateMediaBtn>
 
         {/* My Media Menu Item */}
+
         <Menu.Item key="my-media" icon={<ProductOutlined />}>
-          {tokenPayload.email ? (
-            <Link to={`/my-media/${tokenPayload.email}`}>My Media</Link>
-          ) : (
-            <span>My Media</span>
-          )}
+          <Link to="/my-media">My Media</Link>
         </Menu.Item>
 
         {/* Album Menu Item */}

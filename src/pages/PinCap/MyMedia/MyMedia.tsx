@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import "./MyMedia.less";
 import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
+import MediaList from "../../../components/viewPin/ViewPinComponent";
+import { getMyMedias } from "../../../api/media";
 
 const MyMedia = () => {
   return (
@@ -37,7 +39,9 @@ const MyMedia = () => {
       </div>
       <div className="my-list-media">
         <div className="action"></div>
-        <div className="list"></div>
+        <div className="list">
+          <MediaList apiCall={getMyMedias} extraParams={1} />
+        </div>
       </div>
     </div>
   );

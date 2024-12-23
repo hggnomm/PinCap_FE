@@ -74,7 +74,7 @@ const App = () => {
                           <Route path="/media/:id" element={<DetailMedia />} />
                           <Route path="/album" element={<MyAlbum />} />
                           {/* Dynamic route for MyMedia with email */}
-                          <Route path="/my-media/:email" element={<MyMedia />} />
+                          <Route path="/my-media" element={<MyMedia />} />
                         </Routes>
                       </Content>
                     </>
