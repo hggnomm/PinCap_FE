@@ -15,6 +15,11 @@ import { AddRelationships, DeleteRelationships } from "../../../api/users";
 import { Album, Media } from "../../../types/type";
 import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
 import Comment from "./Comment/Comment";
+import { useSelector } from "react-redux";
+
+interface TokenPayload {
+  id: string;
+}
 
 const DetailMedia = () => {
   const [media, setMedia] = useState<Media | null>(null);
@@ -23,6 +28,7 @@ const DetailMedia = () => {
   const [error, setError] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
 
   const fetchMediaDetail = async (idMedia: string) => {
     setLoading(true);
@@ -129,7 +135,7 @@ const DetailMedia = () => {
       });
 
       if (response) {
-        setMedia((prevState) => {
+        setMedia((prevState): any => {
           if (!prevState) return null;
 
           return {
@@ -148,6 +154,7 @@ const DetailMedia = () => {
       setError("Error when reacting to a media!");
     }
   };
+  const handleDownload = () => {};
 
   const albumMenu = (
     <div className="menu-album">
@@ -219,7 +226,7 @@ const DetailMedia = () => {
                     <span>{media?.reaction_user_count}</span>
                   </div>
 
-                  <button>
+                  <button onClick={handleDownload}>
                     <img src={download} alt="download" />
                   </button>
                   <button>
@@ -245,9 +252,9 @@ const DetailMedia = () => {
                   <button className="save">Save</button>
                 </div>
               </div>
-              {media?.description && (
-                <div className="description">
-                  <span>{media.description}</span>
+              {media?.media_name && (
+                <div className="media_name">
+                  <span>{media.media_name}</span>
                 </div>
               )}
 
@@ -265,16 +272,23 @@ const DetailMedia = () => {
                     </>
                   )}
                 </div>
-                {media?.ownerUser?.isFollowing ? (
-                  <button onClick={handleWithOwnerUser} className="following">
-                    Following
-                  </button>
-                ) : (
-                  <button onClick={handleWithOwnerUser} className="follow ">
-                    Follow
-                  </button>
-                )}
+                {media?.ownerUser.id !== tokenPayload.id &&
+                  (media?.ownerUser?.isFollowing ? (
+                    <button onClick={handleWithOwnerUser} className="following">
+                      Following
+                    </button>
+                  ) : (
+                    <button onClick={handleWithOwnerUser} className="follow">
+                      Follow
+                    </button>
+                  ))}
               </div>
+
+              {media?.description && (
+                <div className="description">
+                  <span>{media.description}</span>
+                </div>
+              )}
             </div>
             {/* Comment */}
             <div>

@@ -101,8 +101,8 @@ const CreateMedia: React.FC = () => {
         setDrafts(draftList.data);
 
         if (isGenerateDraft && draftList.data.length > 0) {
-          setDraftId(draftList.data[0].id); 
-          handleSelectMedia(draftList.data[0]); 
+          setDraftId(draftList.data[0].id);
+          handleSelectMedia(draftList.data[0]);
         }
       }
     } catch (error) {
@@ -241,8 +241,9 @@ const CreateMedia: React.FC = () => {
       );
     } finally {
       setIsLoad(false);
+      setDraftId("");
+      fetchDrafts();
       resetForm();
-      fetchDrafts(true);
     }
   };
 
@@ -408,6 +409,7 @@ const CreateMedia: React.FC = () => {
       </Row>
 
       <Drawer
+        title={`Draft Medias (${drafts.length})`}
         placement="right"
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}

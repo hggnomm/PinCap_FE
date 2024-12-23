@@ -69,9 +69,13 @@ const HeaderCommon = () => {
     {
       key: "3",
       label: (
-        <div style={{ padding: "5px 8px" }} onClick={logoutHandle}>
-          <div>Sign out</div>
-        </div>
+        <Button
+          style={{ width: "100%", textAlign: "left", color: "black" }}
+          onClick={logoutHandle}
+          type="link"
+        >
+          Sign out
+        </Button>
       ),
     },
   ];

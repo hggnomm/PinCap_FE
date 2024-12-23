@@ -9,7 +9,7 @@
 
   .detail-media {
     margin: 2.5rem 0;
-    border-radius: 40px;
+    border-radius: 28px;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     display: flex;
     background-color: rgba(255, 255, 255, 0.7);
@@ -21,8 +21,8 @@
       display: flex;
       height: auto;
       min-width: auto;
-      border-top-left-radius: 40px;
-      border-bottom-left-radius: 40px;
+      border-top-left-radius: 28px;
+      border-bottom-left-radius: 28px;
       overflow: hidden; /* Thêm dòng này để cắt góc ảnh/video */
 
       img,
@@ -44,13 +44,13 @@
       overflow: visible;
 
       .right-top-view {
-        padding: 25px 25px 0 20px;
         width: 100%;
 
         .action {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          padding: 12px 25px 0 20px;
 
           .action-left {
             display: flex;
@@ -125,11 +125,21 @@
           }
         }
 
-        .description {
+        .media_name {
           text-align: left;
+          padding: 10px 20px 0 20px;
 
           span {
-            font-size: 16px;
+            font-size: 20px;
+            font-weight: bold;
+          }
+        }
+        .description {
+          text-align: left;
+          padding: 10px 25px 0 20px;
+
+          span {
+            font-size: 0.95em;
           }
         }
 
@@ -139,6 +149,12 @@
           justify-content: space-between;
           align-items: center;
           background-color: #ffffff;
+          padding: 10px 25px 0 20px;
+
+          p {
+            font-size: 1.1em;
+            font-weight: 500;
+          }
 
           .user {
             display: flex;
