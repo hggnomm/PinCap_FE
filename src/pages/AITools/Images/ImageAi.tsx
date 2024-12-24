@@ -10,7 +10,7 @@ import {
   Dropdown,
   Menu,
 } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./index.less";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, FreeMode, Pagination } from "swiper/modules";
@@ -54,16 +54,22 @@ const ImageAi = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    localStorage.removeItem("generatedImageUrl");
+  }, []);
+
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    setLoading(true); // Bắt đầu trạng thái tải
-    setError(null); // Xóa lỗi cũ nếu có
+    setLoading(true);
+    setError(null);
     setIsGenerate(true);
+
     try {
       const updatedRequest: IRequestCreateAIImage = {
         prompt: values.textInput,
         style_preset: selectedStyle?.value || "",
         width: selectedOptions?.value.width,
         height: selectedOptions?.value.height,
+        imageUrl: localStorage.getItem("generatedImageUrl") || null,
       };
 
       const response = await createAIImage(updatedRequest);
@@ -72,6 +78,7 @@ const ImageAi = () => {
         setUrlImageAI(response.imageUrl);
         setIsDoneGenerate(true);
         setIsGenerate(false);
+        localStorage.setItem("generatedImageUrl", response.imageUrl);
       } else {
         throw new Error("Failed to generate image. Please try again.");
       }
@@ -79,10 +86,11 @@ const ImageAi = () => {
       console.error(err);
       setError(err.message || "An error occurred while generating the image.");
     } finally {
-      setLoading(false); // Kết thúc trạng thái tải
+      setLoading(false);
     }
   };
 
+  // Hàm xử lý khi form submission bị lỗi
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
     errorInfo
   ) => {
@@ -93,13 +101,21 @@ const ImageAi = () => {
     console.log("Failed:", errorInfo);
   };
 
+  const handleReload = () => {
+    form.resetFields(); // Reset lại form
+    localStorage.removeItem("generatedImageUrl"); 
+    setUrlImageAI(null); 
+    setIsDoneGenerate(false); 
+    setIsGenerate(false); 
+  };
+
   // Menu cho dropdown
   const menu = (
     <Menu
       style={{
-        maxHeight: "300px", // Set the desired maximum width
-        overflowX: "auto", // Allow horizontal scrolling if items overflow
-        whiteSpace: "nowrap", // Prevent text from wrapping to the next line
+        maxHeight: "300px",
+        overflowX: "auto",
+        whiteSpace: "nowrap",
       }}
     >
       {options.slice(4).map((option, index) => (
@@ -194,7 +210,6 @@ const ImageAi = () => {
                   ]}
                 >
                   <div className="options">
-                    {/* Hiển thị 4 item đầu tiên */}
                     {options.slice(0, 4).map((option, index) => (
                       <div
                         key={index}
@@ -211,7 +226,6 @@ const ImageAi = () => {
                         <img src={option.image} alt={option.label} />
                       </div>
                     ))}
-                    {/* Dropdown hiển thị các item còn lại */}
                   </div>
                   <Dropdown
                     overlay={menu}
@@ -226,12 +240,19 @@ const ImageAi = () => {
               </Row>
             </div>
 
+            {/* Nút reload */}
+            <Form.Item style={{ display: "flex", justifyContent: "center" }}>
+              <Button type="default" onClick={handleReload}>
+                Reload Form
+              </Button>
+            </Form.Item>
+
             <Form.Item style={{ display: "flex", justifyContent: "center" }}>
               <Button
                 className="btn-generate"
                 type="primary"
                 htmlType="submit"
-                loading={loading} // Thêm loading vào nút
+                loading={loading}
               >
                 Generate
               </Button>
