@@ -41,6 +41,15 @@ export const updateMyAlbum = async (albumId: string, request: any) => {
   }
 };
 
+export const deleteMyAlbum = async (albumId: string) => {
+  try {
+    const res = await apiClient.delete(`/api/albums/${albumId}`);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const addMediasToAlbum = async (request: any) => {
   try {
     const res = await apiClient.post("/api/albums/add-medias", request);

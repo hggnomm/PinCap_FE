@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./DetailAlbum.less";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import MediaList from "../../../components/viewPin/ViewPinComponent";
-import { getDetailAlbum, updateMyAlbum } from "../../..//api/album";
+import {
+  deleteMyAlbum,
+  getDetailAlbum,
+  updateMyAlbum,
+} from "../../..//api/album";
 import { Album } from "type";
 import { toast } from "react-toastify";
 import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
@@ -20,6 +24,9 @@ const DetailAlbum = () => {
   const [albumData, setAlbumData] = useState<Album | null>(null);
   const [isFetchData, setIsFetchData] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false); // Modal confirm delete
+  const navigate = useNavigate();
+
   const [privacy, setPrivacy] = useState(false);
   const [form] = Form.useForm();
 
@@ -94,6 +101,30 @@ const DetailAlbum = () => {
   };
   const handlePrivacyChange = (e: any) => {
     setPrivacy(e.target.checked);
+  };
+
+  const handleDeleteAction = () => {
+    setDeleteModalVisible(true); // Mở modal xác nhận xóa
+    setModalVisible(false); // Ẩn modal chính
+  };
+
+  const deleteAlbum = async () => {
+    try {
+      const response = await deleteMyAlbum(id);
+
+      if (response) {
+        handleCancel();
+        navigate("/album");
+        toast.success("Album deleted successfully!"); // Hiển thị thông báo thành công
+      } else {
+        toast.error("Failed to delete the album. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error deleting album:", error);
+      toast.error(
+        "An error occurred while deleting the album. Please try again."
+      );
+    }
   };
   return (
     <div className="album-detail-container">
@@ -173,6 +204,44 @@ const DetailAlbum = () => {
               name="privacy"
             />
           </Form>
+          {/* Phần xóa album */}
+          <div className="delete-action" onClick={handleDeleteAction}>
+            <p className="title-delelte">Delete album</p>
+            <p className="des-delete">
+              You have 7 days to restore a deleted Board. After that, it will be
+              permanently deleted
+            </p>
+          </div>
+        </div>
+      </ModalComponent>
+
+      {/* Modal xác nhận xóa album */}
+      <ModalComponent
+        titleDefault="Delete this album?"
+        visible={deleteModalVisible}
+        onCancel={handleCancel}
+        onConfirm={deleteAlbum}
+        buttonLabels={{ confirmLabel: "Delete", cancelLabel: "Cancel" }}
+      >
+        <div
+          style={{
+            marginBottom: 20,
+            marginTop: 20,
+          }}
+        >
+          Are you sure you want to delete this album_name
+          <p
+            style={{
+              fontWeight: 500,
+              fontSize: "1.1em",
+              display: "inline",
+              marginRight: "5px",
+              marginLeft: "5px",
+            }}
+          >
+            {albumData?.album_name}?
+          </p>
+          This action cannot be undone.
         </div>
       </ModalComponent>
     </div>

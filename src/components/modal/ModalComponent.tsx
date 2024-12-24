@@ -3,6 +3,7 @@ import { Modal } from "antd";
 import "./ModalComponent.less";
 
 interface ModalComponentProps {
+  titleDefault?: string;
   title?: string;
   visible: boolean; // Hoặc open nếu bạn dùng phiên bản Ant Design mới
   onCancel: () => void;
@@ -15,6 +16,7 @@ interface ModalComponentProps {
 }
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
+  titleDefault,
   title,
   visible,
   onCancel,
@@ -24,6 +26,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
 }) => {
   return (
     <Modal
+      title={titleDefault}
       className="modal-component"
       centered
       open={visible}
@@ -39,9 +42,12 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
         </button>,
       ]}
     >
-      <div className="title">
-        <span>{title}</span>
-      </div>
+      {title && (
+        <div className="title">
+          <span>{title}</span>
+        </div>
+      )}
+
       {children}
     </Modal>
   );
