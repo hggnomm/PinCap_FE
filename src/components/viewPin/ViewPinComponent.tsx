@@ -4,7 +4,7 @@ import PinMedia from "../../pages/PinCap/PinMedia/PinMedia";
 import Loading from "../../components/loading/Loading";
 import { motion, AnimatePresence } from "framer-motion";
 
-const MediaList = ({ apiCall, extraParams }: any) => {
+const MediaList = ({ apiCall, extraParams, medias }: any) => {
   const [listMedia, setListMedia] = useState<any[]>([]);
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
@@ -14,6 +14,13 @@ const MediaList = ({ apiCall, extraParams }: any) => {
   const isFetching = useRef(false);
 
   const fetchData = async () => {
+    // Chỉ gọi API nếu medias không có giá trị
+    if (medias) {
+      setListMedia(medias);
+      return;
+    }
+
+    // Nếu chưa có medias, tiếp tục gọi API
     if (isFetching.current || !hasMore) return;
 
     isFetching.current = true;
@@ -21,7 +28,6 @@ const MediaList = ({ apiCall, extraParams }: any) => {
     setError(null);
 
     try {
-      console.log(extraParams);
       const data = await apiCall(page, extraParams);
       if (data?.data.length) {
         setListMedia((prevList) => [...prevList, ...data.data]);

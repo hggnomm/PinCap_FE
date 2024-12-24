@@ -29,8 +29,13 @@ export type Media = {
 
 export type Album = {
   id: string;
-  image_cover: string;
+  image_cover: string | null;
   album_name: string;
-  description: string;
+  description: string | null;
   privacy: string;
+  medias_count: number;
+  created_at: string;
+  updated_at: string;
+  users: User[];
+  medias: Media[];
 };

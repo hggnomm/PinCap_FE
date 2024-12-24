@@ -9,7 +9,7 @@ import { Dropdown, Input, Menu } from "antd";
 import Loading from "../../../components/loading/Loading";
 
 import "./index.less";
-import { getAlbumData } from "../../../api/album";
+import { getMyAlbumData } from "../../../api/album";
 import { unidecode } from "unidecode";
 import { AddRelationships, DeleteRelationships } from "../../../api/users";
 import { Album, Media } from "../../../types/type";
@@ -54,7 +54,7 @@ const DetailMedia = () => {
   }, [id]);
 
   const fetchAlbumData = async () => {
-    const response = await getAlbumData();
+    const response = await getMyAlbumData();
     if (response && response.data) {
       setAlbumData(response.data);
     }

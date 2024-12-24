@@ -10,6 +10,7 @@ import FieldItem from "../../../../components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "../../../../components/form/checkbox/CheckBoxComponent";
 import { UpdateAlbumRequest } from "Album/AlbumRequest";
 import { updateMyAlbum } from "../../../../api/album";
+import { useNavigate } from "react-router";
 
 interface AlbumCardProps {
   album: Album;
@@ -20,6 +21,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [privacy, setPrivacy] = useState(false);
+  const navigate = useNavigate();
 
   const handleCancel = () => {
     setModalVisible(false);
@@ -66,7 +68,12 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
 
   return (
     <>
-      <div className="album-card">
+      <div
+        className="album-card"
+        onClick={() => {
+          navigate(`/album/${album.id}`);
+        }}
+      >
         <div className="img-container">
           {album.image_cover && (
             <img
@@ -78,7 +85,10 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
           <div className="overlay">
             <div
               className="circle-button right-bottom"
-              onClick={() => setModalVisible(true)}
+              onClick={(e) => {
+                e.stopPropagation(); // Ngừng sự kiện click của phần tử cha khi nhấn vào button
+                setModalVisible(true);
+              }}
             >
               <EditFilled />
             </div>

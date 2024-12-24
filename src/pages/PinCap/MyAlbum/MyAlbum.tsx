@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./MyAlbum.less";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
 import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
-import { createMyAlbum, getAlbumData } from "../../../api/album";
+import { createMyAlbum, getMyAlbumData } from "../../../api/album";
 import { Album } from "type";
 import { useNavigate } from "react-router";
 import ModalComponent from "../../../components/modal/ModalComponent";
@@ -30,7 +30,7 @@ const MyAlbum = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getAlbumData();
+      const response = await getMyAlbumData();
       if (response) {
         setAlbumData(response.data);
       }
