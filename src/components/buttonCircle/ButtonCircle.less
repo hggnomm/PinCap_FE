@@ -4,6 +4,7 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  border: none; 
 
   &.padding-small {
     padding: 0.25rem;
@@ -32,5 +33,17 @@
   &:active {
     transform: scale(0.95);
     transition: transform 0.1s ease-in-out;
+  }
+
+  &:focus {
+    background-color: black;
+    outline: none;
+    color: white;
+  }
+
+  &:focus .icon {
+    svg {
+      stroke-width: 0;
+    }
   }
 }
