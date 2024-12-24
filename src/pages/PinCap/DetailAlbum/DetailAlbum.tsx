@@ -5,6 +5,8 @@ import MediaList from "../../../components/viewPin/ViewPinComponent";
 import { getDetailAlbum } from "../../..//api/album";
 import { Album } from "type";
 import { toast } from "react-toastify";
+import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
+import { LockFilled, PlusOutlined } from "@ant-design/icons/lib";
 
 const DetailAlbum = () => {
   const { id } = useParams<{ id: string }>();
@@ -43,6 +45,44 @@ const DetailAlbum = () => {
 
   return (
     <div className="album-detail-container">
+      <div className="top-container">
+        <div className="detail">
+          <p className="album_name">{albumData?.album_name}</p>
+
+          {albumData?.privacy === "PRIVATE" && (
+            <div className="private">
+              <LockFilled />
+              <p>Private</p>
+            </div>
+          )}
+
+          {albumData?.description && (
+            <p className="album_description">{albumData?.description}</p>
+          )}
+        </div>
+        <div>
+          <ButtonCircle
+            text="Create"
+            paddingClass="padding-0-8"
+            icon={
+              <PlusOutlined
+                style={{
+                  fontSize: "26px",
+                  strokeWidth: "40",
+                  stroke: "black",
+                }}
+              />
+            }
+            dropdownMenu={[
+              {
+                key: "1",
+                title: "Media",
+                onClick: () => {},
+              },
+            ]}
+          />
+        </div>
+      </div>
       {isFetchData && <MediaList medias={albumData?.medias} />}
     </div>
   );
