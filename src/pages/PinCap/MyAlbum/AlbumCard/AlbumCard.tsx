@@ -1,3 +1,4 @@
+// AlbumCard.tsx
 import React, { useEffect, useState } from "react";
 import "./AlbumCard.less";
 import { EditFilled, LockFilled } from "@ant-design/icons";
@@ -7,13 +8,15 @@ import { Form, Input } from "antd";
 import { toast } from "react-toastify";
 import FieldItem from "../../../../components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "../../../../components/form/checkbox/CheckBoxComponent";
+import { UpdateAlbumRequest } from "Album/AlbumRequest";
+import { updateMyAlbum } from "../../../../api/album";
 
 interface AlbumCardProps {
   album: Album;
+  fetchAlbums: () => void; // Accept the fetchAlbums function as a prop
 }
 
-const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
-  // MODAL COMPONENTS
+const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [privacy, setPrivacy] = useState(false);
@@ -25,20 +28,19 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
   const handleConfirm = async () => {
     try {
       const formValues = await form.validateFields();
-      // const albumRequest: CreateAlbumRequest = {
-      //   album_name: formValues.album_name,
-      //   privacy: privacy ? "0" : "1",
-      // };
+      const albumRequest: UpdateAlbumRequest = {
+        album_name: formValues.album_name,
+        privacy: privacy ? "0" : "1",
+      };
 
-      // console.log("Album Request:", albumRequest);
-      // setModalVisible(false);
+      console.log("Album Request:", albumRequest);
+      setModalVisible(false);
 
-      // const response = await createMyAlbum(albumRequest);
+      const response = await updateMyAlbum(album.id, albumRequest);
 
-      // if (response) {
-      //   fetchAlbums();
-      //   setModalVisible(false);
-      // }
+      if (response) {
+        fetchAlbums(); // Call fetchAlbums to refresh the album list
+      }
     } catch (error) {
       console.error("Validation failed:", error);
       toast.error(
@@ -46,6 +48,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
       );
     }
   };
+
   const handlePrivacyChange = (e: any) => {
     setPrivacy(e.target.checked);
   };
@@ -53,16 +56,18 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
   useEffect(() => {
     if (modalVisible) {
       form.resetFields(); // Reset form fields each time the modal is opened
-      setPrivacy(false); // Reset privacy to false when opening the modal
+      setPrivacy(album.privacy === "PRIVATE"); // Set privacy based on album's current privacy status
+
+      form.setFieldsValue({
+        album_name: album.album_name, // Set the album name in the form
+      });
     }
-  }, [modalVisible, form]);
+  }, [modalVisible, album, form]);
 
   return (
     <>
       <div className="album-card">
         <div className="img-container">
-          {/* Dynamically render the image */}
-
           {album.image_cover && (
             <img
               src={album.image_cover}
@@ -70,18 +75,15 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
               className="album-cover"
             />
           )}
-
           <div className="overlay">
             <div
               className="circle-button right-bottom"
-              onClick={() => {
-                setModalVisible(true);
-              }}
+              onClick={() => setModalVisible(true)}
             >
               <EditFilled />
             </div>
 
-            {album.privacy == "PRIVATE" && (
+            {album.privacy === "PRIVATE" && (
               <div className="circle-button left-top">
                 <LockFilled />
               </div>
@@ -90,19 +92,17 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
         </div>
 
         <div className="text-container">
-          {/* Dynamically render album name and description */}
           <p className="album-title">{album.album_name}</p>
           <p className="album-description">{album.description}</p>
         </div>
       </div>
 
-      {/* Modal để tạo album mới */}
       <ModalComponent
         title="Edit Your Album"
         visible={modalVisible}
         onCancel={handleCancel}
         onConfirm={handleConfirm}
-        buttonLabels={{ confirmLabel: "Create", cancelLabel: "Cancel" }}
+        buttonLabels={{ confirmLabel: "Update", cancelLabel: "Cancel" }}
       >
         <div className="create-album">
           <Form form={form} layout="vertical">

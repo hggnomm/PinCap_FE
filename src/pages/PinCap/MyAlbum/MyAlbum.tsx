@@ -13,6 +13,7 @@ import { CreateAlbumRequest } from "Album/AlbumRequest";
 import { toast } from "react-toastify";
 import Loading from "../../../components/loading/Loading";
 import AlbumCard from "./AlbumCard/AlbumCard";
+
 const MyAlbum = () => {
   const [activeButton, setActiveButton] = useState("saved");
   const [albumData, setAlbumData] = useState<Album[]>([]);
@@ -67,7 +68,7 @@ const MyAlbum = () => {
       const response = await createMyAlbum(albumRequest);
 
       if (response) {
-        fetchAlbums();
+        fetchAlbums(); // Fetch the albums after creating a new one
         setModalVisible(false);
       }
     } catch (error) {
@@ -109,42 +110,22 @@ const MyAlbum = () => {
         <div className="action">
           <ButtonCircle
             paddingClass="padding-0-8"
-            icon={
-              <FilterOutlined
-                style={{
-                  fontSize: "26px",
-                  strokeWidth: "30",
-                  stroke: "black",
-                }}
-              />
-            }
+            icon={<FilterOutlined style={{ fontSize: "26px" }} />}
           />
           <ButtonCircle
             text="Create"
             paddingClass="padding-0-8"
-            icon={
-              <PlusOutlined
-                style={{
-                  fontSize: "26px",
-                  strokeWidth: "40",
-                  stroke: "black",
-                }}
-              />
-            }
+            icon={<PlusOutlined style={{ fontSize: "26px" }} />}
             dropdownMenu={[
               {
                 key: "1",
                 title: "Media",
-                onClick: () => {
-                  navigate("/create-media");
-                },
+                onClick: () => navigate("/create-media"),
               },
               {
                 key: "2",
                 title: "Album",
-                onClick: () => {
-                  setModalVisible(true);
-                },
+                onClick: () => setModalVisible(true),
               },
             ]}
           />
@@ -155,7 +136,7 @@ const MyAlbum = () => {
               {albumData.length > 0 &&
                 albumData.map((album: Album) => (
                   <Col key={album.id} xs={24} sm={12} md={8} lg={8} xl={6}>
-                    <AlbumCard album={album} />
+                    <AlbumCard album={album} fetchAlbums={fetchAlbums} />
                   </Col>
                 ))}
             </Row>
