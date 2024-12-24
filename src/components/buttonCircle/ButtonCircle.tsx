@@ -29,18 +29,38 @@ const ButtonCircle = ({
   paddingClass = "padding-medium",
   dropdownMenu,
 }: ButtonCircleProps) => {
-
-  // function render menu when receive DropdownItem to implement function whatever 
+  // function render menu when receive DropdownItem to implement function whatever
   const renderMenu = () => {
     if (dropdownMenu) {
       return (
-        <Menu>
-          {dropdownMenu.map(({ key, title, onClick }) => (
-            <Menu.Item key={key} onClick={onClick}>
-              {title}
-            </Menu.Item>
-          ))}
-        </Menu>
+        <div
+          style={{
+            width: "200px",
+            height: "auto",
+            padding: 10,
+            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+            borderRadius: 10,
+          }}
+        >
+          {text && (
+            <div style={{ padding: 8 }}>
+              <span style={{ fontWeight: 400 }}>{text}</span>
+            </div>
+          )}
+          <Menu
+            style={{ border: "none", boxShadow: "none", background: "none" }}
+          >
+            {dropdownMenu.map(({ key, title, onClick }) => (
+              <Menu.Item
+                key={key}
+                onClick={onClick}
+                style={{ fontWeight: 500, padding: "12px 10px" }}
+              >
+                {title}
+              </Menu.Item>
+            ))}
+          </Menu>
+        </div>
       );
     }
     return null;
@@ -53,7 +73,6 @@ const ButtonCircle = ({
       tabIndex={0} // focus button
     >
       {icon && <span className="icon">{icon}</span>}
-      {text && <span>{text}</span>}
     </button>
   );
 

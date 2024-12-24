@@ -4,8 +4,11 @@ import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
 import MediaList from "../../../components/viewPin/ViewPinComponent";
 import { getMyMedias } from "../../../api/media";
+import { useNavigate } from "react-router";
 
 const MyMedia = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="media-container">
       <div className="fixed-topbar">
@@ -23,25 +26,9 @@ const MyMedia = () => {
               }}
             />
           }
-          dropdownMenu={[
-            {
-              key: "1",
-              title: "Item 1",
-              onClick: () => alert("Item 1 clicked"),
-            },
-            {
-              key: "2",
-              title: "Item 2",
-              onClick: () => alert("Item 2 clicked"),
-            },
-            {
-              key: "3",
-              title: "Item 3",
-              onClick: () => alert("Item 3 clicked"),
-            },
-          ]}
         />
         <ButtonCircle
+          text="Create"
           paddingClass="padding-0-8"
           icon={
             <PlusOutlined
@@ -52,6 +39,15 @@ const MyMedia = () => {
               }}
             />
           }
+          dropdownMenu={[
+            {
+              key: "1",
+              title: "Media",
+              onClick: () => {
+                navigate("/create-media"); 
+              },
+            },
+          ]}
         />
       </div>
       <div className="my-list-media">
