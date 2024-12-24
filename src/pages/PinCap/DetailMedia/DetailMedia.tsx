@@ -5,12 +5,11 @@ import { DownOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import download from "../../../assets/img/PinCap/download.png";
 import more from "../../../assets/img/PinCap/more.png";
-import { Dropdown, Input, Menu } from "antd";
+import { Dropdown, Input, Menu, notification } from "antd";
 import Loading from "../../../components/loading/Loading";
 
 import "./index.less";
-import { getMyAlbumData } from "../../../api/album";
-import { unidecode } from "unidecode";
+import { addMediasToAlbum, getMyAlbumData } from "../../../api/album";
 import { AddRelationships, DeleteRelationships } from "../../../api/users";
 import { Album, Media } from "../../../types/type";
 import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
@@ -26,6 +25,7 @@ interface TokenPayload {
 const DetailMedia = () => {
   const [media, setMedia] = useState<Media | null>(null);
   const [albumData, setAlbumData] = useState<Album[]>([]);
+  const [filteredAlbumData, setFilteredAlbumData] = useState<Album[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
@@ -47,28 +47,39 @@ const DetailMedia = () => {
     }
   };
 
+  const fetchAlbumData = async () => {
+    try {
+      const response = await getMyAlbumData();
+      if (response && response.data) {
+        setAlbumData(response.data); // Set all album data
+        setFilteredAlbumData(response.data); // Initially show all albums
+      }
+    } catch (error) {
+      setError("Lỗi khi tải album: " + error);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       fetchMediaDetail(id);
     }
   }, [id]);
 
-  const fetchAlbumData = async () => {
-    const response = await getMyAlbumData();
-    if (response && response.data) {
-      setAlbumData(response.data);
-    }
-  };
+  useEffect(() => {
+    return () => {
+      fetchAlbumData();
+    };
+  }, []);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
 
-    const normalizedSearchTerm = unidecode(value.toLowerCase());
+    const normalizedSearchTerm = value.toLowerCase();
 
-    const filteredAlbums = albumData.filter((album) =>
-      unidecode(album.album_name.toLowerCase()).includes(normalizedSearchTerm)
+    const filteredAlbums = albumData.filter(
+      (album) => album.album_name.toLowerCase().includes(normalizedSearchTerm) //
     );
-    setAlbumData(filteredAlbums);
+    setFilteredAlbumData(filteredAlbums);
   };
 
   const handleWithOwnerUser = async () => {
@@ -156,37 +167,88 @@ const DetailMedia = () => {
       setError("Error when reacting to a media!");
     }
   };
+
   const handleDownload = () => {
     if (media?.media_url) {
       saveAs(media.media_url, media.media_name || "downloaded-file");
     }
   };
 
+  const [api, contextHolder] = notification.useNotification();
+
+  const handleSaveMediaInAlbum = async (
+    albumId: string,
+    album_name: string
+  ) => {
+    try {
+      const request = {
+        album_id: albumId,
+        medias_id: [id],
+      };
+      const response = await addMediasToAlbum(request);
+
+      if (response) {
+        api.success({
+          message: "Success",
+          description: `Media has been saved to the ${album_name}!`,
+          placement: "top",
+        });
+      } else {
+        api.error({
+          message: "Error",
+          description: `Failed to save media to the ${album_name}. Please try again.`,
+          placement: "top",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving media to album", error);
+      api.error({
+        message: "Error",
+        description: `Failed to save media to the ${album_name}. Please try again.`,
+        placement: "top",
+      });
+    }
+  };
+
   const albumMenu = (
-    <div className="menu-album">
-      <div className="top-menu-album">
-        <span>Album</span>
+    <>
+      {contextHolder}
+      <div className="menu-album">
+        <div className="top-menu-album">
+          <span>Album</span>
+        </div>
+        <Input
+          placeholder="Search album..."
+          allowClear
+          onSearch={handleSearch} // Khi nhấn Enter
+          onChange={(e) => handleSearch(e.target.value)} // Khi gõ trực tiếp
+          className="search-album"
+          value={searchTerm} // Đồng bộ hóa giá trị tìm kiếm
+        />
+        <Menu className="list-album">
+          {filteredAlbumData.map((album) => (
+            <Menu.Item className="item-album" key={album.id}>
+              <div className="album-info">
+                <div className="img-album">
+                  {album.image_cover && (
+                    <img src={album.image_cover} alt={album.album_name} />
+                  )}
+                </div>
+                <span>{album.album_name}</span>
+              </div>
+              <button
+                className="save-button"
+                onClick={() =>
+                  handleSaveMediaInAlbum(album.id, album.album_name)
+                }
+              >
+                <p>Save</p>
+              </button>
+            </Menu.Item>
+          ))}
+        </Menu>
       </div>
-      <Input
-        placeholder="Search album..."
-        allowClear
-        onSearch={handleSearch} // Khi nhấn Enter
-        onChange={(e) => handleSearch(e.target.value)} // Khi gõ trực tiếp
-        className="search-album"
-        value={searchTerm} // Đồng bộ hóa giá trị tìm kiếm
-      />
-      <Menu className="list-album">
-        {albumData.map((album) => (
-          <Menu.Item className="item-album" key={album.id}>
-            <div className="album-info">
-              <img src={album.image_cover} alt={album.album_name} />
-              <span>{album.album_name}</span>
-            </div>
-            <button className="save-button">Save</button>
-          </Menu.Item>
-        ))}
-      </Menu>
-    </div>
+    </>
   );
 
   return (
@@ -272,8 +334,7 @@ const DetailMedia = () => {
                       <img src={media.ownerUser.avatar} alt="owner" />
                       <div className="info">
                         <span style={{ fontWeight: "bold" }}>
-                          {media.ownerUser.first_name}
-                          {" "}
+                          {media.ownerUser.first_name}{" "}
                           {media.ownerUser.last_name}
                         </span>
                         <span>{media.numberUserFollowers} follower</span>

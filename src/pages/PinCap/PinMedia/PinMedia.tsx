@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./index.less";
+import { EditFilled } from "@ant-design/icons/lib";
 
 const PinMedia = (props: any) => {
   const navigate = useNavigate();
@@ -43,7 +44,16 @@ const PinMedia = (props: any) => {
           zIndex: 1,
           borderRadius: "15px",
         }}
-      />
+      >
+        <div
+          className="save-button right-bottom"
+          onClick={(e) => {
+            e.stopPropagation(); // Ngừng sự kiện click của phần tử cha khi nhấn vào button
+          }}
+        >
+          <p>Save</p>
+        </div>
+      </motion.div>
     </motion.div>
   );
 };
