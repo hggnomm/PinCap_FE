@@ -43,6 +43,8 @@ const ButtonCircle = ({
             padding: 10,
             boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
             borderRadius: 10,
+            background: "#F6F6F6",
+            zIndex: 9999,
           }}
         >
           {text && (
@@ -51,7 +53,11 @@ const ButtonCircle = ({
             </div>
           )}
           <Menu
-            style={{ border: "none", boxShadow: "none", background: "none" }}
+            style={{
+              border: "none",
+              boxShadow: "none",
+              // background: "none",
+            }}
           >
             {dropdownMenu.map(({ key, title, onClick }) => (
               <Menu.Item

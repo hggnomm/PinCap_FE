@@ -2,32 +2,42 @@ import React, { useEffect, useState } from "react";
 import "./MyAlbum.less";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
 import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
-import { getAlbumData } from "../../../api/album";
+import { createMyAlbum, getAlbumData } from "../../../api/album";
 import { Album } from "type";
 import { useNavigate } from "react-router";
 import ModalComponent from "../../../components/modal/ModalComponent";
-import { Form, Input } from "antd";
+import { Col, Form, Input, Row } from "antd";
 import FieldItem from "../../../components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "../../../components/form/checkbox/CheckBoxComponent";
 import { CreateAlbumRequest } from "Album/AlbumRequest";
 import { toast } from "react-toastify";
-
+import Loading from "../../../components/loading/Loading";
+import AlbumCard from "./AlbumCard/AlbumCard";
 const MyAlbum = () => {
   const [activeButton, setActiveButton] = useState("saved");
   const [albumData, setAlbumData] = useState<Album[]>([]);
   const [privacy, setPrivacy] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    return () => {
-      fetchAlbums();
-    };
+    fetchAlbums();
   }, []);
 
   const fetchAlbums = async () => {
-    const response = await getAlbumData();
-    if (response) {
-      setAlbumData(response.data);
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getAlbumData();
+      if (response) {
+        setAlbumData(response.data);
+      }
+    } catch (err) {
+      setError("Failed to fetch albums. Please try again later.");
+      toast.error("Failed to fetch albums. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,7 +64,12 @@ const MyAlbum = () => {
       console.log("Album Request:", albumRequest);
       setModalVisible(false);
 
-      // await createAlbumAPI(albumRequest);
+      const response = await createMyAlbum(albumRequest);
+
+      if (response) {
+        fetchAlbums();
+        setModalVisible(false);
+      }
     } catch (error) {
       console.error("Validation failed:", error);
       toast.error(
@@ -134,23 +149,18 @@ const MyAlbum = () => {
             ]}
           />
         </div>
-        <div className="list">
-          {albumData.length > 0 ? (
-            albumData.map((album: Album) => (
-              <div key={album.id} className="album-item">
-                <img
-                  src={album.image_cover}
-                  alt={album.image_cover}
-                  className="album-cover"
-                />
-                <p className="album-title">{album.album_name}</p>
-                <p className="album-description">{album.description}</p>
-              </div>
-            ))
-          ) : (
-            <p>No albums available.</p>
-          )}
-        </div>
+        <Loading isLoading={loading} error={error}>
+          <div style={{ padding: "12px" }}>
+            <Row gutter={[24, 70]}>
+              {albumData.length > 0 &&
+                albumData.map((album: Album) => (
+                  <Col key={album.id} xs={24} sm={12} md={8} lg={8} xl={6}>
+                    <AlbumCard album={album} />
+                  </Col>
+                ))}
+            </Row>
+          </div>
+        </Loading>
       </div>
 
       {/* Modal để tạo album mới */}
@@ -164,7 +174,7 @@ const MyAlbum = () => {
         <div className="create-album">
           <Form form={form} layout="vertical">
             <FieldItem
-              label="Title"
+              label="Name"
               name="album_name"
               rules={[
                 { required: true, message: "Please input the album title!" },

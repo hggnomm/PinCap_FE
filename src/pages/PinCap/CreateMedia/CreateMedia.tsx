@@ -363,13 +363,13 @@ const CreateMedia: React.FC = () => {
           </Col>
 
           <Col span={14} className="field-input">
-            <div className="field-item">
+            <div className="field-item-create">
               <span className="text-label">Title</span>
               <Form.Item name="media_name">
                 <Input placeholder="Type media name" />
               </Form.Item>
             </div>
-            <div className="field-item">
+            <div className="field-item-create">
               <span className="text-label">Description</span>
               <Form.Item name="description">
                 <Input.TextArea
@@ -379,7 +379,7 @@ const CreateMedia: React.FC = () => {
                 />
               </Form.Item>
             </div>
-            <div className="field-item">
+            <div className="field-item-create">
               <span className="text-label">Privacy</span>
               <Form.Item name="privacy" initialValue="0">
                 <Select className="custom-select">
@@ -388,7 +388,7 @@ const CreateMedia: React.FC = () => {
                 </Select>
               </Form.Item>
             </div>
-            <div className="field-item">
+            <div className="field-item-create">
               <span className="text-label">Tags</span>
               <Form.Item name="tags_name">
                 <Input
