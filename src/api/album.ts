@@ -1,6 +1,6 @@
 import apiClient from "./apiClient"; // Đường dẫn tới tệp apiClient
 
-export const getAlbumData = async () => {
+export const getMyAlbumData = async () => {
   try {
     const res = await apiClient.get("/api/albums/my-album", {
       params: {
@@ -8,6 +8,15 @@ export const getAlbumData = async () => {
         page: 1,
       },
     });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getDetailAlbum = async (albumId: string) => {
+  try {
+    const res = await apiClient.get(`/api/albums/${albumId}`);
     return res.data;
   } catch (error) {
     console.log(error);

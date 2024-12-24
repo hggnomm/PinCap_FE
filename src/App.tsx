@@ -17,6 +17,7 @@ import Register from "./pages/Auth/Register";
 import Home from "./pages/Home/Home";
 import MyAlbum from "./pages/PinCap/MyAlbum/MyAlbum";
 import MyMedia from "./pages/PinCap/MyMedia/MyMedia";
+import DetailAlbum from "./pages/PinCap/DetailAlbum/DetailAlbum";
 
 const App = () => {
   const tokenPayload = useSelector((state: any) => state.auth);
@@ -73,6 +74,7 @@ const App = () => {
                           <Route path="/ai" element={<ImageAi />} />
                           <Route path="/media/:id" element={<DetailMedia />} />
                           <Route path="/album" element={<MyAlbum />} />
+                          <Route path="/album/:id" element={<DetailAlbum />} />
                           {/* Dynamic route for MyMedia with email */}
                           <Route path="/my-media" element={<MyMedia />} />
                         </Routes>

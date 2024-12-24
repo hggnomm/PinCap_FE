@@ -4,7 +4,7 @@ export const getAllMedias = async (page: number) => {
   try {
     const res = await apiClient.get("/api/medias/all", {
       params: {
-        per_page: 10,
+        per_page: 15,
         page, // Dynamic page
       },
     });
