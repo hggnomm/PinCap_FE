@@ -103,10 +103,10 @@ const ImageAi = () => {
 
   const handleReload = () => {
     form.resetFields(); // Reset lại form
-    localStorage.removeItem("generatedImageUrl"); 
-    setUrlImageAI(null); 
-    setIsDoneGenerate(false); 
-    setIsGenerate(false); 
+    localStorage.removeItem("generatedImageUrl");
+    setUrlImageAI(null);
+    setIsDoneGenerate(false);
+    setIsGenerate(false);
   };
 
   // Menu cho dropdown
@@ -169,7 +169,7 @@ const ImageAi = () => {
                   <Input.TextArea
                     rows={3}
                     placeholder="Enter your prompt"
-                    autoSize={{ minRows: 1, maxRows: 3 }}
+                    autoSize={{ minRows: 2, maxRows: 6 }}
                   />
                 </Form.Item>
               </Row>
