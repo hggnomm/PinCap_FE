@@ -248,18 +248,30 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
+      position: relative; 
+
+      &:hover .save-button {
+        opacity: 1; /* Hiển thị nút khi hover vào item-album */
+        pointer-events: all; /* Cho phép button nhận sự kiện chuột khi hiển thị */
+      }
 
       .album-info {
         display: flex;
         align-items: center;
         flex-grow: 1;
 
-        img {
+        .img-album {
           width: 60px;
           height: 60px;
-          object-fit: cover;
-          border-radius: 10px;
           margin-right: 15px;
+          border-radius: 10px;
+          overflow: hidden;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
 
         span {
@@ -269,16 +281,30 @@
       }
 
       .save-button {
-        padding: 14px 20px;
-        font-size: 14px;
+        width: 60px;
+        height: 40px;
         background-color: #d42364;
-        color: white;
-        border: none;
-        border-radius: 30px;
-        cursor: pointer;
+        border-radius: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        opacity: 0; 
+        pointer-events: none; 
+        position: absolute;
+        right: 15px; 
+
 
         &:hover {
+          transform: scale(1.06);
+        }
+
+        &:active {
+          transform: scale(0.95);
           background-color: #92103f;
+        }
+        p {
+          color: #fff;
         }
       }
     }
