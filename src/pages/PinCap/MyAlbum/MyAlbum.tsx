@@ -10,6 +10,7 @@ import { Form, Input } from "antd";
 import FieldItem from "../../../components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "../../../components/form/checkbox/CheckBoxComponent";
 import { CreateAlbumRequest } from "Album/AlbumRequest";
+import { toast } from "react-toastify";
 
 const MyAlbum = () => {
   const [activeButton, setActiveButton] = useState("saved");
@@ -18,7 +19,9 @@ const MyAlbum = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchAlbums();
+    return () => {
+      fetchAlbums();
+    };
   }, []);
 
   const fetchAlbums = async () => {
@@ -40,23 +43,36 @@ const MyAlbum = () => {
     setModalVisible(false);
   };
 
-  const handleConfirm = () => {
-    const formValue = form.getFieldsValue(); 
-    const privacyValue = privacy ? "1" : "0"; 
+  const handleConfirm = async () => {
+    try {
+      const formValues = await form.validateFields();
+      const albumRequest: CreateAlbumRequest = {
+        album_name: formValues.album_name,
+        privacy: privacy ? "0" : "1",
+      };
 
-    const albumRequest: CreateAlbumRequest = {
-      album_name: formValue.media_name, 
-      privacy: privacyValue,
-    };
+      console.log("Album Request:", albumRequest);
+      setModalVisible(false);
 
-    console.log(albumRequest);
-
-    setModalVisible(false);
+      // await createAlbumAPI(albumRequest);
+    } catch (error) {
+      console.error("Validation failed:", error);
+      toast.error(
+        "Validation failed: Please check the form fields and try again."
+      );
+    }
   };
 
   const handlePrivacyChange = (e: any) => {
     setPrivacy(e.target.checked);
   };
+
+  useEffect(() => {
+    if (modalVisible) {
+      form.resetFields(); // Reset form fields each time the modal is opened
+      setPrivacy(false); // Reset privacy to false when opening the modal
+    }
+  }, [modalVisible, form]);
 
   return (
     <div className="album-container">
@@ -147,28 +163,24 @@ const MyAlbum = () => {
       >
         <div className="create-album">
           <Form form={form} layout="vertical">
-            <Form.Item
-              name="media_name"
+            <FieldItem
+              label="Title"
+              name="album_name"
               rules={[
                 { required: true, message: "Please input the album title!" },
               ]}
+              placeholder="Like 'Places to Go' or 'Recipes to Make'"
             >
-              <FieldItem
-                label="Title"
-                placeholder="Like 'Places to Go' or 'Recipes to Make'"
-              >
-                <Input />
-              </FieldItem>
-            </Form.Item>
+              <Input />
+            </FieldItem>
 
-            <Form.Item name="privacy" valuePropName="checked">
-              <CheckboxWithDescription
-                title="Keep this album private"
-                description="So only you and collaborator can see it."
-                value={privacy}
-                onChange={handlePrivacyChange}
-              />
-            </Form.Item>
+            <CheckboxWithDescription
+              title="Keep this album private"
+              description="So only you and collaborator can see it."
+              value={privacy}
+              onChange={handlePrivacyChange}
+              name="privacy"
+            />
           </Form>
         </div>
       </ModalComponent>
