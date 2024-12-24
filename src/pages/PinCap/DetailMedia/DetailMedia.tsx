@@ -273,6 +273,8 @@ const DetailMedia = () => {
                       <div className="info">
                         <span style={{ fontWeight: "bold" }}>
                           {media.ownerUser.first_name}
+                          {" "}
+                          {media.ownerUser.last_name}
                         </span>
                         <span>{media.numberUserFollowers} follower</span>
                       </div>

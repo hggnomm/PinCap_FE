@@ -1,0 +1,71 @@
+@keyframes slideUnderline {
+  0% {
+    width: 0;
+    left: 50%;
+  }
+  50% {
+    left: 0;
+    width: 100%;
+  }
+  100% {
+    left: 0;
+    width: 100%;
+  }
+}
+
+.album-container {
+  width: 100%;
+
+  .fixed-topbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 40px;
+    margin: 0 auto;
+    gap: 20px;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05); // Shadow nhẹ ở dưới
+
+    button {
+      border-radius: 8px;
+      position: relative;
+
+      &:hover {
+        background-color: #d5e0f0;
+      }
+
+      p {
+        font-size: 1.4em;
+        font-weight: 600;
+        color: #111111;
+        position: relative;
+      }
+
+      &.active::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #111111;
+        animation: slideUnderline 0.3s ease-out; // Gạch chân sẽ lướt
+      }
+    }
+  }
+
+  .my-list-media {
+    .action {
+      display: flex;
+      padding: 10px 20px;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .list {
+      background-color: aquamarine;
+      height: 500px;
+      width: 100%;
+    }
+  }
+}
