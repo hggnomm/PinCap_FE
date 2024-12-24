@@ -23,6 +23,23 @@ const MyMedia = () => {
               }}
             />
           }
+          dropdownMenu={[
+            {
+              key: "1",
+              title: "Item 1",
+              onClick: () => alert("Item 1 clicked"),
+            },
+            {
+              key: "2",
+              title: "Item 2",
+              onClick: () => alert("Item 2 clicked"),
+            },
+            {
+              key: "3",
+              title: "Item 3",
+              onClick: () => alert("Item 3 clicked"),
+            },
+          ]}
         />
         <ButtonCircle
           paddingClass="padding-0-8"
