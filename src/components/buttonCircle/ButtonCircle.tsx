@@ -1,7 +1,10 @@
+// This component is designed to create a circular button with a black focus effect. It can optionally include a dropdown menu, but is fully functional as a standalone button as well. Please refer to the detailed code for implementation and usage instructions.
+
+// If you are unsure about how to use it, feel free to explore other references or implementations of similar button components for guidance.
+
 import React from "react";
 import "./ButtonCircle.less";
 import { Dropdown, Menu } from "antd";
-import { FilterOutlined, PlusOutlined } from "@ant-design/icons";
 
 interface DropdownItem {
   key: string;
