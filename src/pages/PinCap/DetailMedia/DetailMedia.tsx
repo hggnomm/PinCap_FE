@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getDetailMedia, mediaReactions } from "../../../api/media";
+import {
+  getAllMedias,
+  getDetailMedia,
+  mediaReactions,
+} from "../../../api/media";
 import { DownOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import download from "../../../assets/img/PinCap/download.png";
@@ -17,6 +21,7 @@ import Comment from "./Comment/Comment";
 import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
 import BackButton from "../../../components/backButton/BackButton";
+import MediaList from "../../../components/viewPin/ViewPinComponent";
 
 interface TokenPayload {
   id: string;
@@ -367,6 +372,7 @@ const DetailMedia = () => {
           </div>
         </div>
       </motion.div>
+      <MediaList apiCall={getAllMedias} />
     </Loading>
   );
 };

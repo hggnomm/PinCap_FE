@@ -97,6 +97,12 @@ const SiderCommon = () => {
       className="siderbar"
       width={isMobile ? "80px" : "240px"}
       trigger={isMobile ? null : undefined}
+      style={{ 
+        overflow: 'auto',
+        height: '100vh',
+        // position: 'fixed',
+        // left: 230,
+    }}
     >
       <Menu
         mode="inline"

@@ -187,7 +187,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
             marginTop: 20,
           }}
         >
-          Are you sure you want to delete this album_name
+          Are you sure you want to delete this album
           <p
             style={{
               fontWeight: 500,
