@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../api/auth";
 import { addToken } from "../../store/authSlice";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import "./index.less";
 
@@ -17,16 +17,42 @@ const Login = () => {
   const [api, contextHolder] = notification.useNotification();
   const dispatch = useDispatch();
 
+  const [form] = Form.useForm();
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    const savedPassword = localStorage.getItem("rememberedPassword");
+    if (savedEmail && savedPassword) {
+      form.setFieldsValue({
+        email: savedEmail,
+        password: savedPassword,
+        remember: true,
+      });
+      setRememberMe(true);
+    }
+  }, [form]);
+
   const onSwitchCreate = () => {
     navigate("/sign-up");
   };
 
   const onLogin = async (values: any) => {
     try {
+      const { email, password, remember } = values;
       const data = await login(values);
       if (data) {
         dispatch(addToken(data.token));
         localStorage.setItem("token", data.token);
+
+        if (remember) {
+          localStorage.setItem("rememberedEmail", email);
+          localStorage.setItem("rememberedPassword", password);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.removeItem("rememberedPassword");
+        }
+
         navigate("/home");
         window.location.reload();
       } else {
@@ -75,8 +101,9 @@ const Login = () => {
         {contextHolder}
 
         <Form
+          form={form}
           name="login_form"
-          initialValues={{ remember: true }}
+          initialValues={{ remember: rememberMe }}
           onFinish={onLogin}
           className="form"
         >
@@ -104,7 +131,9 @@ const Login = () => {
 
           <Form.Item className="action">
             <Col span={12} className="checkbox-container">
-              <Checkbox>Remember Me</Checkbox>
+              <Form.Item name="remember" valuePropName="checked" noStyle>
+                <Checkbox>Remember Me</Checkbox>
+              </Form.Item>
             </Col>
             <Col span={12} className="forgot-password">
               <span>Forgot Password?</span>
@@ -127,7 +156,7 @@ const Login = () => {
           </div>
           <Row className="register-field">
             <div>
-              Not Registered Yet?
+              Not Registered Yet?{" "}
               <span onClick={onSwitchCreate}>Create an account</span>
             </div>
           </Row>

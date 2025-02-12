@@ -101,7 +101,7 @@ const Register = () => {
           </div>
           <Row className="register-field">
             <div>
-              Have An Account Yet?
+              Have An Account Yet?{" "}
               <span onClick={onSwitchLogin}>Login an account</span>
             </div>
           </Row>
