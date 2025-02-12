@@ -43,6 +43,8 @@ const AIToolBtn = styled(Menu.Item)`
   justify-content: start;
   transition: background 0.3s ease;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
 
   &:hover {
     background: linear-gradient(#fff, #fff) padding-box,
@@ -99,16 +101,10 @@ const SiderCommon = () => {
       trigger={isMobile ? null : undefined}
       style={{
         overflow: "auto",
-        height: "100vh",
-        // position: 'fixed',
-        // left: 230,
+        minHeight: "100vh",
       }}
     >
-      <Menu
-        mode="inline"
-        style={{ padding: "0.5rem" }}
-        selectedKeys={getSelectedKeys()}
-      >
+      <Menu selectedKeys={getSelectedKeys()} mode="inline">
         {/* Create Media Button */}
         <CreateMediaBtn key="create-media" icon={<PlusOutlined />}>
           <Link to="/create-media">Create Media</Link>
@@ -145,12 +141,17 @@ const SiderCommon = () => {
         )}
 
         {/* AI Tool Button */}
-        <AIToolBtn key="ai-tool">
-          <img
-            src={iconAI}
-            alt="AI Tool"
-            style={{ width: "16px", marginRight: "1.5rem" }}
-          />
+
+        <AIToolBtn
+          key="ai-tool"
+          icon={
+            <img
+              src={iconAI}
+              alt="AI Tool"
+              style={{ width: "16px", height: "16px" }}
+            />
+          }
+        >
           <Link to="/ai">AI Tool</Link>
         </AIToolBtn>
       </Menu>

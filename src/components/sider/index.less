@@ -1,4 +1,4 @@
-@blue-main: #9EB8D9;
+@blue-main: #9eb8d9;
 @dirt-pink: #a25772;
 @background-color: #f9fbfd;
 
@@ -23,9 +23,15 @@
   }
 
   /* Tùy chỉnh menu bên trong sider */
+  .ant-menu-inline-collapsed {
+    width: 5rem !important;
+  }
   .ant-menu {
+    padding: 0.5rem;
+    width: 15rem;
+    position: fixed;
     background-color: transparent;
-    /* Tùy chỉnh item trong menu */
+
     .ant-menu-item {
       text-align: left;
       margin-bottom: 1.2rem;
@@ -39,7 +45,7 @@
         background-color: @blue-main;
         color: #000;
       }
- 
+
       /* Tùy chỉnh icon */
       .anticon {
         display: flex;
@@ -80,4 +86,3 @@
     }
   }
 }
-
