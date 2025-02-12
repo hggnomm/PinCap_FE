@@ -66,7 +66,7 @@ const DetailMedia = () => {
 
   useEffect(() => {
     if (id) {
-      window.scrollTo(0, 0)
+      window.scrollTo(0, 0);
       fetchMediaDetail(id);
     }
   }, [id]);
@@ -102,6 +102,7 @@ const DetailMedia = () => {
           if (!prevState) return null;
           return {
             ...prevState,
+            numberUserFollowers: (media?.numberUserFollowers ?? 0) - 1,
             ownerUser: {
               ...prevState.ownerUser,
               isFollowing: false,
@@ -122,6 +123,7 @@ const DetailMedia = () => {
           if (!prevState) return null;
           return {
             ...prevState,
+            numberUserFollowers: (media?.numberUserFollowers ?? 0) + 1,
             ownerUser: {
               ...prevState.ownerUser,
               isFollowing: true,
@@ -319,7 +321,7 @@ const DetailMedia = () => {
                     <button className="album">
                       Album
                       <DownOutlined
-                        style={{ marginLeft: "10px", fontWeight: "600" }}
+                        style={{ marginLeft: "5px", fontWeight: "600" }}
                       />
                     </button>
                   </Dropdown>

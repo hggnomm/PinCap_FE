@@ -93,7 +93,7 @@
           .action-right button {
             border: none;
             outline: none;
-            margin-left: 10px;
+            margin-left: 5px;
             padding: 12px 18px;
             cursor: pointer;
             border-radius: 30px;
@@ -249,7 +249,7 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      position: relative; 
+      position: relative;
 
       &:hover .save-button {
         opacity: 1; /* Hiển thị nút khi hover vào item-album */
@@ -290,11 +290,10 @@
         justify-content: center;
         align-items: center;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        opacity: 0; 
-        pointer-events: none; 
+        opacity: 0;
+        pointer-events: none;
         position: absolute;
-        right: 15px; 
-
+        right: 15px;
 
         &:hover {
           transform: scale(1.06);
@@ -306,6 +305,55 @@
         }
         p {
           color: #fff;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1280px) {
+  .detail-media-container {
+    .detail-media {
+      min-width: 80% !important;
+    }
+
+    .action {
+      padding: 10px !important;
+
+      .action-right button {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-media-container {
+    .detail-media {
+      flex-direction: column;
+
+      .left-view {
+        border-radius: 28px;
+      }
+      
+      .action {
+        padding: 10px !important;
+
+        .action-left {
+          gap: 10px !important;
+
+          button {
+            padding: 0.1rem !important;
+          }
+        }
+        .action-right button {
+          padding: 6px 10px !important;
+          font-size: 13px !important;
+
+          &.save {
+            display: none;
+          }
         }
       }
     }

@@ -282,13 +282,13 @@ const CreateMedia: React.FC = () => {
 
   return (
     <div className="create-media-container">
-      <Row className="field-create-media">
-        <Col>
+      <div className="field-create-media">
+        <div>
           <Title level={4} style={{ margin: 0 }}>
             Create Media
           </Title>
-        </Col>
-        <Col>
+        </div>
+        <div>
           <div
             style={{
               display: "flex",
@@ -313,8 +313,8 @@ const CreateMedia: React.FC = () => {
               Draft
             </Button>
           </div>
-        </Col>
-      </Row>
+        </div>
+      </div>
 
       <Row className="field-form-create-media">
         {isLoad && (
@@ -328,7 +328,7 @@ const CreateMedia: React.FC = () => {
           className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
           onValuesChange={handleFormChange} // Gọi khi có thay đổi
         >
-          <Col span={10} className="upload-image">
+          <Col md={24} xl={10} className="upload-image">
             {imageUrl ? (
               <div className="draft-img">
                 <ProgressiveImage src={imageUrl} placeholder={imageUrl}>
@@ -362,7 +362,7 @@ const CreateMedia: React.FC = () => {
             )}
           </Col>
 
-          <Col span={14} className="field-input">
+          <Col md={24} xl={14} className="field-input">
             <div className="field-item-create">
               <span className="text-label">Title</span>
               <Form.Item name="media_name">

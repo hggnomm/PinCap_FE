@@ -46,31 +46,33 @@ const Comment = () => {
   return (
     <div className="comment">
       <p>What do you think?</p>
-      <form className="msg-form" onSubmit={(e) => e.preventDefault()}>
-        <input
-          placeholder="Type a message..."
-          type="text"
-          className="msg-input"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setShowEmojiPicker(false)} // Close emoji picker when input is focused
-        />
-        <SmileOutlined
-          className="emoji"
-          onClick={() => setShowEmojiPicker((prev) => !prev)}
-        />
-        {showEmojiPicker && (
-          <div className="picker" ref={pickerRef}>
-            <Picker
-              data={data}
-              onEmojiSelect={handleEmojiSelect}
-              theme="auto"
-            />
-          </div>
-        )}
-        <SendOutlined className="send-icon" onClick={sendMessage} />
-      </form>
+      <div>
+        <form className="msg-form" onSubmit={(e) => e.preventDefault()}>
+          <input
+            placeholder="Type a message..."
+            type="text"
+            className="msg-input"
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setShowEmojiPicker(false)} // Close emoji picker when input is focused
+          />
+          <SmileOutlined
+            className="emoji"
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+          />
+          {showEmojiPicker && (
+            <div className="picker" ref={pickerRef}>
+              <Picker
+                data={data}
+                onEmojiSelect={handleEmojiSelect}
+                theme="auto"
+              />
+            </div>
+          )}
+          <SendOutlined className="send-icon" onClick={sendMessage} />
+        </form>
+      </div>
     </div>
   );
 };
