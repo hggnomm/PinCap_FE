@@ -66,6 +66,7 @@ const DetailMedia = () => {
 
   useEffect(() => {
     if (id) {
+      window.scrollTo(0, 0)
       fetchMediaDetail(id);
     }
   }, [id]);
