@@ -313,7 +313,7 @@ const DetailMedia = () => {
                 <div className="action-right">
                   <Dropdown
                     overlay={albumMenu} // Pass the dynamically fetched album data to the dropdown
-                    placement="bottom"
+                    placement="bottomLeft"
                     trigger={["click"]}
                     onVisibleChange={fetchAlbumData} // Fetch album data when the dropdown is clicked
                     className="dropdown_item"

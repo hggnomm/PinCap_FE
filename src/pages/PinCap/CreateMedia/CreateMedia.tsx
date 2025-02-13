@@ -419,12 +419,13 @@ const CreateMedia: React.FC = () => {
       </Row>
 
       <Drawer
+        
         title={`Draft Medias (${drafts.length})`}
         placement="right"
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
         width={500}
-        closable={false}
+        // closable={false}
       >
         <DraftMedia
           resetFormAndCloseDrawer={resetForm}

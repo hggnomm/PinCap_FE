@@ -15,7 +15,7 @@ import Loading from "../../../components/loading/Loading";
 import AlbumCard from "./AlbumCard/AlbumCard";
 
 const MyAlbum = () => {
-  const [activeButton, setActiveButton] = useState("saved");
+  const [activeButton, setActiveButton] = useState("created");
   const [albumData, setAlbumData] = useState<Album[]>([]);
   const [privacy, setPrivacy] = useState(false);
   const navigate = useNavigate();
