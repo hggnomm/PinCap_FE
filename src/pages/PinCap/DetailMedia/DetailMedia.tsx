@@ -16,10 +16,7 @@ import "./index.less";
 import { addMediasToAlbum, getMyAlbumData } from "../../../api/album";
 import { AddRelationships, DeleteRelationships } from "../../../api/users";
 import { Album, Media } from "../../../types/type";
-import {
-  FeelingType,
-  getImageReactionWithId,
-} from "../../../utils/utils";
+import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
 import Comment from "./Comment/Comment";
 import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
@@ -333,6 +330,9 @@ const DetailMedia = () => {
                   <button className="save">Save</button>
                 </div>
               </div>
+            </div>
+
+            <div className="main-view">
               {media?.media_name && (
                 <div className="media_name">
                   <span>{media.media_name}</span>
@@ -376,7 +376,7 @@ const DetailMedia = () => {
               </div>
             </div>
             {/* Comment */}
-            <div>
+            <div className="right-bottom-view">
               <Comment />
             </div>
           </div>
