@@ -16,12 +16,16 @@ import "./index.less";
 import { addMediasToAlbum, getMyAlbumData } from "../../../api/album";
 import { AddRelationships, DeleteRelationships } from "../../../api/users";
 import { Album, Media } from "../../../types/type";
-import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
+import {
+  FeelingType,
+  getImageReactionWithId,
+} from "../../../utils/utils";
 import Comment from "./Comment/Comment";
 import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
 import BackButton from "../../../components/backButton/BackButton";
 import MediaList from "../../../components/viewPin/ViewPinComponent";
+import ListComments from "./ListComments/ListComments";
 
 interface TokenPayload {
   id: string;
@@ -367,6 +371,9 @@ const DetailMedia = () => {
                   <span>{media.description}</span>
                 </div>
               )}
+              <div className="comments">
+                {media?.userComments && <ListComments media={media} />}
+              </div>
             </div>
             {/* Comment */}
             <div>

@@ -49,7 +49,7 @@ const Comment = () => {
       <div>
         <form className="msg-form" onSubmit={(e) => e.preventDefault()}>
           <input
-            placeholder="Type a message..."
+            placeholder="Add a comment"
             type="text"
             className="msg-input"
             value={inputValue}
