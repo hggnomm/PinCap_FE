@@ -70,3 +70,14 @@ export const mediaReactions = async (request: any) => {
     console.log(error);
   }
 };
+
+export const deleteMedias = async (ids: string[]) => {
+  try {
+    const res = await apiClient.delete(`/api/medias`, {
+      data: { ids },
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

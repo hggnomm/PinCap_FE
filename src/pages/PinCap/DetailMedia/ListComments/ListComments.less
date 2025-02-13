@@ -12,6 +12,7 @@
     padding: 0;
     align-items: flex-start;
     gap: 10px;
+    max-width: 100%; 
 
     .avatar {
       flex-shrink: 0;
@@ -22,7 +23,7 @@
         width: 30px;
         height: 30px;
         cursor: pointer;
-        object-fit: cover;
+        object-fit: contain;
         transition: transform 0.2s ease-in-out;
 
         &:hover {
@@ -33,6 +34,7 @@
 
     .content {
       flex: 1;
+      max-width: 17.5rem; 
 
       .header_content {
         display: flex;
@@ -59,12 +61,19 @@
         font-weight: 400;
       }
 
-      img {
-        max-width: 30%;
-        transition: opacity 0.2s ease-in-out;
+      .comment_img {
+        margin-top: 0.5rem;
+        width: 100%;
+        max-width: 60%; 
 
-        &:hover {
-          opacity: 0.8;
+        img {
+          border-radius: 5px;
+          width: 100%; 
+          transition: opacity 0.2s ease-in-out;
+
+          &:hover {
+            opacity: 0.8;
+          }
         }
       }
     }

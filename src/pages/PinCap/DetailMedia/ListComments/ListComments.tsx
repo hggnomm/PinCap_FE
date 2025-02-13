@@ -3,6 +3,7 @@ import React from "react";
 import { formatTime } from "../../../../utils/utils";
 import { Media } from "../../../../types/type";
 import "./ListComments.less";
+
 const ListComments = ({ media }: { media: Media }) => {
   return (
     <Collapse ghost expandIconPosition="end" className="user_comment">
@@ -19,7 +20,9 @@ const ListComments = ({ media }: { media: Media }) => {
 
             <p>{media?.userComments?.content}</p>
             {media?.userComments?.image_url && (
-              <img src={media?.userComments?.image_url} alt="comment-img" />
+              <div className="comment_img">
+                <img src={media?.userComments?.image_url} alt="comment-img" />
+              </div>
             )}
           </div>
         </div>
