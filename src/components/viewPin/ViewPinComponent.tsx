@@ -3,25 +3,42 @@ import "./ViewPinComponent.less";
 import PinMedia from "../../pages/PinCap/PinMedia/PinMedia";
 import Loading from "../../components/loading/Loading";
 import { motion, AnimatePresence } from "framer-motion";
+import { Media } from "type";
 
-const MediaList = ({ apiCall, extraParams, medias }: any) => {
-  const [listMedia, setListMedia] = useState<any[]>([]);
+interface MediaListProps {
+  apiCall?: (page: number, extraParams: any) => Promise<any>;
+  extraParams?: any;
+  medias?: Media[];
+  isEditMedia?: boolean;
+}
+
+const MediaList: React.FC<MediaListProps> = ({
+  apiCall,
+  extraParams,
+  medias,
+  isEditMedia = false,
+}) => {
+  const [listMedia, setListMedia] = useState<Media[]>([]);
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const isFetching = useRef(false);
+  const isFetching = useRef<boolean>(false);
 
   const fetchData = async () => {
-    // Chỉ gọi API nếu medias không có giá trị
+    // If medias are provided, directly set the media list and skip API call
     if (medias) {
       setListMedia(medias);
       return;
     }
 
-    // Nếu chưa có medias, tiếp tục gọi API
     if (isFetching.current || !hasMore) return;
+
+    if (!apiCall) {
+      setError("API call function is not provided.");
+      return;
+    }
 
     isFetching.current = true;
     setLoading(true);
@@ -29,13 +46,13 @@ const MediaList = ({ apiCall, extraParams, medias }: any) => {
 
     try {
       const data = await apiCall(page, extraParams);
-      if (data?.data.length) {
+      if (data?.data?.length) {
         setListMedia((prevList) => [...prevList, ...data.data]);
       } else {
         setHasMore(false);
       }
-    } catch (error) {
-      setError("Lỗi khi lấy list media: " + error);
+    } catch (error: any) {
+      setError("Error fetching media list: " + error?.message || error);
     } finally {
       setLoading(false);
       isFetching.current = false;
@@ -79,11 +96,12 @@ const MediaList = ({ apiCall, extraParams, medias }: any) => {
           }}
         >
           <AnimatePresence>
-            {listMedia.map((media: any) => (
+            {listMedia.map((media) => (
               <PinMedia
-                key={media?.id}
-                srcUrl={media?.media_url}
+                key={media.id}
+                srcUrl={media.media_url}
                 data={media}
+                isEditMedia={isEditMedia}
               />
             ))}
           </AnimatePresence>

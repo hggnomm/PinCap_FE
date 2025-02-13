@@ -54,7 +54,7 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 12px 25px 0 20px;
+          padding: 12px 25px 0 18px;
 
           .action-left {
             display: flex;
@@ -132,12 +132,12 @@
 
       .main-view {
         height: 300px;
-        overflow-y: auto;
         flex-grow: 1;
+        overflow-y: auto;
 
         .media_name {
           text-align: left;
-          padding: 15px 20px 0 20px;
+          padding: 15px 25px 0 20px;
 
           span {
             font-size: 17px;
@@ -146,7 +146,7 @@
         }
         .description {
           text-align: left;
-          padding: 10px 25px 0 25px;
+          padding: 10px 20px 0 20px;
 
           span {
             font-size: 0.95em;
@@ -225,6 +225,26 @@
         }
         .comments {
           padding: 15px 4px 0 4px;
+
+          .no_comment {
+            margin-top: 1rem;
+            padding: 0 15px;
+            font-size: 16px;
+            color: #767676;
+            text-align: left;
+            animation: fadeIn 0.5s ease-in-out;
+          }
+
+          @keyframes fadeIn {
+            0% {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
         }
       }
       .right-bottom-view {
@@ -352,7 +372,7 @@
       }
 
       .action {
-        padding: 10px !important;
+        padding: 14px !important;
 
         .action-left {
           gap: 10px !important;
@@ -382,6 +402,9 @@
 
           .user_owner {
             padding: 15px 13px 0 13px;
+          }
+          .no_comment {
+            padding: 10px !important;
           }
         }
       }

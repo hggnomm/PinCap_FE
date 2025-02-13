@@ -372,12 +372,17 @@ const DetailMedia = () => {
                 </div>
               )}
               <div className="comments">
-                {media?.userComments && <ListComments media={media} />}
+                {media?.is_comment ? (
+                  media?.userComments && <ListComments media={media} />
+                ) : (
+                  <p className="no_comment">
+                    Comments are turned off for this Media
+                  </p>
+                )}
               </div>
             </div>
-            {/* Comment */}
             <div className="right-bottom-view">
-              <Comment />
+              {media?.is_comment && <Comment />}
             </div>
           </div>
         </div>

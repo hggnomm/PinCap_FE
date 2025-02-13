@@ -44,7 +44,7 @@ const MyMedia = () => {
               key: "1",
               title: "Media",
               onClick: () => {
-                navigate("/create-media"); 
+                navigate("/create-media");
               },
             },
           ]}
@@ -53,7 +53,7 @@ const MyMedia = () => {
       <div className="my-list-media">
         <div className="action"></div>
         <div className="list">
-          <MediaList apiCall={getMyMedias} extraParams={1} />
+          <MediaList apiCall={getMyMedias} extraParams={1} isEditMedia />
         </div>
       </div>
     </div>

@@ -174,7 +174,7 @@ const DetailAlbum = () => {
         </div>
       )}
 
-      {isFetchData && <MediaList medias={albumData?.medias} />}
+      {isFetchData && <MediaList medias={albumData?.medias} isEditMedia />}
 
       <ModalComponent
         title="Edit Your Album"
@@ -208,8 +208,8 @@ const DetailAlbum = () => {
           <div className="delete-action" onClick={handleDeleteAction}>
             <p className="title-delelte">Delete album</p>
             <p className="des-delete">
-              You have 7 days to restore a deleted Board. After that, it will be
-              permanently deleted
+              You have 7 days to restore a deleted Album. After that, it will be
+              permanently deleted.
             </p>
           </div>
         </div>
