@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
 import BackButton from "../../../components/backButton/BackButton";
 import MediaList from "../../../components/viewPin/ViewPinComponent";
+import ListComments from "./ListComments/ListComments";
 
 interface TokenPayload {
   id: string;
@@ -329,6 +330,9 @@ const DetailMedia = () => {
                   <button className="save">Save</button>
                 </div>
               </div>
+            </div>
+
+            <div className="main-view">
               {media?.media_name && (
                 <div className="media_name">
                   <span>{media.media_name}</span>
@@ -367,9 +371,12 @@ const DetailMedia = () => {
                   <span>{media.description}</span>
                 </div>
               )}
+              <div className="comments">
+                {media?.userComments && <ListComments media={media} />}
+              </div>
             </div>
             {/* Comment */}
-            <div>
+            <div className="right-bottom-view">
               <Comment />
             </div>
           </div>

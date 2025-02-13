@@ -2,7 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import "./Comment.less";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
-import { SmileOutlined, SendOutlined } from "@ant-design/icons";
+import {
+  SmileOutlined,
+  SendOutlined,
+  FileImageOutlined,
+} from "@ant-design/icons";
 
 const Comment = () => {
   const [inputValue, setInputValue] = useState("");
@@ -22,7 +26,6 @@ const Comment = () => {
 
   const sendMessage = async () => {
     if (inputValue.trim() === "") return;
-    // Logic gửi tin nhắn
   };
 
   const handleEmojiSelect = (emoji) => {
@@ -49,7 +52,7 @@ const Comment = () => {
       <div>
         <form className="msg-form" onSubmit={(e) => e.preventDefault()}>
           <input
-            placeholder="Type a message..."
+            placeholder="Add a comment"
             type="text"
             className="msg-input"
             value={inputValue}
@@ -60,6 +63,10 @@ const Comment = () => {
           <SmileOutlined
             className="emoji"
             onClick={() => setShowEmojiPicker((prev) => !prev)}
+          />
+          <FileImageOutlined
+            className="emoji"
+            // onClick={() => setShowEmojiPicker((prev) => !prev)}
           />
           {showEmojiPicker && (
             <div className="picker" ref={pickerRef}>

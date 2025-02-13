@@ -7,6 +7,31 @@ export type User = {
   isFollowing?: boolean;
 };
 
+export type Feeling = {
+  id: string;
+  feeling_type: string;
+  icon_url: string;
+};
+
+export type Reaction = {
+  id: string;
+  feeling_id: string;
+} | null;
+
+export type Comment = {
+  id: string;
+  content: string;
+  image_url: string;
+  created_at: string;
+  feelings: Feeling[];
+  all_feelings_count: number;
+  name: string;
+  is_following: boolean;
+  user_id: string;
+  avatar: string;
+  replies_count: number;
+} | null;
+
 export type Media = {
   id: string;
   is_comment: boolean;
@@ -18,13 +43,12 @@ export type Media = {
   ownerUser: User;
   reaction_user_count: number | null;
   type: "IMAGE" | "VIDEO";
-  userComments: any | null;
+  userComments: Comment | null;
   privacy: string;
   tags_name: string[];
-  reaction: {
-    id: string;
-    feeling_id: string;
-  } | null;
+  reaction: Reaction;
+  feelings: Feeling[];
+  commentCount: number;
 };
 
 export type Album = {

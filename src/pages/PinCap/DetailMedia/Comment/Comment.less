@@ -1,9 +1,10 @@
 .comment {
   padding: 1rem;
-  
+
   p {
     font-weight: 600;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.5rem;
+    margin-left: 10px;
     font-size: 1.1em;
   }
   .msg-form {
@@ -17,12 +18,20 @@
 
     .emoji {
       font-size: 22px;
-      margin-left: 15px;
+      margin-left: 10px;
     }
 
     .send-icon {
-      font-size: 22px;
-      margin-left: 15px;
+      background-color: #a25772;
+      padding: 8px;
+      border-radius: 50%;
+      font-size: 16px;
+      margin-left: 10px;
+      color: white;
+
+      &:hover {
+        background-color: #804258;
+      }
     }
 
     .msg-input {
@@ -54,5 +63,18 @@
       bottom: 100px;
       z-index: 9999;
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .emoji {
+    font-size: 15px !important;
+    margin-left: 5px !important;
+  }
+  .send-icon {
+    padding: 5px !important;
+    border-radius: 50%;
+    font-size: 12px !important;
+    margin-left: 5px !important;
   }
 }

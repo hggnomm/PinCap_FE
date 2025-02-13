@@ -5,7 +5,7 @@
   padding-bottom: 20px;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: self-start;
 
   .detail-media {
     margin-top: 1rem;
@@ -15,12 +15,13 @@
     display: flex;
     background-color: rgba(255, 255, 255, 0.7);
     max-width: 65%;
-    height: 100%;
+    max-height: 100%;
     border: 1px solid rgba(0, 0, 0, 0.1);
     position: relative;
 
     .left-view {
       display: flex;
+      align-items: start;
       height: auto;
       min-width: auto;
       border-top-left-radius: 28px;
@@ -38,7 +39,7 @@
 
     .right-view {
       min-width: 55%;
-      min-height: 300px;
+      min-height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -47,6 +48,7 @@
 
       .right-top-view {
         width: 100%;
+        flex-shrink: 0;
 
         .action {
           display: flex;
@@ -126,6 +128,12 @@
             }
           }
         }
+      }
+
+      .main-view {
+        height: 300px;
+        overflow-y: auto;
+        flex-grow: 1;
 
         .media_name {
           text-align: left;
@@ -138,7 +146,7 @@
         }
         .description {
           text-align: left;
-          padding: 10px 25px 0 20px;
+          padding: 10px 25px 0 25px;
 
           span {
             font-size: 0.95em;
@@ -151,7 +159,7 @@
           justify-content: space-between;
           align-items: center;
           background-color: #ffffff;
-          padding: 15px 25px 0 20px;
+          padding: 15px 20px 0 20px;
 
           p {
             font-size: 1.1em;
@@ -215,6 +223,12 @@
             background: #f9f7f7;
           }
         }
+        .comments {
+          padding: 15px 4px 0 4px;
+        }
+      }
+      .right-bottom-view {
+        flex-shrink: 0;
       }
     }
   }
@@ -336,7 +350,7 @@
       .left-view {
         border-radius: 28px;
       }
-      
+
       .action {
         padding: 10px !important;
 
@@ -353,6 +367,21 @@
 
           &.save {
             display: none;
+          }
+        }
+      }
+
+      .right-view {
+        .main-view {
+          .media_name {
+            padding: 15px 13px 0 13px;
+          }
+          .description {
+            padding: 15px 13px 0 13px;
+          }
+
+          .user_owner {
+            padding: 15px 13px 0 13px;
           }
         }
       }

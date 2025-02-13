@@ -61,3 +61,31 @@ export const getImageReactionWithId = (id?: string): string => {
       return black_heart;
   }
 };
+
+export const formatTime = (dateString: string): string => {
+  const pastDate = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - pastDate.getTime()) / 1000);
+
+  const ONE_MINUTE = 60;
+  const ONE_HOUR = ONE_MINUTE * 60;
+  const ONE_DAY = ONE_HOUR * 24;
+  const ONE_WEEK = ONE_DAY * 7;
+  const ONE_YEAR = ONE_DAY * 365;
+
+  if (seconds < ONE_MINUTE) {
+    return "Just now";
+  }
+
+  const years = Math.floor(seconds / ONE_YEAR);
+  if (years > 0) return `${years}y`;
+
+  const weeks = Math.floor(seconds / ONE_WEEK);
+  if (weeks > 0) return `${weeks}w`;
+
+  const hours = Math.floor(seconds / ONE_HOUR);
+  if (hours > 0) return `${hours}h`;
+
+  const minutes = Math.floor(seconds / ONE_MINUTE);
+  return `${minutes}m`;
+};
