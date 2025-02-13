@@ -14,11 +14,13 @@ interface PinMediaProps {
     media_url: string;
   };
   isEditMedia?: boolean;
+  onDelete?: () => void; 
 }
 
 const PinMedia: React.FC<PinMediaProps> = (props) => {
+  const { srcUrl, data, isEditMedia, onDelete } = props;
   const navigate = useNavigate();
-  const { srcUrl, data, isEditMedia } = props;
+
   const isMp4 = srcUrl?.endsWith(".mp4");
 
   const [modalVisible, setModalVisible] = useState(false); // Modal chính
@@ -50,8 +52,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
 
       if (response) {
         handleCancel();
-        // Fetch lại data
-        toast.success("Media deleted successfully!"); // Hiển thị thông báo thành công
+        toast.success("Media deleted successfully!");
+
+        if (onDelete) {
+          onDelete();
+        }
       } else {
         toast.error("Failed to delete the Media. Please try again.");
       }
@@ -150,18 +155,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             marginTop: 20,
           }}
         >
-          Are you sure you want to delete this Media
-          <p
-            style={{
-              fontWeight: 500,
-              fontSize: "1.1em",
-              display: "inline",
-              marginRight: "5px",
-              marginLeft: "5px",
-            }}
-          >
-            Media Name...
-          </p>
+          Are you sure you want to delete this Media?
           This action cannot be undone.
         </div>
       </ModalComponent>

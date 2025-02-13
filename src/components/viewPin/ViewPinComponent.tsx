@@ -59,6 +59,12 @@ const MediaList: React.FC<MediaListProps> = ({
     }
   };
 
+  const reloadData = () => {
+    setPage(1);
+    setListMedia([]);
+    fetchData();
+  };
+
   useEffect(() => {
     fetchData();
 
@@ -102,6 +108,7 @@ const MediaList: React.FC<MediaListProps> = ({
                 srcUrl={media.media_url}
                 data={media}
                 isEditMedia={isEditMedia}
+                onDelete={reloadData}
               />
             ))}
           </AnimatePresence>
