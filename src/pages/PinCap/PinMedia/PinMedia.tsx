@@ -19,6 +19,7 @@ interface PinMediaProps {
   data: {
     id: string;
     media_url: string;
+    type: string;
   };
   isEditMedia?: boolean;
   onDelete?: () => void;
@@ -26,6 +27,7 @@ interface PinMediaProps {
 
 const PinMedia: React.FC<PinMediaProps> = (props) => {
   const { srcUrl, data, isEditMedia, onDelete } = props;
+  console.log(data);
   const tokenPayload = useSelector((state: any) => state.auth);
   const [media, setMedia] = useState<Media>();
   const navigate = useNavigate();
@@ -57,7 +59,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
       if (detail) {
         setMedia(detail);
         form.setFieldsValue({
-          media_name: detail?.media_name, // Set the album name in the form
+          media_name: detail?.media_name,
           description: detail?.description,
         });
         setPrivacy(detail.privacy === "PRIVATE");
@@ -139,9 +141,9 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         transition={{ duration: 1 }}
         style={{ position: "relative", overflow: "hidden" }}
       >
-        {isMp4 ? (
-          <video controls>
-            <source src={srcUrl} type="video/mp4" />
+        {data?.type === "VIDEO" ? (
+          <video autoPlay loop>
+            <source src={srcUrl} />
           </video>
         ) : (
           <img src={srcUrl} alt="Media content" />
@@ -234,8 +236,14 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
                 </p>
               </div>
             </div>
-            <div className="img_detail">
-              <img src={media?.media_url} alt={media?.media_name} />
+            <div className="media_detail">
+              {media?.type === "VIDEO" ? (
+                <video controls>
+                  <source src={media?.media_url} type="video/mp4" />
+                </video>
+              ) : (
+                <img src={media?.media_url} alt={media?.media_name} />
+              )}
             </div>
           </div>
         </Loading>

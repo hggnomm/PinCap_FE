@@ -34,10 +34,9 @@ export const isImageFile = (file: UploadFile): boolean => {
   return extensions.includes(extension.toLowerCase());
 };
 
-export const isMp4File = (file: UploadFile): boolean => {
-  const extensions = ["mp4"];
-  const extension = getFileExtension(file.name);
-  return extensions.includes(extension.toLowerCase());
+export const isVideo = (url: string) => {
+  const videoExtensions = [".mp4", ".mov", ".avi", ".mkv", ".webm", ".flv"];
+  return videoExtensions.some((ext) => url.endsWith(ext));
 };
 
 export const getFileExtension = (fileName: string): string => {

@@ -279,7 +279,7 @@ const DetailMedia = () => {
               (media.type === "IMAGE" ? (
                 <img src={media.media_url} alt={media.media_name} />
               ) : (
-                <video src={media.media_url} controls />
+                <video src={media.media_url} controls autoPlay/>
               ))}
           </div>
           <div className="right-view">
