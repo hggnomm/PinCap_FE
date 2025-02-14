@@ -206,7 +206,7 @@ const DetailAlbum = () => {
           </Form>
           {/* Phần xóa album */}
           <div className="delete-action" onClick={handleDeleteAction}>
-            <p className="title-delelte">Delete album</p>
+            <p className="title-delele">Delete album</p>
             <p className="des-delete">
               You have 7 days to restore a deleted Album. After that, it will be
               permanently deleted.

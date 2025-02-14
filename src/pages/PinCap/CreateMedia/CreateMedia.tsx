@@ -24,6 +24,7 @@ import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
 import DraftMedia from "./DraftMedia";
 import { Media } from "type";
 import ProgressiveImage from "react-progressive-image";
+import { MediaFormValues } from "Media/MediaRequest";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -36,19 +37,6 @@ registerPlugin(
 // Types
 interface TokenPayload {
   id: string;
-}
-
-interface MediaFormValues {
-  id?: string;
-  media?: File | null;
-  media_name: string;
-  description: string;
-  privacy: string;
-  mediaOwner_id: string;
-  type: string;
-  tags_name: string[];
-  is_created: number;
-  is_comment: number;
 }
 
 const CreateMedia: React.FC = () => {
@@ -419,7 +407,6 @@ const CreateMedia: React.FC = () => {
       </Row>
 
       <Drawer
-        
         title={`Draft Medias (${drafts.length})`}
         placement="right"
         onClose={() => setDrawerVisible(false)}
