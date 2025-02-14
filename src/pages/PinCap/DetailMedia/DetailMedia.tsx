@@ -23,7 +23,8 @@ import { saveAs } from "file-saver";
 import BackButton from "../../../components/backButton/BackButton";
 import MediaList from "../../../components/viewPin/ViewPinComponent";
 import ListComments from "./ListComments/ListComments";
-
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 interface TokenPayload {
   id: string;
 }
@@ -277,9 +278,11 @@ const DetailMedia = () => {
           <div className="left-view">
             {media &&
               (media.type === "IMAGE" ? (
-                <img src={media.media_url} alt={media.media_name} />
+                <Zoom>
+                  <img src={media.media_url} alt={media.media_name} />
+                </Zoom>
               ) : (
-                <video src={media.media_url} controls autoPlay/>
+                <video src={media.media_url} controls autoPlay />
               ))}
           </div>
           <div className="right-view">

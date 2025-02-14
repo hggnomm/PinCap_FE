@@ -13,7 +13,8 @@ import CheckboxWithDescription from "../../../components/form/checkbox/CheckBoxC
 import Loading from "../../../components/loading/Loading";
 import { MediaFormValues } from "Media/MediaRequest";
 import { useSelector } from "react-redux";
-
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 interface PinMediaProps {
   srcUrl: string;
   data: {
@@ -27,7 +28,6 @@ interface PinMediaProps {
 
 const PinMedia: React.FC<PinMediaProps> = (props) => {
   const { srcUrl, data, isEditMedia, onDelete } = props;
-  console.log(data);
   const tokenPayload = useSelector((state: any) => state.auth);
   const [media, setMedia] = useState<Media>();
   const navigate = useNavigate();
@@ -237,13 +237,15 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
               </div>
             </div>
             <div className="media_detail">
-              {media?.type === "VIDEO" ? (
-                <video controls>
-                  <source src={media?.media_url} type="video/mp4" />
-                </video>
-              ) : (
-                <img src={media?.media_url} alt={media?.media_name} />
-              )}
+              <Zoom>
+                {media?.type === "VIDEO" ? (
+                  <video controls>
+                    <source src={media?.media_url} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img src={media?.media_url} alt={media?.media_name} />
+                )}
+              </Zoom>
             </div>
           </div>
         </Loading>
