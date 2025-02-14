@@ -48,7 +48,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
         </div>
       )}
 
-      {children}
+      <div className="modal-body">{children}</div>
     </Modal>
   );
 };

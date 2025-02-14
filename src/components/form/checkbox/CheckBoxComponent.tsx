@@ -31,11 +31,13 @@ const CheckboxWithDescription: React.FC<CheckboxWithDescriptionProps> = ({
             className="custom-checkbox"
           />
           <span className="checkbox-title">{title}</span>
-          <Tooltip title={description} placement="top">
-            <span className="checkbox-description">
-              <QuestionCircleOutlined className="custom-icon" />
-            </span>
-          </Tooltip>
+          {description && (
+            <Tooltip title={description} placement="top">
+              <span className="checkbox-description">
+                <QuestionCircleOutlined className="custom-icon" />
+              </span>
+            </Tooltip>
+          )}
         </div>
       </div>
     </Form.Item>

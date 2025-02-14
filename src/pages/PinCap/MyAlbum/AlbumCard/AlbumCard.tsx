@@ -19,13 +19,13 @@ interface AlbumCardProps {
 const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
   const [modalVisible, setModalVisible] = useState(false); // Modal chính
   const [deleteModalVisible, setDeleteModalVisible] = useState(false); // Modal confirm delete
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Album>();
   const [privacy, setPrivacy] = useState(false);
   const navigate = useNavigate();
 
   const handleCancel = () => {
     setModalVisible(false);
-    setDeleteModalVisible(false); // Đảm bảo khi đóng modal confirm delete, modal chính vẫn có thể mở
+    setDeleteModalVisible(false);
   };
 
   const handleConfirm = async () => {
@@ -37,11 +37,11 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
       };
 
       console.log("Album Request:", albumRequest);
-      setModalVisible(false);
 
       const response = await updateMyAlbum(album.id, albumRequest);
 
       if (response) {
+        setModalVisible(false);
         fetchAlbums(); // Call fetchAlbums to refresh the album list
       }
     } catch (error) {
@@ -164,7 +164,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
 
           {/* Phần xóa album */}
           <div className="delete-action" onClick={handleDeleteAction}>
-            <p className="title-delelte">Delete album</p>
+            <p className="title-delele">Delete album</p>
             <p className="des-delete">
               You have 7 days to restore a deleted Album. After that, it will be
               permanently deleted.
@@ -177,7 +177,10 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
       <ModalComponent
         titleDefault="Delete this album?"
         visible={deleteModalVisible}
-        onCancel={handleCancel}
+        onCancel={() => {
+          setDeleteModalVisible(false);
+          setModalVisible(true);
+        }}
         onConfirm={deleteAlbum}
         buttonLabels={{ confirmLabel: "Delete", cancelLabel: "Cancel" }}
       >
