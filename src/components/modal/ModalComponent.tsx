@@ -41,6 +41,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           {buttonLabels.confirmLabel}
         </button>,
       ]}
+      width="auto"
     >
       {title && (
         <div className="title">

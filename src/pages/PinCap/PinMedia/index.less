@@ -58,3 +58,43 @@
     }
   }
 }
+
+.detail_container {
+  display: flex;
+  flex-direction: row;
+  padding: 0 20px;
+  gap: 2rem;
+
+  .img_detail {
+    display: flex;
+    align-items: start;
+    height: auto;
+    min-width: auto;
+    overflow: hidden;
+
+    img,
+    video {
+      width: 100%;
+      object-fit: contain;
+      max-width: 100%;
+      max-height: 50vh;
+      border-radius: 10px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .detail_container {
+    padding: 0 10px;
+    gap: 2rem;
+
+    .img_detail {
+      width: auto;
+
+      img,
+      video {
+        max-height: 100vh;
+      }
+    }
+  }
+}

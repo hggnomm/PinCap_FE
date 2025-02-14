@@ -193,44 +193,50 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         buttonLabels={{ confirmLabel: "Update", cancelLabel: "Cancel" }}
       >
         <Loading isLoading={loading} error={error}>
-          <Form form={form} layout="vertical">
-            <FieldItem
-              label="Name"
-              name="media_name"
-              placeholder="Like 'Places to Go' or 'Recipes to Make'"
-            >
-              <Input />
-            </FieldItem>
+          <div className="detail_container">
+            <div className="form_det">
+              <Form form={form} layout="vertical">
+                <FieldItem
+                  label="Name"
+                  name="media_name"
+                  placeholder="Like 'Places to Go' or 'Recipes to Make'"
+                >
+                  <Input />
+                </FieldItem>
 
-            <FieldItem
-              label="Description"
-              name="description"
-              placeholder="Write a detailed description for your Media here."
-            >
-              <Input />
-            </FieldItem>
+                <FieldItem
+                  label="Description"
+                  name="description"
+                  placeholder="Write a detailed description for your Media here."
+                >
+                  <Input />
+                </FieldItem>
 
-            <CheckboxWithDescription
-              title="Keep this media private"
-              description="So only you and collaborators can see it."
-              value={privacy}
-              onChange={(e) => setPrivacy(e.target.checked)}
-              name="privacy"
-            />
-            <CheckboxWithDescription
-              title="Allow people to comment"
-              value={isComment}
-              onChange={(e) => setIsComment(e.target.checked)}
-              name="is_comment"
-            />
-          </Form>
-
-          <div className="delete-action" onClick={handleDeleteAction}>
-            <p className="title-delele">Delete Media</p>
-            <p className="des-delete">
-              You have 7 days to restore a deleted Media. After that, it will be
-              permanently deleted.
-            </p>
+                <CheckboxWithDescription
+                  title="Keep this media private"
+                  description="So only you and collaborators can see it."
+                  value={privacy}
+                  onChange={(e) => setPrivacy(e.target.checked)}
+                  name="privacy"
+                />
+                <CheckboxWithDescription
+                  title="Allow people to comment"
+                  value={isComment}
+                  onChange={(e) => setIsComment(e.target.checked)}
+                  name="is_comment"
+                />
+              </Form>
+              <div className="delete-action" onClick={handleDeleteAction}>
+                <p className="title-delele">Delete Media</p>
+                <p className="des-delete">
+                  You have 7 days to restore a deleted Media. After that, it
+                  will be permanently deleted.
+                </p>
+              </div>
+            </div>
+            <div className="img_detail">
+              <img src={media?.media_url} alt={media?.media_name} />
+            </div>
           </div>
         </Loading>
       </ModalComponent>
