@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import {
   getAllMedias,
   getDetailMedia,
@@ -35,7 +35,8 @@ const DetailMedia = () => {
   const [filteredAlbumData, setFilteredAlbumData] = useState<Album[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const id = location.state?.mediaId;
   const [searchTerm, setSearchTerm] = useState<string>("");
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
 
@@ -230,7 +231,6 @@ const DetailMedia = () => {
         <Input
           placeholder="Search album..."
           allowClear
-          onSearch={handleSearch} // Khi nhấn Enter
           onChange={(e) => handleSearch(e.target.value)} // Khi gõ trực tiếp
           className="search-album"
           value={searchTerm} // Đồng bộ hóa giá trị tìm kiếm
@@ -319,7 +319,7 @@ const DetailMedia = () => {
                     overlay={albumMenu} // Pass the dynamically fetched album data to the dropdown
                     placement="bottomLeft"
                     trigger={["click"]}
-                    onVisibleChange={fetchAlbumData} // Fetch album data when the dropdown is clicked
+                    onOpenChange={fetchAlbumData} // Fetch album data when the dropdown is clicked
                     className="dropdown_item"
                   >
                     <button className="album">
