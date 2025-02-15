@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Avatar,
   Button,
@@ -10,17 +12,14 @@ import {
   Tooltip,
 } from "antd";
 import { DownOutlined, SearchOutlined } from "@ant-design/icons";
-import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./index.less";
-import { LogoIcon, TextIcon } from "../../assets/img";
-import { useSelector } from "react-redux";
 import Notification from "../notification";
-import { isBrowser } from "react-device-detect";
+import { LogoIcon, TextIcon } from "../../assets/img";
 import iconChatbot from "../../assets/img/PinCap/chatbot.png";
 import Chatbot from "../chatbot";
+import { addToken } from "../../store/authSlice";
+import "./index.less";
 
-// Type for user information
 interface UserInfo {
   name: string;
   email: string;
@@ -31,10 +30,10 @@ const HeaderCommon = () => {
   const [userInfor, setUserInfor] = useState<UserInfo>({ name: "", email: "" });
   const tokenPayload = useSelector((state: any) => state.auth);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Set user info when tokenPayload changes
   useEffect(() => {
-    if (tokenPayload) {
+    if (tokenPayload?.name && tokenPayload?.email) {
       setUserInfor({
         name: tokenPayload.name,
         email: tokenPayload.email,
@@ -50,12 +49,11 @@ const HeaderCommon = () => {
   // Handle user logout
   const logoutHandle = () => {
     localStorage.removeItem("token");
+    dispatch(addToken(null));
     navigate("/");
-    window.location.reload();
   };
 
-  // Define menu items for the dropdown
-  const menuItems: MenuProps["items"] = [
+  const menuItems = [
     {
       key: "1",
       label: (
@@ -80,18 +78,22 @@ const HeaderCommon = () => {
     },
   ];
 
+  const isAuthenticated = tokenPayload?.id || localStorage.getItem("token");
+
   return (
     <Row className="main-header">
       <Col
         className="left-header"
-        onClick={() => (tokenPayload.email ? navigate("/home") : navigate("/"))}
+        onClick={() => (isAuthenticated ? navigate("/home") : navigate("/"))}
       >
         <img className="logo-icon" src={LogoIcon} alt="Logo" />
-        {isBrowser && <img className="text-icon" src={TextIcon} alt="Text" />}
+        {isAuthenticated && (
+          <img className="text-icon" src={TextIcon} alt="Text" />
+        )}
       </Col>
 
       {/* Middle Search Bar */}
-      {tokenPayload?.id && (
+      {isAuthenticated && (
         <Col className="middle-header">
           <Input
             className="search-bar"
@@ -102,9 +104,8 @@ const HeaderCommon = () => {
       )}
 
       <Col className="right-header">
-        {tokenPayload?.id ? (
+        {isAuthenticated ? (
           <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
-            {/* Chatbot Button */}
             <Tooltip title="Pinbot: Virtual Assistant" placement="bottom">
               <div className="chatbot-btn" onClick={toggleChatbot}>
                 <img
@@ -115,17 +116,14 @@ const HeaderCommon = () => {
               </div>
             </Tooltip>
 
-            {/* Chatbot mini screen */}
             {isChatbotOpen && (
               <Chatbot toggleChatbot={toggleChatbot} isOpen={isChatbotOpen} />
             )}
 
-            {/* Notification Section */}
             <Col className="menu-notification">
               <Notification />
             </Col>
 
-            {/* User Avatar and Dropdown */}
             <Space direction="vertical" className="logo-avatar">
               <Dropdown
                 menu={{ items: menuItems }}

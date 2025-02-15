@@ -44,8 +44,8 @@ const Login = () => {
       const data = await login(values);
 
       if (data.token) {
-        dispatch(addToken(data.token));
         localStorage.setItem("token", data.token);
+        dispatch(addToken(data.token));
 
         if (remember) {
           localStorage.setItem("rememberedEmail", email);
@@ -55,7 +55,7 @@ const Login = () => {
           localStorage.removeItem("rememberedPassword");
         }
 
-        window.location.reload();
+        navigate("/home");
       } else {
         notification.error({
           message: "Login Failed",
