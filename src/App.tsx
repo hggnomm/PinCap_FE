@@ -18,29 +18,39 @@ import Home from "./pages/Home/Home";
 import MyAlbum from "./pages/PinCap/MyAlbum/MyAlbum";
 import MyMedia from "./pages/PinCap/MyMedia/MyMedia";
 import DetailAlbum from "./pages/PinCap/DetailAlbum/DetailAlbum";
+import { decodedToken } from "./utils/utils";
 
 const App = () => {
-  const tokenPayload = useSelector((state: any) => state.auth);
+  const token = localStorage.getItem("token");
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // State to control loading spinner
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (tokenPayload.email) {
-      if (tokenPayload.exp < Date.now() / 1000) {
+    if (token) {
+      try {
+        const decoded = decodedToken(token);
+        const exp = decoded.exp;
+
+        if (exp < Date.now() / 1000) {
+          localStorage.removeItem("token");
+          navigate("/sign-in");
+        } else {
+          setIsLogin(true);
+        }
+      } catch (error) {
         localStorage.removeItem("token");
         navigate("/sign-in");
-      } else {
-        setIsLogin(true);
       }
     } else {
-      if (pathname === "/sign-in" || pathname === "/sign-up") return;
-      setIsLogin(false);
-      navigate("/");
+      if (pathname !== "/sign-in" && pathname !== "/sign-up") {
+        setIsLogin(false);
+        navigate("/");
+      }
     }
-    setIsLoading(false); 
-  }, [tokenPayload.email, pathname, navigate]);
+    setIsLoading(false);
+  }, [pathname, navigate, token]);
 
   return (
     <ConfigProvider>
@@ -60,7 +70,7 @@ const App = () => {
             element={
               <LoadingSpinner isLoading={isLoading}>
                 <Layout className="main-container">
-                  {pathname === "/sign-in" ? "" : <HeaderCommon />}
+                  {pathname !== "/sign-in" && <HeaderCommon />}
                   {isLogin ? (
                     <>
                       <SiderCommon />
@@ -75,7 +85,6 @@ const App = () => {
                           <Route path="/media/:id" element={<DetailMedia />} />
                           <Route path="/album" element={<MyAlbum />} />
                           <Route path="/album/:id" element={<DetailAlbum />} />
-                          {/* Dynamic route for MyMedia with email */}
                           <Route path="/my-media" element={<MyMedia />} />
                         </Routes>
                       </Content>
