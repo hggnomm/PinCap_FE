@@ -1,9 +1,18 @@
-# Step 1: Build Vite App
-FROM node:alpine3.18 as build
+FROM node:alpine3.18 AS build
 WORKDIR /app
+
 COPY package.json .
+
+# Set environment variables from GitHub secrets
+ARG VITE_BASE_API
+ARG VITE_GEMINI_API_KEY
+ENV VITE_BASE_API=${VITE_BASE_API}
+ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY}
+
 RUN npm install
-COPY . . 
+
+COPY . .
+
 RUN npm run build
 
 FROM nginx:1.23-alpine
