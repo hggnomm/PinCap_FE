@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./DetailAlbum.less";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import MediaList from "../../../components/viewPin/ViewPinComponent";
 import {
   deleteMyAlbum,
   getDetailAlbum,
   updateMyAlbum,
-} from "../../..//api/album";
+} from "../../../api/album";
 import { Album } from "type";
 import { toast } from "react-toastify";
 import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
