@@ -15,7 +15,11 @@ const initialState: ChatState = {
   messages: [
     {
       sender: "ai",
-      text: "Describe more clearly what you would like them to do to help you create a high-quality photo prompt?",
+      text: "Describe more clearly what you would like them to do to help you create a high-quality photo prompt? 😃😉",
+    },
+    {
+      sender: "ai",
+      text: "For example: A dog sitting in a park on a sunny day, looking at the camera with its tongue out, surrounded by green grass and a few trees in the background.",
     },
   ],
   isTyping: false,
