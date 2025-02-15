@@ -9,7 +9,7 @@ ARG VITE_GEMINI_API_KEY
 ENV VITE_BASE_API=${VITE_BASE_API}
 ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY}
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
