@@ -96,7 +96,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
       <div
         className="album-card"
         onClick={() => {
-          navigate(`/album/${album.album_name}`, { state: { albumId: album.id } });
+          navigate(`/album/${album.id}`, { state: { albumId: album.id } });
         }}
       >
         <div className="img-container">
