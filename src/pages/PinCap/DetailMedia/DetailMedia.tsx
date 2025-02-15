@@ -75,9 +75,7 @@ const DetailMedia = () => {
   }, [id]);
 
   useEffect(() => {
-    return () => {
       fetchAlbumData();
-    };
   }, []);
 
   const handleSearch = (value: string) => {
