@@ -75,7 +75,7 @@ const DetailMedia = () => {
   }, [id]);
 
   useEffect(() => {
-      fetchAlbumData();
+    fetchAlbumData();
   }, []);
 
   const handleSearch = (value: string) => {
@@ -196,24 +196,25 @@ const DetailMedia = () => {
       };
       const response = await addMediasToAlbum(request);
 
-      if (response) {
-        api.success({
-          message: "Success",
-          description: `Media has been saved to the ${album_name}!`,
+      if (response.status === 422) {
+        api.warning({
+          message: `Cannot save media`,
+          description:
+            response.message ||
+            "This media is already associated with this album.",
           placement: "top",
         });
       } else {
-        api.error({
-          message: "Error",
-          description: `Failed to save media to the ${album_name}. Please try again.`,
+        api.success({
+          message: "Success",
+          description: `Media has been successfully saved to ${album_name}.`,
           placement: "top",
         });
       }
     } catch (error) {
-      console.error("Error saving media to album", error);
       api.error({
         message: "Error",
-        description: `Failed to save media to the ${album_name}. Please try again.`,
+        description: `Failed to save media to ${album_name}. Please try again.`,
         placement: "top",
       });
     }
