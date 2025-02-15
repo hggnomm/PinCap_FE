@@ -282,7 +282,7 @@ const DetailMedia = () => {
                   <img src={media.media_url} alt={media.media_name} />
                 </Zoom>
               ) : (
-                <video src={media.media_url} controls autoPlay />
+                <video src={media.media_url} controls autoPlay muted />
               ))}
           </div>
           <div className="right-view">
