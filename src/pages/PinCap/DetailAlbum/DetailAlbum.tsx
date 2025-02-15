@@ -33,15 +33,13 @@ const DetailAlbum = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    return () => {
-      if (albumId) {
-        fetchDetailAlbums();
-      } else {
-        setError("Album ID is missing.");
-        toast.error("Album ID is missing.");
-      }
-    };
-  }, [albumId]);
+    if (albumId) {
+      fetchDetailAlbums();
+    } else {
+      setError("Album ID is missing.");
+      toast.error("Album ID is missing.");
+    }
+  }, []);
 
   useEffect(() => {
     if (modalVisible) {
