@@ -14,24 +14,32 @@ const Register = () => {
   const onSwitchLogin = () => {
     navigate("/sign-in");
   };
-  const onFinish = async (values: any) => {
-    console.log("Register:", values);
 
+  const onFinish = async (values: any) => {
     try {
       const response = await register(values);
-      console.log(response.data);
-      notification.success({
-        message: response.message,
-        description:
-          "Please check your email for a confirmation link to verify your account.",
-      });
-    } catch (error) {
-      console.log("error", error);
-      api.open({
+
+      if (response.status === 422) {
+        notification.error({
+          message: "Registration Failed",
+          description:
+            response.message || "An error occurred. Please try again later.",
+        });
+      } else {
+        notification.success({
+          message: response.message || "Registration successful",
+          description:
+            "Please check your email for a confirmation link to verify your account.",
+        });
+      }
+    } catch (error: any) {
+      notification.error({
         message: "Can't register",
+        description: error?.message || "An unknown error occurred.",
       });
     }
   };
+
   return (
     <Row className="main-page">
       <Col xs={24} md={10} className="right-login">

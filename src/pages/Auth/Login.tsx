@@ -40,30 +40,34 @@ const Login = () => {
   const onLogin = async (values: any) => {
     try {
       const { email, password, remember } = values;
-      const data = await login(values);
-      if (data) {
-        dispatch(addToken(data.token));
+
+      const data = await login(values); 
+
+      if (data.token) {
+        dispatch(addToken(data.token)); 
         localStorage.setItem("token", data.token);
 
         if (remember) {
-          localStorage.setItem("rememberedEmail", email);
-          localStorage.setItem("rememberedPassword", password);
+          localStorage.setItem("rememberedEmail", email); 
+          localStorage.setItem("rememberedPassword", password); 
         } else {
           localStorage.removeItem("rememberedEmail");
           localStorage.removeItem("rememberedPassword");
         }
 
-        navigate("/home");
-        window.location.reload();
+        navigate("/home"); 
+        window.location.reload(); 
       } else {
-        api.open({
+        notification.error({
           message: "Login Failed",
-          onClose: close,
+          description:
+            data?.message || "An error occurred. Please try again later.",
         });
       }
-    } catch (e) {
+    } catch (error: any) {
       api.open({
         message: "Login Failed",
+        description: error.message, 
         onClose: close,
       });
     }
