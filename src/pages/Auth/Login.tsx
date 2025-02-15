@@ -41,22 +41,21 @@ const Login = () => {
     try {
       const { email, password, remember } = values;
 
-      const data = await login(values); 
+      const data = await login(values);
 
       if (data.token) {
-        dispatch(addToken(data.token)); 
+        dispatch(addToken(data.token));
         localStorage.setItem("token", data.token);
 
         if (remember) {
-          localStorage.setItem("rememberedEmail", email); 
-          localStorage.setItem("rememberedPassword", password); 
+          localStorage.setItem("rememberedEmail", email);
+          localStorage.setItem("rememberedPassword", password);
         } else {
           localStorage.removeItem("rememberedEmail");
           localStorage.removeItem("rememberedPassword");
         }
 
-        navigate("/home"); 
-        window.location.reload(); 
+        window.location.reload();
       } else {
         notification.error({
           message: "Login Failed",
@@ -67,7 +66,7 @@ const Login = () => {
     } catch (error: any) {
       api.open({
         message: "Login Failed",
-        description: error.message, 
+        description: error.message,
         onClose: close,
       });
     }

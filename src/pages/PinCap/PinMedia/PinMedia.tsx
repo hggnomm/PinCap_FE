@@ -142,7 +142,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         style={{ position: "relative", overflow: "hidden" }}
       >
         {data?.type === "VIDEO" ? (
-          <video autoPlay loop>
+          <video autoPlay loop muted>
             <source src={srcUrl} />
           </video>
         ) : (
@@ -239,7 +239,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             <div className="media_detail">
               <Zoom>
                 {media?.type === "VIDEO" ? (
-                  <video controls>
+                  <video controls muted>
                     <source src={media?.media_url} type="video/mp4" />
                   </video>
                 ) : (
