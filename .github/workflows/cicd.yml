@@ -36,4 +36,4 @@ jobs:
         # Add || true to avoid error if container does not exist
 
       - name: Run Docker Container
-        run: docker run -d -p 80:80 --name reactContainer hggnomm/pincap_fe:latest
+        run: docker run -d -p 3000:80 --name reactContainer hggnomm/pincap_fe:latest
