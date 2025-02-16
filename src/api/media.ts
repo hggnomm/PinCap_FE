@@ -1,30 +1,40 @@
-import apiClient from "./apiClient"; // Đường dẫn tới tệp apiClient
+import { Media } from "type";
+import apiClient from "./apiClient";
 
-export const getAllMedias = async (page: number) => {
+export const getAllMedias = async ({
+  pageParam,
+}: {
+  pageParam: number;
+}): Promise<Media[]> => {
   try {
     const res = await apiClient.get("/api/medias/all", {
       params: {
         per_page: 15,
-        page, // Dynamic page
+        page: pageParam,
       },
     });
-    return res.data;
+    return res.data.data;
   } catch (error) {
     console.log(error);
     throw error;
   }
 };
-
-export const getMyMedias = async (page: number, is_created: number) => {
+export const getMyMedias = async ({
+  pageParam,
+  is_created,
+}: {
+  pageParam: number;
+  is_created: number;
+}): Promise<Media[]> => {
   try {
     const res = await apiClient.get("/api/medias/my-media", {
       params: {
         per_page: 10,
-        page,
+        page: pageParam,
         is_created: is_created,
       },
     });
-    return res.data;
+    return res.data.data;
   } catch (error) {
     console.log(error);
     throw error;

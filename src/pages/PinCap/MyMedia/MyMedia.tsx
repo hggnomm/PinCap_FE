@@ -8,6 +8,7 @@ import { useNavigate } from "react-router";
 
 const MyMedia = () => {
   const navigate = useNavigate();
+  window.scrollTo(0, 0);
 
   return (
     <div className="media-container">
@@ -53,7 +54,7 @@ const MyMedia = () => {
       <div className="my-list-media">
         <div className="action"></div>
         <div className="list">
-          <MediaList apiCall={getMyMedias} extraParams={1} isEditMedia />
+          <MediaList apiCall={getMyMedias} isEditMedia />
         </div>
       </div>
     </div>
