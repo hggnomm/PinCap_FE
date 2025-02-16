@@ -1,26 +1,45 @@
-import { Checkbox, Col, Row, notification } from "antd";
-import { Form, Input, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { notification, Checkbox, Col, Row, Form, Input, Button } from "antd";
+import { useDispatch } from "react-redux";
+
 import LoginImage from "../../assets/img/PinCap/login_page_image.jpg";
 import { LogoIcon } from "../../assets/img";
 import GoogleIcon from "../../assets/img/PinCap/googleIcon.png";
 import Title from "antd/es/typography/Title";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { login } from "../../api/auth";
 import { addToken } from "../../store/authSlice";
-import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { LoginRequest } from "Auth/LoginRequest";
 import "./index.less";
 
-const Login = () => {
+interface LoginFormValues {
+  email: string;
+  password: string;
+  remember: boolean;
+}
+
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const [api, contextHolder] = notification.useNotification();
   const dispatch = useDispatch();
-
   const [form] = Form.useForm();
   const [rememberMe, setRememberMe] = useState(false);
 
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const verifiedToken = params.get("verified-token");
+
   useEffect(() => {
+    if (verifiedToken) {
+      handleLoginSuccess({
+        token: verifiedToken,
+        email: "",
+        password: "",
+        remember: false,
+      });
+    }
+
     const savedEmail = localStorage.getItem("rememberedEmail");
     const savedPassword = localStorage.getItem("rememberedPassword");
     if (savedEmail && savedPassword) {
@@ -31,21 +50,28 @@ const Login = () => {
       });
       setRememberMe(true);
     }
-  }, [form]);
+  }, [form, verifiedToken]);
 
   const onSwitchCreate = () => {
-    navigate("/sign-up");
+    navigate("/register");
   };
 
-  const onLogin = async (values: any) => {
+  const handleLoginSuccess = (data: LoginRequest) => {
+    localStorage.setItem("token", data.token || "");
+    dispatch(addToken(data.token || ""));
+    navigate("/home");
+  };
+
+  // Hàm xử lý đăng nhập
+  const onLogin = async (values: LoginFormValues) => {
     try {
       const { email, password, remember } = values;
 
-      const data = await login(values);
+      const data: LoginRequest = await login(values); 
 
       if (data.token) {
-        localStorage.setItem("token", data.token);
-        dispatch(addToken(data.token));
+        localStorage.setItem("token", data.token); 
+        dispatch(addToken(data.token)); 
 
         if (remember) {
           localStorage.setItem("rememberedEmail", email);
@@ -55,7 +81,7 @@ const Login = () => {
           localStorage.removeItem("rememberedPassword");
         }
 
-        navigate("/home");
+        navigate("/home"); 
       } else {
         notification.error({
           message: "Login Failed",
@@ -67,7 +93,6 @@ const Login = () => {
       api.open({
         message: "Login Failed",
         description: error.message,
-        onClose: close,
       });
     }
   };
