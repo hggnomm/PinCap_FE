@@ -74,7 +74,7 @@ const App = () => {
                   {isLogin ? (
                     <>
                       <SiderCommon />
-                      <Content>
+                      <Content className="right-layout">
                         <Routes>
                           <Route path="/home" element={<PinCap />} />
                           <Route

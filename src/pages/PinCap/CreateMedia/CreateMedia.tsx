@@ -89,13 +89,17 @@ const CreateMedia: React.FC = () => {
   const fetchDrafts = async (isGenerateDraft = false) => {
     setLoadingDrafts(true);
     try {
-      const draftList = await getMyMedias(1, 0);
-      if (draftList?.data) {
-        setDrafts(draftList.data);
+      const draftList = await getMyMedias({
+        pageParam: 1,
+        is_created: 0, 
+      });
 
-        if (isGenerateDraft && draftList.data.length > 0) {
-          setDraftId(draftList.data[0].id);
-          handleSelectMedia(draftList.data[0]);
+      if (draftList) {
+        setDrafts(draftList);
+
+        if (isGenerateDraft && draftList.length > 0) {
+          setDraftId(draftList[0].id);
+          handleSelectMedia(draftList[0]);
         }
       }
     } catch (error) {
