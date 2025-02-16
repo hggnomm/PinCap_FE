@@ -2,7 +2,7 @@ import { Media } from "type";
 import apiClient from "./apiClient";
 
 export const getAllMedias = async ({
-  pageParam = 1,
+  pageParam,
 }: {
   pageParam: number;
 }): Promise<Media[]> => {

@@ -8,51 +8,65 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 
 interface MediaListProps {
-  apiCall?: (page: number, extraParams: any) => Promise<any>;
-  extraParams?: any;
+  apiCall?: () => Promise<any>;
   medias?: Media[];
   isEditMedia?: boolean;
 }
 
 const MediaList: React.FC<MediaListProps> = ({
   apiCall,
-  extraParams,
-  medias,
+  medias: propMedias,
   isEditMedia = false,
 }) => {
+  const [medias, setMedias] = useState<Media[]>([]);
+  const { ref, inView } = useInView();
+
   const {
     data,
     status,
     error,
     fetchNextPage,
     isFetchingNextPage,
+    isFetching,
     hasNextPage,
+    refetch,
   } = useInfiniteQuery({
     queryKey: ["medias"],
     queryFn: apiCall,
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const nextPage = lastPage.length ? allPages.length + 1 : undefined;
-
       return nextPage;
     },
+    enabled: !propMedias,
   });
 
-  const reloadData = () => {
-    // setListMedia([]);
-    // fetchData();
-  };
-
-  const { ref, inView } = useInView();
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
     }
   }, [fetchNextPage, inView, hasNextPage]);
 
-  const content = data?.pages.map((medias) => {
-    return medias.map((media: Media, index: number) => {
-      if (medias.length === index + 1) {
+  useEffect(() => {
+    if (propMedias) {
+      setMedias(propMedias);
+    } else {
+      const allMedias = data?.pages.flat() || [];
+      setMedias(allMedias);
+    }
+  }, [propMedias, data]);
+
+  const reloadData = () => {
+    if (propMedias) {
+      return;
+    }
+    refetch();
+  };
+
+  let content;
+  if (status === "success") {
+    content = medias.map((media: Media, index: number) => {
+      if (medias.length === index + 1 && !propMedias) {
         return (
           <PinMedia
             innerRef={ref}
@@ -75,10 +89,10 @@ const MediaList: React.FC<MediaListProps> = ({
         />
       );
     });
-  });
+  }
 
   return (
-    <Loading isLoading={isFetchingNextPage} error={error}>
+    <Loading isLoading={isFetching || isFetchingNextPage} error={error}>
       <div className="pincap-container">
         <motion.div
           className="media-list-container"
@@ -89,10 +103,10 @@ const MediaList: React.FC<MediaListProps> = ({
             visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
           }}
         >
-          <AnimatePresence>
-            {content}
-            <div ref={ref} style={{ height: 10 }} />
-          </AnimatePresence>
+          {/* <AnimatePresence> */}
+          {content}
+          {!propMedias && <div ref={ref} style={{ height: 10 }} />}
+          {/* </AnimatePresence> */}
         </motion.div>
       </div>
     </Loading>
