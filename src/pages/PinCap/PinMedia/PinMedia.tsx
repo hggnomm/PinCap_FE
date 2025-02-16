@@ -15,7 +15,9 @@ import { MediaFormValues } from "Media/MediaRequest";
 import { useSelector } from "react-redux";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
-interface PinMediaProps {
+
+interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  innerRef?: React.Ref<HTMLParagraphElement>;
   srcUrl: string;
   data: {
     id: string;

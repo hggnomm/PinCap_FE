@@ -4,6 +4,8 @@ import PinMedia from "../../pages/PinCap/PinMedia/PinMedia";
 import Loading from "../../components/loading/Loading";
 import { motion, AnimatePresence } from "framer-motion";
 import { Media } from "type";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 
 interface MediaListProps {
   apiCall?: (page: number, extraParams: any) => Promise<any>;
@@ -18,79 +20,65 @@ const MediaList: React.FC<MediaListProps> = ({
   medias,
   isEditMedia = false,
 }) => {
-  const [listMedia, setListMedia] = useState<Media[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data,
+    status,
+    error,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["medias"],
+    queryFn: apiCall,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const nextPage = lastPage.length ? allPages.length + 1 : undefined;
 
-  const isFetching = useRef<boolean>(false);
-
-  const fetchData = async () => {
-    // If medias are provided, directly set the media list and skip API call
-    if (medias) {
-      setListMedia(medias);
-      return;
-    }
-
-    if (isFetching.current || !hasMore) return;
-
-    if (!apiCall) {
-      setError("API call function is not provided.");
-      return;
-    }
-
-    isFetching.current = true;
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await apiCall(page, extraParams);
-      if (data?.data?.length) {
-        setListMedia((prevList) => [...prevList, ...data.data]);
-      } else {
-        setHasMore(false);
-      }
-    } catch (error: any) {
-      setError("Error fetching media list: " + error?.message || error);
-    } finally {
-      setLoading(false);
-      isFetching.current = false;
-    }
-  };
+      return nextPage;
+    },
+  });
 
   const reloadData = () => {
-    setPage(1);
-    setListMedia([]);
-    fetchData();
+    // setListMedia([]);
+    // fetchData();
   };
 
+  const { ref, inView } = useInView();
   useEffect(() => {
-    fetchData();
-
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 100
-      ) {
-        loadMore();
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [page]);
-
-  const loadMore = () => {
-    if (!loading && hasMore) {
-      setPage((prevPage) => prevPage + 1);
+    if (inView && hasNextPage) {
+      fetchNextPage();
     }
-  };
+  }, [fetchNextPage, inView, hasNextPage]);
+
+  const content = data?.pages.map((medias) => {
+    return medias.map((media: Media, index: number) => {
+      if (medias.length === index + 1) {
+        return (
+          <PinMedia
+            innerRef={ref}
+            key={media.id}
+            srcUrl={media.media_url}
+            data={media}
+            isEditMedia={isEditMedia}
+            onDelete={reloadData}
+          />
+        );
+      }
+
+      return (
+        <PinMedia
+          key={media.id}
+          srcUrl={media.media_url}
+          data={media}
+          isEditMedia={isEditMedia}
+          onDelete={reloadData}
+        />
+      );
+    });
+  });
 
   return (
-    <Loading isLoading={loading} error={error}>
+    <Loading isLoading={isFetchingNextPage} error={error}>
       <div className="pincap-container">
         <motion.div
           className="media-list-container"
@@ -102,15 +90,8 @@ const MediaList: React.FC<MediaListProps> = ({
           }}
         >
           <AnimatePresence>
-            {listMedia.map((media) => (
-              <PinMedia
-                key={media.id}
-                srcUrl={media.media_url}
-                data={media}
-                isEditMedia={isEditMedia}
-                onDelete={reloadData}
-              />
-            ))}
+            {content}
+            <div ref={ref} style={{ height: 10 }} />
           </AnimatePresence>
         </motion.div>
       </div>

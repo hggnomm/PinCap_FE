@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css"; // Import styles
 
 interface LoadingSpinnerProps {
   isLoading: boolean;
-  error?: string | null;
+  error?: string | Error | null;
   children: ReactNode;
 }
 
@@ -16,7 +16,7 @@ const Loading: React.FC<LoadingSpinnerProps> = ({
 }) => {
   useEffect(() => {
     if (error) {
-      toast.error(error);
+      toast.error(error.toString());
     }
   }, [error]);
 
@@ -30,13 +30,13 @@ const Loading: React.FC<LoadingSpinnerProps> = ({
             left: 0,
             maxWidth: "100%",
             height: "100%",
-            backgroundColor: "rgba(255, 255, 255, 0.7)", 
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
             backdropFilter: "blur(5px)",
-            zIndex: 9998, 
+            zIndex: 9998,
           }}
         />
       )}
-      
+
       {isLoading && (
         <div
           style={{
@@ -44,13 +44,13 @@ const Loading: React.FC<LoadingSpinnerProps> = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            zIndex: 9999, 
+            zIndex: 9999,
           }}
         >
           <ClipLoader size={40} color={"#A64D79"} loading={isLoading} />
         </div>
       )}
-      
+
       <div style={{ filter: isLoading ? "blur(5px)" : "none" }}>{children}</div>
     </div>
   );
