@@ -19,6 +19,7 @@ interface PinMediaProps {
   srcUrl: string;
   data: {
     id: string;
+    media_name: string;
     media_url: string;
     type: string;
   };
@@ -134,7 +135,9 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     <>
       <motion.div
         className="box"
-        onClick={() => navigate(`/media/${data?.id}`)}
+        onClick={() =>
+          navigate(`/media/${data?.id}`, { state: { mediaId: data?.id } })
+        }
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

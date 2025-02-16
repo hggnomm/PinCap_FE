@@ -152,7 +152,7 @@ const Login = () => {
               Login
             </Button>
 
-            <Button className="button btn-login-icon">
+            <Button className="button btn-login-icon" disabled>
               <img src={GoogleIcon} alt="" />
               <span>Continue with Google</span>
             </Button>

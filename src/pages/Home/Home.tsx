@@ -67,7 +67,10 @@ const Home = () => {
           </motion.div>
 
           {/* Section 2 */}
-          <div className="element" style={{ background: "#EEF5FF" }}>
+          <div
+            className="element"
+            style={{ background: "#EEF5FF", padding: "2rem 0" }}
+          >
             <div className="banner-flex-image">
               <img
                 className="image-border"
@@ -81,7 +84,7 @@ const Home = () => {
                   Khám phá và khơi nguồn cảm hứng từ thế giới xung quanh thông
                   qua việc tìm kiếm ý tưởng từ những hình ảnh tuyệt vời.
                 </div>
-                <Button className="content-banner-button">Khám phá</Button>
+                <button className="content-banner-button">Khám phá</button>
               </div>
             </div>
           </div>
@@ -89,7 +92,7 @@ const Home = () => {
           {/* Section 3 */}
           <div
             className="element"
-            style={{ background: "rgba(162, 87, 114, 1)" }}
+            style={{ background: "rgba(162, 87, 114, 1)", padding: "2rem 0" }}
           >
             <div className="banner-flex-video" style={{ color: "white" }}>
               <div className="content-banner">
@@ -100,9 +103,9 @@ const Home = () => {
                   Khám phá nguồn cảm hứng không giới hạn từ các video đa dạng
                   trên mạng, để tạo ra những ý tưởng mới và sáng tạo.
                 </div>
-                <Button className="content-banner-button-reverse">
+                <button className="content-banner-button-reverse">
                   Khám phá
-                </Button>
+                </button>
               </div>
               <div className="videos">
                 <video

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./DetailAlbum.less";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import MediaList from "../../../components/viewPin/ViewPinComponent";
 import {
   deleteMyAlbum,
   getDetailAlbum,
   updateMyAlbum,
-} from "../../..//api/album";
+} from "../../../api/album";
 import { Album } from "type";
 import { toast } from "react-toastify";
 import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
@@ -16,9 +16,11 @@ import { Form, Input } from "antd";
 import FieldItem from "../../../components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "../../../components/form/checkbox/CheckBoxComponent";
 import { UpdateAlbumRequest } from "Album/AlbumRequest";
+import Loading from "../../../components/loading/Loading";
 
 const DetailAlbum = () => {
-  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const albumId = location.state?.albumId;
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [albumData, setAlbumData] = useState<Album | null>(null);
@@ -31,15 +33,13 @@ const DetailAlbum = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    return () => {
-      if (id) {
-        fetchDetailAlbums();
-      } else {
-        setError("Album ID is missing.");
-        toast.error("Album ID is missing.");
-      }
-    };
-  }, [id]);
+    if (albumId) {
+      fetchDetailAlbums();
+    } else {
+      setError("Album ID is missing.");
+      toast.error("Album ID is missing.");
+    }
+  }, []);
 
   useEffect(() => {
     if (modalVisible) {
@@ -62,7 +62,7 @@ const DetailAlbum = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getDetailAlbum(id);
+      const response = await getDetailAlbum(albumId);
       console.log(response);
       if (response) {
         setAlbumData(response);
@@ -87,7 +87,7 @@ const DetailAlbum = () => {
       console.log("Album Request:", albumRequest);
       setModalVisible(false);
 
-      const response = await updateMyAlbum(id, albumRequest);
+      const response = await updateMyAlbum(albumId, albumRequest);
 
       if (response) {
         fetchDetailAlbums();
@@ -110,7 +110,7 @@ const DetailAlbum = () => {
 
   const deleteAlbum = async () => {
     try {
-      const response = await deleteMyAlbum(id);
+      const response = await deleteMyAlbum(albumId);
 
       if (response) {
         handleCancel();
@@ -127,124 +127,126 @@ const DetailAlbum = () => {
     }
   };
   return (
-    <div className="album-detail-container">
-      <div className="top-container">
-        <div className="detail">
-          <p className="album_name">{albumData?.album_name}</p>
+    <Loading isLoading={loading} error={error}>
+      <div className="album-detail-container">
+        <div className="top-container">
+          <div className="detail">
+            <p className="album_name">{albumData?.album_name}</p>
 
-          {albumData?.privacy === "PRIVATE" && (
-            <div className="private">
-              <LockFilled />
-              <p>Private</p>
-            </div>
-          )}
+            {albumData?.privacy === "PRIVATE" && (
+              <div className="private">
+                <LockFilled />
+                <p>Private</p>
+              </div>
+            )}
 
-          {albumData?.description && (
-            <p className="album_description">{albumData?.description}</p>
-          )}
-        </div>
-        <div>
-          <ButtonCircle
-            text="Create"
-            paddingClass="padding-0-8"
-            icon={
-              <MoreOutlined
-                style={{
-                  fontSize: "26px",
-                  strokeWidth: "40",
-                  stroke: "black",
-                }}
-              />
-            }
-            dropdownMenu={[
-              {
-                key: "1",
-                title: "Edit Album",
-                onClick: () => {
-                  setModalVisible(true);
+            {albumData?.description && (
+              <p className="album_description">{albumData?.description}</p>
+            )}
+          </div>
+          <div>
+            <ButtonCircle
+              text="Create"
+              paddingClass="padding-0-8"
+              icon={
+                <MoreOutlined
+                  style={{
+                    fontSize: "26px",
+                    strokeWidth: "40",
+                    stroke: "black",
+                  }}
+                />
+              }
+              dropdownMenu={[
+                {
+                  key: "1",
+                  title: "Edit Album",
+                  onClick: () => {
+                    setModalVisible(true);
+                  },
                 },
-              },
-            ]}
-          />
-        </div>
-      </div>
-      {albumData?.medias && albumData.medias.length === 0 && (
-        <div className="no-medias">
-          <p>There aren’t any Medias on this album yet</p>
-        </div>
-      )}
-
-      {isFetchData && <MediaList medias={albumData?.medias} isEditMedia />}
-
-      <ModalComponent
-        title="Edit Your Album"
-        visible={modalVisible}
-        onCancel={handleCancel}
-        onConfirm={handleConfirm}
-        buttonLabels={{ confirmLabel: "Update", cancelLabel: "Cancel" }}
-      >
-        <div className="create-album">
-          <Form form={form} layout="vertical">
-            <FieldItem
-              label="Name"
-              name="album_name"
-              rules={[
-                { required: true, message: "Please input the album title!" },
               ]}
-              placeholder="Like 'Places to Go' or 'Recipes to Make'"
-            >
-              <Input />
-            </FieldItem>
-
-            <CheckboxWithDescription
-              title="Keep this album private"
-              description="So only you and collaborator can see it."
-              value={privacy}
-              onChange={handlePrivacyChange}
-              name="privacy"
             />
-          </Form>
-          {/* Phần xóa album */}
-          <div className="delete-action" onClick={handleDeleteAction}>
-            <p className="title-delele">Delete album</p>
-            <p className="des-delete">
-              You have 7 days to restore a deleted Album. After that, it will be
-              permanently deleted.
-            </p>
           </div>
         </div>
-      </ModalComponent>
+        {albumData?.medias && albumData.medias.length === 0 && (
+          <div className="no-medias">
+            <p>There aren’t any Medias on this album yet</p>
+          </div>
+        )}
 
-      {/* Modal xác nhận xóa album */}
-      <ModalComponent
-        titleDefault="Delete this album?"
-        visible={deleteModalVisible}
-        onCancel={handleCancel}
-        onConfirm={deleteAlbum}
-        buttonLabels={{ confirmLabel: "Delete", cancelLabel: "Cancel" }}
-      >
-        <div
-          style={{
-            marginBottom: 20,
-            marginTop: 20,
-          }}
+        {isFetchData && <MediaList medias={albumData?.medias} isEditMedia />}
+
+        <ModalComponent
+          title="Edit Your Album"
+          visible={modalVisible}
+          onCancel={handleCancel}
+          onConfirm={handleConfirm}
+          buttonLabels={{ confirmLabel: "Update", cancelLabel: "Cancel" }}
         >
-          Are you sure you want to delete this album
-          <p
+          <div className="create-album">
+            <Form form={form} layout="vertical">
+              <FieldItem
+                label="Name"
+                name="album_name"
+                rules={[
+                  { required: true, message: "Please input the album title!" },
+                ]}
+                placeholder="Like 'Places to Go' or 'Recipes to Make'"
+              >
+                <Input />
+              </FieldItem>
+
+              <CheckboxWithDescription
+                title="Keep this album private"
+                description="So only you and collaborator can see it."
+                value={privacy}
+                onChange={handlePrivacyChange}
+                name="privacy"
+              />
+            </Form>
+            {/* Phần xóa album */}
+            <div className="delete-action" onClick={handleDeleteAction}>
+              <p className="title-delele">Delete album</p>
+              <p className="des-delete">
+                You have 7 days to restore a deleted Album. After that, it will
+                be permanently deleted.
+              </p>
+            </div>
+          </div>
+        </ModalComponent>
+
+        {/* Modal xác nhận xóa album */}
+        <ModalComponent
+          titleDefault="Delete this album?"
+          visible={deleteModalVisible}
+          onCancel={handleCancel}
+          onConfirm={deleteAlbum}
+          buttonLabels={{ confirmLabel: "Delete", cancelLabel: "Cancel" }}
+        >
+          <div
             style={{
-              fontWeight: 500,
-              fontSize: "1.1em",
-              display: "inline",
-              marginRight: "5px",
-              marginLeft: "5px",
+              marginBottom: 20,
+              marginTop: 20,
             }}
           >
-            {albumData?.album_name}?
-          </p>
-          This action cannot be undone.
-        </div>
-      </ModalComponent>
-    </div>
+            Are you sure you want to delete this album
+            <p
+              style={{
+                fontWeight: 500,
+                fontSize: "1.1em",
+                display: "inline",
+                marginRight: "5px",
+                marginLeft: "5px",
+              }}
+            >
+              {albumData?.album_name}?
+            </p>
+            This action cannot be undone.
+          </div>
+        </ModalComponent>
+      </div>
+    </Loading>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import {
   getAllMedias,
   getDetailMedia,
@@ -35,7 +35,8 @@ const DetailMedia = () => {
   const [filteredAlbumData, setFilteredAlbumData] = useState<Album[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const id = location.state?.mediaId;
   const [searchTerm, setSearchTerm] = useState<string>("");
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
 
@@ -74,9 +75,7 @@ const DetailMedia = () => {
   }, [id]);
 
   useEffect(() => {
-    return () => {
-      fetchAlbumData();
-    };
+    fetchAlbumData();
   }, []);
 
   const handleSearch = (value: string) => {
@@ -197,24 +196,25 @@ const DetailMedia = () => {
       };
       const response = await addMediasToAlbum(request);
 
-      if (response) {
-        api.success({
-          message: "Success",
-          description: `Media has been saved to the ${album_name}!`,
+      if (response.status === 422) {
+        api.warning({
+          message: `Cannot save media`,
+          description:
+            response.message ||
+            "This media is already associated with this album.",
           placement: "top",
         });
       } else {
-        api.error({
-          message: "Error",
-          description: `Failed to save media to the ${album_name}. Please try again.`,
+        api.success({
+          message: "Success",
+          description: `Media has been successfully saved to ${album_name}.`,
           placement: "top",
         });
       }
     } catch (error) {
-      console.error("Error saving media to album", error);
       api.error({
         message: "Error",
-        description: `Failed to save media to the ${album_name}. Please try again.`,
+        description: `Failed to save media to ${album_name}. Please try again.`,
         placement: "top",
       });
     }
@@ -230,7 +230,6 @@ const DetailMedia = () => {
         <Input
           placeholder="Search album..."
           allowClear
-          onSearch={handleSearch} // Khi nhấn Enter
           onChange={(e) => handleSearch(e.target.value)} // Khi gõ trực tiếp
           className="search-album"
           value={searchTerm} // Đồng bộ hóa giá trị tìm kiếm
@@ -319,7 +318,7 @@ const DetailMedia = () => {
                     overlay={albumMenu} // Pass the dynamically fetched album data to the dropdown
                     placement="bottomLeft"
                     trigger={["click"]}
-                    onVisibleChange={fetchAlbumData} // Fetch album data when the dropdown is clicked
+                    onOpenChange={fetchAlbumData} // Fetch album data when the dropdown is clicked
                     className="dropdown_item"
                   >
                     <button className="album">

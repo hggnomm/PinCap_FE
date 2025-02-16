@@ -60,9 +60,7 @@ const CreateMedia: React.FC = () => {
   const [draftId, setDraftId] = useState<string>("");
 
   useEffect(() => {
-    return () => {
-      fetchDrafts();
-    };
+    fetchDrafts();
   }, []);
 
   useEffect(() => {
