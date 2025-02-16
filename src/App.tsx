@@ -11,7 +11,7 @@ import ImageAi from "./pages/AITools/Images/ImageAi";
 import DetailMedia from "./pages/PinCap/DetailMedia/DetailMedia";
 import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
-import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner"; // Import LoadingSpinner component
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner"; 
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Home from "./pages/Home/Home";
@@ -35,16 +35,16 @@ const App = () => {
 
         if (exp < Date.now() / 1000) {
           localStorage.removeItem("token");
-          navigate("/sign-in");
+          navigate("/login");
         } else {
           setIsLogin(true);
         }
       } catch (error) {
         localStorage.removeItem("token");
-        navigate("/sign-in");
+        navigate("/login");
       }
     } else {
-      if (pathname !== "/sign-in" && pathname !== "/sign-up") {
+      if (pathname !== "/login" && pathname !== "/register") {
         setIsLogin(false);
         navigate("/");
       }
@@ -62,15 +62,15 @@ const App = () => {
       />
       <div className="App">
         <Routes>
-          <Route path="/sign-in" element={<Login />} />
-          <Route path="/sign-up" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           <Route
             path="*"
             element={
               <LoadingSpinner isLoading={isLoading}>
                 <Layout className="main-container">
-                  {pathname !== "/sign-in" && <HeaderCommon />}
+                  {pathname !== "/login" && <HeaderCommon />}
                   {isLogin ? (
                     <>
                       <SiderCommon />

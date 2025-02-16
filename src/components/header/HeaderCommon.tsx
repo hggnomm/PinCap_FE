@@ -144,13 +144,13 @@ const HeaderCommon = () => {
         ) : (
           <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
             <Button
-              onClick={() => navigate("/sign-in")}
+              onClick={() => navigate("/login")}
               className="button-auth-sign-in"
             >
               Sign in
             </Button>
             <Button
-              onClick={() => navigate("/sign-up")}
+              onClick={() => navigate("/register")}
               className="button-auth-sign-up"
             >
               Sign up

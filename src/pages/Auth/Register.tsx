@@ -12,7 +12,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   const onSwitchLogin = () => {
-    navigate("/sign-in");
+    navigate("/login");
   };
 
   const onFinish = async (values: any) => {
