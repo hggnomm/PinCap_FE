@@ -50,7 +50,7 @@ const Home = () => {
                 initial="hidden"
                 animate="visible"
               >
-                Khám phá những nội dung đa dạng và độc đáo tại PinCap
+                Nhóm 6 demo môn điện toán đám mây
               </motion.span>
               <motion.p
                 className="text-description"
