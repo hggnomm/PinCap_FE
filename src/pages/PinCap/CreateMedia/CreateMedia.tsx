@@ -91,7 +91,7 @@ const CreateMedia: React.FC = () => {
     try {
       const draftList = await getMyMedias({
         pageParam: 1,
-        is_created: 0, 
+        is_created: false, 
       });
 
       if (draftList) {
@@ -156,7 +156,7 @@ const CreateMedia: React.FC = () => {
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
       tags_name: tags,
-      is_created: 0,
+      is_created: false,
       is_comment: 1,
     };
 
@@ -205,7 +205,7 @@ const CreateMedia: React.FC = () => {
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
       tags_name: tags_name,
-      is_created: 1,
+      is_created: false,
       is_comment: 1,
     };
 
