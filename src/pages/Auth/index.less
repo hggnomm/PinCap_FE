@@ -51,6 +51,18 @@
         span {
           text-align: left;
         }
+
+        .password-strength {
+          width: 100%;
+          margin-top: 5px;
+          
+          .strength-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-top: 3px;
+          }
+        }
       }
 
       .action {
@@ -113,5 +125,26 @@
         }
       }
     }
+  }
+}
+
+.lock-message {
+  text-align: center;
+  margin: 30px auto;
+  padding: 30px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+  width: 80%;
+
+  h2 {
+    font-size: 28px;
+    color: #ff4d4f;
+    margin: 15px 0;
+  }
+
+  p {
+    font-size: 16px;
+    margin-bottom: 10px;
   }
 }
