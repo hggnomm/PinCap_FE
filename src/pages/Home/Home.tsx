@@ -50,8 +50,8 @@ const Home = () => {
                 initial="hidden"
                 animate="visible"
               >
-                Nhóm 6 demo DTDM4
-              </motion.span>
+                Khám phá những nội dung đa dạng và độc đáo tại PinCap
+                </motion.span>
               <motion.p
                 className="text-description"
                 variants={waveEffect}
