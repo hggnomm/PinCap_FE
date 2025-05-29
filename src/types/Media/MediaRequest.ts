@@ -7,6 +7,6 @@ export interface MediaFormValues {
   mediaOwner_id?: string;
   type?: string;
   tags_name?: string[];
-  is_created?: number;
+  is_created?: boolean;
   is_comment: number;
 }

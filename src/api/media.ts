@@ -24,7 +24,7 @@ export const getMyMedias = async ({
   is_created,
 }: {
   pageParam: number;
-  is_created: number;
+  is_created: boolean;
 }): Promise<Media[]> => {
   try {
     const res = await apiClient.get("/api/medias/my-media", {

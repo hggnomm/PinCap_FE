@@ -51,7 +51,7 @@ const Home = () => {
                 animate="visible"
               >
                 Khám phá những nội dung đa dạng và độc đáo tại PinCap
-              </motion.span>
+                </motion.span>
               <motion.p
                 className="text-description"
                 variants={waveEffect}
