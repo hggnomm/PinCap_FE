@@ -65,7 +65,7 @@ const ImageAi = () => {
 
     try {
       const updatedRequest: IRequestCreateAIImage = {
-        prompt: values.textInput,
+        prompt: `${values.textInput.trim()}. Hình ảnh ${selectedStyle?.value || ""} với kích thước ${selectedOptions?.label || ""}`.trim(),
         style_preset: selectedStyle?.value || "",
         width: selectedOptions?.value.width,
         height: selectedOptions?.value.height,
