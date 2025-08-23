@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { Media } from "type";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { getAllMedias, getMyMedias } from "../../api/media";
 
 /**
  * MediaList Component - Hiển thị danh sách media với infinite scroll

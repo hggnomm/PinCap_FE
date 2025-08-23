@@ -151,7 +151,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             <source src={srcUrl} />
           </video>
         ) : (
-          <img src={srcUrl} alt="Media content" />
+          <img src={srcUrl} alt="Media content" loading="lazy" />
         )}
         <motion.div
           className="overlay"
