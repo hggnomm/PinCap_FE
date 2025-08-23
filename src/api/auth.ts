@@ -1,6 +1,6 @@
 import axios from "axios";
 import apiClient from "./apiClient";
-const baseUrl = import.meta.env.VITE_BASE_API;
+const baseUrl = import.meta.env.VITE_BASE_API as string;
 
 export const login = async (data: any) => {
   var config = {

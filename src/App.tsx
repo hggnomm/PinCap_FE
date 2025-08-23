@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import "./App.less";
 import CreateMedia from "./pages/PinCap/CreateMedia/CreateMedia";
 import Layout, { Content } from "antd/es/layout/layout";
@@ -31,9 +30,9 @@ const App = () => {
     if (token) {
       try {
         const decoded = decodedToken(token);
-        const exp = decoded.exp;
+        const exp = decoded?.exp;
 
-        if (exp < Date.now() / 1000) {
+        if (exp && exp < Date.now() / 1000) {
           localStorage.removeItem("token");
           navigate("/login");
         } else {
