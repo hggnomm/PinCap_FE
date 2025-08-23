@@ -5,6 +5,7 @@ import {
   getDetailMedia,
   mediaReactions,
 } from "../../../api/media";
+
 import { DownOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import download from "../../../assets/img/PinCap/download.png";
@@ -39,6 +40,7 @@ const DetailMedia = () => {
   const id = location.state?.mediaId;
   const [searchTerm, setSearchTerm] = useState<string>("");
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
+
 
   const fetchMediaDetail = async (idMedia: string) => {
     setLoading(true);
@@ -399,7 +401,10 @@ const DetailMedia = () => {
           </div>
         </div>
       </motion.div>
-      <MediaList apiCall={() => getAllMedias({ pageParam: 1 })} />
+      <MediaList 
+        queryKey={["medias", "detail-page"]}
+        queryFn={(pageParam) => getAllMedias({ pageParam })}
+      />
     </Loading>
   );
 };

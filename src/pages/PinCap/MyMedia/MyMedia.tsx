@@ -54,7 +54,11 @@ const MyMedia = () => {
       <div className="my-list-media">
         <div className="action"></div>
         <div className="list">
-          <MediaList apiCall={getMyMedias} isEditMedia />
+          <MediaList 
+            queryKey={["medias", "my-media", "created"]}
+            queryFn={(pageParam) => getMyMedias({ pageParam, is_created: true })}
+            isEditMedia 
+          />
         </div>
       </div>
     </div>

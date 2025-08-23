@@ -1,22 +1,56 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import "./ViewPinComponent.less";
 import PinMedia from "../../pages/PinCap/PinMedia/PinMedia";
 import Loading from "../../components/loading/Loading";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Media } from "type";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
+import { getAllMedias, getMyMedias } from "../../api/media";
 
+/**
+ * MediaList Component - Hiển thị danh sách media với infinite scroll
+ * 
+ * Cách sử dụng:
+ * 1. Với API call (khuyến nghị):
+ *    <MediaList 
+ *      queryKey={["medias", "all"]}
+ *      queryFn={(pageParam) => getAllMedias({ pageParam })}
+ *      isEditMedia={false}
+ *    />
+ * 
+ * 2. Với data có sẵn:
+ *    <MediaList 
+ *      medias={myMediaData}
+ *      isEditMedia={true}
+ *    />
+ * 
+ * Ví dụ cụ thể:
+ * - Trong PinCap.tsx: Hiển thị tất cả media
+ * - Trong MyMedia.tsx: Hiển thị media của user với infinite scroll
+ * - Trong DetailAlbum.tsx: Hiển thị media trong album (data có sẵn)
+ * 
+ * Props:
+ * - queryKey: Array chứa key cho React Query cache
+ * - queryFn: Function để fetch data (nhận pageParam và trả về Promise<Media[]>)
+ * - medias: Array media có sẵn (optional, nếu có thì không dùng queryFn)
+ * - isEditMedia: Boolean cho phép edit media
+ * - enabled: Boolean để enable/disable query (default: true)
+ */
 interface MediaListProps {
-  apiCall?: () => Promise<any>;
+  queryKey: string[];
+  queryFn: (pageParam: number) => Promise<Media[]>;
   medias?: Media[];
   isEditMedia?: boolean;
+  enabled?: boolean;
 }
 
 const MediaList: React.FC<MediaListProps> = ({
-  apiCall,
+  queryKey,
+  queryFn,
   medias: propMedias,
   isEditMedia = false,
+  enabled = true,
 }) => {
   const [medias, setMedias] = useState<Media[]>([]);
   const { ref, inView } = useInView();
@@ -31,14 +65,14 @@ const MediaList: React.FC<MediaListProps> = ({
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["medias"],
-    queryFn: apiCall,
+    queryKey,
+    queryFn: ({ pageParam }) => queryFn(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const nextPage = lastPage.length ? allPages.length + 1 : undefined;
       return nextPage;
     },
-    enabled: !propMedias,
+    enabled: !propMedias && enabled,
   });
 
   useEffect(() => {
@@ -64,7 +98,7 @@ const MediaList: React.FC<MediaListProps> = ({
   };
 
   let content;
-  if (status === "success") {
+  if (status === "success" || propMedias) {
     content = medias.map((media: Media, index: number) => {
       if (medias.length === index + 1 && !propMedias) {
         return (
@@ -103,10 +137,8 @@ const MediaList: React.FC<MediaListProps> = ({
             visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
           }}
         >
-          {/* <AnimatePresence> */}
           {content}
           {!propMedias && <div ref={ref} style={{ height: 10 }} />}
-          {/* </AnimatePresence> */}
         </motion.div>
       </div>
     </Loading>

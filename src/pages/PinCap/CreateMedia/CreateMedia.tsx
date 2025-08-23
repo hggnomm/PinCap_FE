@@ -165,7 +165,7 @@ const CreateMedia: React.FC = () => {
 
     try {
       const response = formValue.id
-        ? await updatedMedia(formValue.id, { ...mediaData, media: undefined })
+        ? await updatedMedia(formValue.id, { ...mediaData})
         : await createMedia(mediaData);
 
       if (response) {
@@ -205,7 +205,7 @@ const CreateMedia: React.FC = () => {
       mediaOwner_id: tokenPayload.id,
       media: fileList[0],
       tags_name: tags_name,
-      is_created: false,
+      is_created: true,
       is_comment: 1,
     };
 
