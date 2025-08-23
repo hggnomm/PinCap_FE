@@ -15,6 +15,8 @@ import { MediaFormValues } from "Media/MediaRequest";
 import { useSelector } from "react-redux";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
@@ -151,7 +153,12 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             <source src={srcUrl} />
           </video>
         ) : (
-          <img src={srcUrl} alt="Media content" loading="lazy" />
+          <LazyLoadImage
+            src={srcUrl}
+            alt="Media content"
+            effect="blur"
+            threshold={100}
+          />
         )}
         <motion.div
           className="overlay"
