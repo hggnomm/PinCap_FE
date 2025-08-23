@@ -6,14 +6,24 @@ import { Provider } from "react-redux";
 import HttpsRedirect from "react-https-redirect";
 import { store } from "./store/store.ts";
 
-import "./index.css";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

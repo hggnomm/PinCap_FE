@@ -14,7 +14,7 @@ import Loading from "../../../components/loading/Loading";
 
 import "./index.less";
 import { addMediasToAlbum, getMyAlbumData } from "../../../api/album";
-import { AddRelationships, DeleteRelationships } from "../../../api/users";
+import { followOrBlockUser, unfollowOrUnblockUser } from "../../../api/users";
 import { Album, Media } from "../../../types/type";
 import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
 import Comment from "./Comment/Comment";
@@ -94,8 +94,13 @@ const DetailMedia = () => {
 
     try {
       if (media?.ownerUser?.isFollowing) {
-        await DeleteRelationships({
-          followeeId: media?.ownerUser.id,
+        if (!media?.ownerUser?.id) {
+          setError("User ID not found!");
+          return;
+        }
+
+        await unfollowOrUnblockUser({
+          followeeId: media.ownerUser.id,
           status: request,
         });
 
@@ -114,8 +119,13 @@ const DetailMedia = () => {
         return;
       }
 
-      const response = await AddRelationships({
-        followeeId: media?.ownerUser.id,
+      if (!media?.ownerUser?.id) {
+        setError("User ID not found!");
+        return;
+      }
+
+      const response = await followOrBlockUser({
+        followeeId: media.ownerUser.id,
         status: request,
       });
 
@@ -389,7 +399,7 @@ const DetailMedia = () => {
           </div>
         </div>
       </motion.div>
-      <MediaList apiCall={getAllMedias} />
+      <MediaList apiCall={() => getAllMedias({ pageParam: 1 })} />
     </Loading>
   );
 };

@@ -60,7 +60,7 @@ const Login: React.FC = () => {
     let interval: NodeJS.Timeout | null = null;
     if (isAccountLocked && lockTimeRemaining > 0) {
       interval = setInterval(() => {
-        setLockTimeRemaining(prev => {
+        setLockTimeRemaining((prev) => {
           const newTime = prev - 1;
           if (newTime <= 0) {
             clearInterval(interval!);
@@ -78,11 +78,11 @@ const Login: React.FC = () => {
   }, [form, verifiedToken, isAccountLocked, lockTimeRemaining]);
 
   const checkAccountLockStatus = () => {
-    const lockExpiryTime = localStorage.getItem('loginLockExpiry');
+    const lockExpiryTime = localStorage.getItem("loginLockExpiry");
     if (lockExpiryTime) {
       const expiryTime = parseInt(lockExpiryTime);
       const currentTime = Date.now();
-      
+
       if (currentTime < expiryTime) {
         // Account is still locked
         setIsAccountLocked(true);
@@ -95,8 +95,8 @@ const Login: React.FC = () => {
   };
 
   const resetLoginAttempts = () => {
-    localStorage.removeItem('loginAttempts');
-    localStorage.removeItem('loginLockExpiry');
+    localStorage.removeItem("loginAttempts");
+    localStorage.removeItem("loginLockExpiry");
     setIsAccountLocked(false);
     setLockTimeRemaining(0);
   };
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
   const formatRemainingTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
   // Hàm xử lý đăng nhập
@@ -123,7 +123,9 @@ const Login: React.FC = () => {
     if (isAccountLocked) {
       api.error({
         message: "Account Locked",
-        description: `Too many failed login attempts. Please try again in ${formatRemainingTime(lockTimeRemaining)}.`,
+        description: `Too many failed login attempts. Please try again in ${formatRemainingTime(
+          lockTimeRemaining
+        )}.`,
       });
       return;
     }
@@ -131,11 +133,11 @@ const Login: React.FC = () => {
     try {
       const { email, password, remember } = values;
 
-      const data: LoginRequest = await login(values); 
+      const data: LoginRequest = await login(values);
 
       if (data.token) {
-        localStorage.setItem("token", data.token); 
-        dispatch(addToken(data.token)); 
+        localStorage.setItem("token", data.token);
+        dispatch(addToken(data.token));
 
         if (remember) {
           localStorage.setItem("rememberedEmail", email);
@@ -146,45 +148,44 @@ const Login: React.FC = () => {
         }
 
         resetLoginAttempts();
-        navigate("/home"); 
+        navigate("/home");
       } else {
         // Handle failed login attempt
-        const attempts = parseInt(localStorage.getItem('loginAttempts') || '0') + 1;
-        localStorage.setItem('loginAttempts', attempts.toString());
-        
+        const attempts =
+          parseInt(localStorage.getItem("loginAttempts") || "0") + 1;
+        localStorage.setItem("loginAttempts", attempts.toString());
+
         // If reached max attempts, lock account
         if (attempts >= 5) {
-          const lockExpiry = Date.now() + (60 * 60 * 1000); // 1 hour lock
-          localStorage.setItem('loginLockExpiry', lockExpiry.toString());
+          const lockExpiry = Date.now() + 60 * 60 * 1000; // 1 hour lock
+          localStorage.setItem("loginLockExpiry", lockExpiry.toString());
           setIsAccountLocked(true);
           setLockTimeRemaining(60 * 60); // 3600 seconds = 1 hour
-          
+
           api.error({
             message: "Account Locked",
-            description: "Too many failed login attempts. Your account has been locked for 1 hour.",
-          });
-        } else {
-          notification.error({
-            message: "Login Failed",
-            description: `${data?.message || "An error occurred. Please try again later."} (${5 - attempts} attempts remaining)`,
+            description:
+              "Too many failed login attempts. Your account has been locked for 1 hour.",
           });
         }
       }
     } catch (error: any) {
       // Handle login error
-      const attempts = parseInt(localStorage.getItem('loginAttempts') || '0') + 1;
-      localStorage.setItem('loginAttempts', attempts.toString());
-      
+      const attempts =
+        parseInt(localStorage.getItem("loginAttempts") || "0") + 1;
+      localStorage.setItem("loginAttempts", attempts.toString());
+
       // If reached max attempts, lock account
       if (attempts >= 5) {
-        const lockExpiry = Date.now() + (60 * 60 * 1000); // 1 hour lock
-        localStorage.setItem('loginLockExpiry', lockExpiry.toString());
+        const lockExpiry = Date.now() + 60 * 60 * 1000; // 1 hour lock
+        localStorage.setItem("loginLockExpiry", lockExpiry.toString());
         setIsAccountLocked(true);
         setLockTimeRemaining(60 * 60); // 3600 seconds = 1 hour
-        
+
         api.error({
           message: "Account Locked",
-          description: "Too many failed login attempts. Your account has been locked for 1 hour.",
+          description:
+            "Too many failed login attempts. Your account has been locked for 1 hour.",
         });
       } else {
         api.error({
@@ -246,7 +247,9 @@ const Login: React.FC = () => {
               <span>Email</span>
               <Form.Item
                 name="email"
-                rules={[{ required: true, message: "Please input your email!" }]}
+                rules={[
+                  { required: true, message: "Please input your email!" },
+                ]}
               >
                 <Input />
               </Form.Item>

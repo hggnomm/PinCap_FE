@@ -1,19 +1,108 @@
-import apiClient from "./apiClient";
+import apiClient from './apiClient';
 
-export const AddRelationships = async (request: any) => {
+export const getMyProfile = async () => {
   try {
-    const res = await apiClient.post(`/api/users/relationships`, request);
-    return res.data;
+    const response = await apiClient.get('/api/users/my-profile');
+    return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };
 
-export const DeleteRelationships = async (request: any) => {
+export const updateMyProfile = async (data: any) => {
   try {
-    const res = await apiClient.delete(`/api/users/relationships`, request);
-    return res.data;
+    const response = await apiClient.post('/api/users/my-profile', data);
+    return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
+  }
+};
+
+export const getRelationships = async (relationship: 'followers' | 'followees') => {
+  try {
+    const response = await apiClient.get('/api/users/relationships', {
+      params: { relationship }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const followOrBlockUser = async (data: { followeeId: string; status: 'FOLLOWING' | 'BLOCK' }) => {
+  try {
+    const response = await apiClient.post('/api/users/relationships', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const unfollowOrUnblockUser = async (data: { followeeId: string; status: 'FOLLOWING' | 'BLOCK' }) => {
+  try {
+    const response = await apiClient.delete('/api/users/relationships', { data });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserProfile = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/api/users/profiles/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserRelationships = async (userId: string, relationship: 'followers' | 'followees') => {
+  try {
+    const response = await apiClient.get(`/api/users/relationships/${userId}`, {
+      params: { relationship }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const searchUsers = async (target: string) => {
+  try {
+    const response = await apiClient.get('/api/users/search', {
+      params: { target }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const findUsers = async (target: string) => {
+  try {
+    const response = await apiClient.get('/api/users/find', {
+      params: { target }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getReportReasons = async () => {
+  try {
+    const response = await apiClient.get('/api/users/report-reasons');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const reportUser = async (data: { user_id: string; reason_report_id?: string; other_reasons?: string }) => {
+  try {
+    const response = await apiClient.post('/api/users/report', data);
+    return response.data;
+  } catch (error) {
+    throw error;
   }
 };

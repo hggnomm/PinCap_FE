@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import React from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import "./App.less";
 import CreateMedia from "./pages/PinCap/CreateMedia/CreateMedia";
 import Layout, { Content } from "antd/es/layout/layout";
@@ -10,46 +10,27 @@ import ImageAi from "./pages/AITools/Images/ImageAi";
 import DetailMedia from "./pages/PinCap/DetailMedia/DetailMedia";
 import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
-import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner"; 
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Home from "./pages/Home/Home";
 import MyAlbum from "./pages/PinCap/MyAlbum/MyAlbum";
 import MyMedia from "./pages/PinCap/MyMedia/MyMedia";
 import DetailAlbum from "./pages/PinCap/DetailAlbum/DetailAlbum";
-import { decodedToken } from "./utils/utils";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import { ROUTES } from "./constants/routes";
+import { useAuth } from "./hooks";
 
 const App = () => {
-  const token = localStorage.getItem("token");
-  const [isLogin, setIsLogin] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // State to control loading spinner
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { isLoadingUser } = useAuth();
 
-  useEffect(() => {
-    if (token) {
-      try {
-        const decoded = decodedToken(token);
-        const exp = decoded?.exp;
-
-        if (exp && exp < Date.now() / 1000) {
-          localStorage.removeItem("token");
-          navigate("/login");
-        } else {
-          setIsLogin(true);
-        }
-      } catch (error) {
-        localStorage.removeItem("token");
-        navigate("/login");
-      }
-    } else {
-      if (pathname !== "/login" && pathname !== "/register") {
-        setIsLogin(false);
-        navigate("/");
-      }
-    }
-    setIsLoading(false);
-  }, [pathname, navigate, token]);
+  if (isLoadingUser) {
+    return (
+      <LoadingSpinner isLoading={true}>
+        <div />
+      </LoadingSpinner>
+    );
+  }
 
   return (
     <ConfigProvider>
@@ -61,42 +42,48 @@ const App = () => {
       />
       <div className="App">
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path={ROUTES.LOGIN} element={<Login />} />
+          <Route path={ROUTES.REGISTER} element={<Register />} />
+
+          <Route path={ROUTES.HOME} element={
+            <>
+              <HeaderCommon />
+              <Home />
+            </>
+          } />
 
           <Route
             path="*"
             element={
-              <LoadingSpinner isLoading={isLoading}>
+              <ProtectedRoute>
                 <Layout className="main-container">
-                  {pathname !== "/login" && <HeaderCommon />}
-                  {isLogin ? (
-                    <>
-                      <SiderCommon />
-                      <Content className="right-layout">
-                        <Routes>
-                          <Route path="/home" element={<PinCap />} />
-                          <Route
-                            path="/create-media"
-                            element={<CreateMedia />}
-                          />
-                          <Route path="/ai" element={<ImageAi />} />
-                          <Route path="/media/:id" element={<DetailMedia />} />
-                          <Route path="/album" element={<MyAlbum />} />
-                          <Route path="/album/:id" element={<DetailAlbum />} />
-                          <Route path="/my-media" element={<MyMedia />} />
-                        </Routes>
-                      </Content>
-                    </>
-                  ) : (
-                    <Content>
-                      <Routes>
-                        <Route path="/" element={<Home />} />
-                      </Routes>
-                    </Content>
-                  )}
+                  <HeaderCommon />
+                  <SiderCommon />
+                  <Content className="right-layout">
+                    <Routes>
+                      <Route
+                        path={ROUTES.PINCAP_HOME}
+                        element={<PinCap />}
+                      />
+                      <Route
+                        path={ROUTES.CREATE_MEDIA}
+                        element={<CreateMedia />}
+                      />
+                      <Route path={ROUTES.AI_TOOLS} element={<ImageAi />} />
+                      <Route
+                        path={ROUTES.MEDIA_DETAIL}
+                        element={<DetailMedia />}
+                      />
+                      <Route path={ROUTES.MY_ALBUM} element={<MyAlbum />} />
+                      <Route
+                        path={ROUTES.ALBUM_DETAIL}
+                        element={<DetailAlbum />}
+                      />
+                      <Route path={ROUTES.MY_MEDIA} element={<MyMedia />} />
+                    </Routes>
+                  </Content>
                 </Layout>
-              </LoadingSpinner>
+              </ProtectedRoute>
             }
           />
         </Routes>

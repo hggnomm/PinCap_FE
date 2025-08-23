@@ -19,6 +19,7 @@ import iconChatbot from "../../assets/img/PinCap/chatbot.png";
 import Chatbot from "../chatbot";
 import { addToken } from "../../store/authSlice";
 import "./index.less";
+import { ROUTES } from "../../constants/routes";
 
 interface UserInfo {
   name: string;
@@ -50,7 +51,7 @@ const HeaderCommon = () => {
   const logoutHandle = () => {
     localStorage.removeItem("token");
     dispatch(addToken(null));
-    navigate("/");
+    navigate(ROUTES.LOGIN);
   };
 
   const menuItems = [
@@ -84,7 +85,7 @@ const HeaderCommon = () => {
     <Row className="main-header">
       <Col
         className="left-header"
-        onClick={() => (isAuthenticated ? navigate("/home") : navigate("/"))}
+        onClick={() => (isAuthenticated ? navigate(ROUTES.PINCAP_HOME) : navigate(ROUTES.LOGIN))}
       >
         <img className="logo-icon" src={LogoIcon} alt="Logo" />
         {isAuthenticated && (

@@ -51,3 +51,21 @@ export const register = async (data: any) => {
     }
   }
 };
+
+export const getCurrentUser = async () => {
+  try {
+    const response = await apiClient.get('/api/users/my-profile');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    const response = await apiClient.post('/api/auth/logout');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
