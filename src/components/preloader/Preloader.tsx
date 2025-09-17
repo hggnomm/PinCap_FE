@@ -20,7 +20,7 @@ const Preloader: React.FC = () => {
           clearTimeout(timer2);
         };
       }
-    }, 2000);
+    }, 1500);
 
     return () => {
       clearTimeout(timer1);

@@ -6,6 +6,7 @@ import RegisterImage from "../../assets/img/PinCap/register_page_image.jpg";
 import { LogoIcon } from "../../assets/img";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { MailOutlined, CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 
 // List of common passwords to disallow
 const commonPasswords = ["123456", "password", "admin", "qwerty", "welcome", "123456789", "12345678", "111111", "abc123"];
@@ -19,6 +20,9 @@ const Register = () => {
     feedback: "",
     color: "#ff4d4f"
   });
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [isResending, setIsResending] = useState(false);
 
   const onSwitchLogin = () => {
     navigate("/login");
@@ -108,10 +112,13 @@ const Register = () => {
             response.message || "An error occurred. Please try again later.",
         });
       } else {
+        // Show email verification UI instead of just notification
+        setUserEmail(values.email);
+        setShowEmailVerification(true);
+        
         notification.success({
           message: response.message || "Registration successful",
-          description:
-            "Please check your email for a confirmation link to verify your account.",
+          description: "Please check your email to verify your account.",
         });
       }
     } catch (error: any) {
@@ -119,6 +126,26 @@ const Register = () => {
         message: "Can't register",
         description: error?.message || "An unknown error occurred.",
       });
+    }
+  };
+
+  const handleResendEmail = async () => {
+    setIsResending(true);
+    try {
+      // Simulate resend email API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      notification.success({
+        message: "Email Sent",
+        description: "We've sent a new verification email to your inbox.",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Failed to resend",
+        description: "Please try again later.",
+      });
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -142,7 +169,72 @@ const Register = () => {
           <span>Step into a world of opportunities with PinCap today!</span>
         </Row>
         {contextHolder}
-        <Form name="register_form" className="form" onFinish={onFinish}>
+        
+        {showEmailVerification && (
+          <div className="flex justify-center items-center w-full py-5">
+            <motion.div 
+              className="text-center bg-white rounded-xl p-10 shadow-lg border border-gray-100 w-[90%] max-w-md"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <div className="mb-5">
+                <CheckCircleOutlined className="text-6xl text-green-500" />
+              </div>
+              
+              <Title level={3} className="text-green-500 text-center my-5">
+                Registration Successful!
+              </Title>
+              
+              <div className="flex items-center justify-center my-5 text-base text-gray-600">
+                <MailOutlined className="text-xl text-blue-500 mr-2" />
+                <span>We've sent a verification email to:</span>
+              </div>
+              
+              <div className="bg-green-50 border border-green-200 rounded-md py-3 px-5 my-4 text-green-700 font-semibold text-base break-all">
+                {userEmail}
+              </div>
+              
+              <div className="my-6">
+                <p className="my-2 text-sm text-gray-600 leading-relaxed">
+                  Please check your inbox and click the verification link to activate your account.
+                </p>
+                <p className="my-2 text-sm text-gray-600 leading-relaxed">
+                  The link will expire in 24 hours.
+                </p>
+              </div>
+              
+              <div className="flex justify-center gap-3 my-8 flex-wrap">
+                <Button 
+                  type="default" 
+                  icon={<ReloadOutlined />}
+                  loading={isResending}
+                  onClick={handleResendEmail}
+                  className="rounded-md font-medium h-10 px-5 border-gray-300 text-gray-600 hover:border-[#a25772] hover:text-[#a25772]"
+                >
+                  Resend Email
+                </Button>
+                
+                <Button 
+                  type="primary"
+                  onClick={onSwitchLogin}
+                  className="rounded-md font-medium h-10 px-5 bg-[#a25772] border-[#a25772] hover:bg-[#8b4a63] hover:border-[#8b4a63]"
+                >
+                  Go to Login
+                </Button>
+              </div>
+              
+              <div className="border-t border-gray-100 pt-5 mt-6">
+                <p className="text-xs text-gray-500 text-center">
+                  Didn't receive the email? Check your spam folder or contact support.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+        
+        {!showEmailVerification && (
+          <Form name="register_form" className="form !gap-3" onFinish={onFinish}>
           <Row className="form-field">
             <span>First name</span>
             <Form.Item 
@@ -256,6 +348,7 @@ const Register = () => {
             </div>
           </Row>
         </Form>
+        )}
       </Col>
       <Col xs={0} md={14} className="left-login">
         <motion.img

@@ -1,134 +1,289 @@
-import React, { useEffect } from "react";
-import "./index.less";
-import { Button, Layout, Row } from "antd";
-import { motion } from "framer-motion";
-import VideoLandingPage from "../../assets/videos/VideoPinCapAI.mp4";
-import Preloader from "../../components/preloader/Preloader";
-import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { motion, useScroll, useTransform } from "framer-motion"
+import { ArrowRight, Sparkles, ImageIcon, Video, Zap } from "lucide-react"
+import { useRef } from "react"
+import videoPinCapAI from "../../assets/videos/VideoPinCapAI.mp4"
 
-const waveEffect = {
-  hidden: { y: 0 },
-  visible: {
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] },
+}
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+}
+
+const floatingAnimation = {
+  animate: {
     y: [0, -20, 0],
     transition: {
-      repeat: Infinity,
-      repeatType: "reverse",
-      duration: 2,
+      duration: 3,
+      repeat: Number.POSITIVE_INFINITY,
       ease: "easeInOut",
     },
   },
-};
+}
 
-const Home = () => {
-  const tokenPayload = useSelector((state: any) => state.auth);
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
+export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  })
 
-  useEffect(() => {
-    if (tokenPayload.email) {
-      navigate("/home");
-    }
-  }, [tokenPayload.email, pathname]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+
   return (
-    <>
-      <Preloader />
-      <Layout className="main-layout">
-        <Row className="home-layout">
-          {/* Section 1 */}
-          <motion.div
-            className="element"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-          >
-            <div className="overlay"></div>
-            <div className="content">
-              <motion.span
-                className="text-title"
-                variants={waveEffect}
-                initial="hidden"
-                animate="visible"
-              >
-                Khám phá những nội dung đa dạng và độc đáo tại PinCap
-                </motion.span>
-              <motion.p
-                className="text-description"
-                variants={waveEffect}
-                initial="hidden"
-                animate="visible"
-              >
-                Khả năng chỉnh sửa linh hoạt, công cụ AI diệu kỳ
-              </motion.p>
-            </div>
-            <motion.div className="video-container">
-              <video src={VideoLandingPage} autoPlay loop muted></video>
-            </motion.div>
+    <div ref={containerRef} className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gray-900">
+        {/* Video Background */}
+        <motion.div className="absolute inset-0 z-0" style={{ y, opacity }}>
+          <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+            <source
+              src={videoPinCapAI}
+              type="video/mp4"
+            />
+          </video>
+          <div className="absolute inset-0 bg-black/70" />
+        </motion.div>
+
+        {/* Hero Content */}
+        <motion.div
+          className="relative z-20 text-center px-4 max-w-4xl mx-auto"
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+        >
+          <motion.div variants={floatingAnimation} animate="animate" className="mb-6">
+            <Sparkles className="w-16 h-16 mx-auto text-pink-400 mb-4" />
           </motion.div>
 
-          {/* Section 2 */}
-          <div
-            className="element"
-            style={{ background: "#EEF5FF", padding: "2rem 0" }}
-          >
-            <div className="banner-flex-image">
-              <img
-                className="image-border"
-                src="https://i.pinimg.com/564x/9d/74/2f/9d742f523389564937f495263972199c.jpg"
-              />
-              <div className="content-banner">
-                <div className="content-banner-title">
-                  Tìm kiếm các ý tưởng từ những hình ảnh
-                </div>
-                <div className="content-banner-description">
-                  Khám phá và khơi nguồn cảm hứng từ thế giới xung quanh thông
-                  qua việc tìm kiếm ý tưởng từ những hình ảnh tuyệt vời.
-                </div>
-                <button className="content-banner-button">Khám phá</button>
-              </div>
-            </div>
-          </div>
+          <motion.h1 variants={fadeInUp} className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance">
+            <span className="text-white">Khám phá những nội dung đa dạng và độc đáo tại PinCap</span>
+          </motion.h1>
 
-          {/* Section 3 */}
-          <div
-            className="element"
-            style={{ background: "rgba(162, 87, 114, 1)", padding: "2rem 0" }}
+          <motion.p
+            variants={fadeInUp}
+            className="text-xl md:text-2xl text-gray-100 mb-8 text-pretty max-w-2xl mx-auto"
           >
-            <div className="banner-flex-video" style={{ color: "white" }}>
-              <div className="content-banner">
-                <div className="content-banner-title-reverse">
-                  Tìm kiếm các ý tưởng từ những video
-                </div>
-                <div className="content-banner-description-reverse">
-                  Khám phá nguồn cảm hứng không giới hạn từ các video đa dạng
-                  trên mạng, để tạo ra những ý tưởng mới và sáng tạo.
-                </div>
-                <button className="content-banner-button-reverse">
-                  Khám phá
-                </button>
-              </div>
-              <div className="videos">
-                <video
-                  className="image-border"
-                  src="https://v1.pinimg.com/videos/mc/720p/dc/8e/90/dc8e90ae0e945a44105c06f6beca858b.mp4"
-                  autoPlay
-                  loop
-                  muted
-                ></video>
-                <video
-                  className="image-border"
-                  src="https://v1.pinimg.com/videos/mc/720p/7a/c0/fd/7ac0fd6016b5d4d8494430902803c07c.mp4"
-                  autoPlay
-                  loop
-                  muted
-                ></video>
-              </div>
-            </div>
-          </div>
-        </Row>
-      </Layout>
-    </>
-  );
-};
+            Khả năng chỉnh sửa linh hoạt, công cụ AI diệu kỳ
+          </motion.p>
 
-export default Home;
+          <motion.div variants={fadeInUp}>
+            <button className="bg-rose-600 hover:bg-rose-700 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg inline-flex items-center">
+              Khám phá ngay
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </button>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Image Discovery Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="grid lg:grid-cols-2 gap-12 items-center"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="order-2 lg:order-1">
+              <div className="relative">
+                <img
+                  src="/beautiful-pinterest-style-image-collage-with-creat.jpg"
+                  alt="Image Discovery"
+                  className="rounded-2xl shadow-2xl w-full max-w-md mx-auto lg:mx-0"
+                />
+                <motion.div
+                  className="absolute -top-4 -right-4 bg-rose-100 text-rose-600 p-3 rounded-full shadow-lg"
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  <ImageIcon className="w-6 h-6" />
+                </motion.div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="order-1 lg:order-2 space-y-6">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 text-balance">
+                Tìm kiếm các ý tưởng từ những hình ảnh
+              </h2>
+              <p className="text-lg text-gray-600 text-pretty leading-relaxed">
+                Khám phá và khơi nguồn cảm hứng từ thế giới xung quanh thông qua việc tìm kiếm ý tưởng từ những hình ảnh
+                tuyệt vời.
+              </p>
+              <button className="border-2 border-rose-600 text-rose-600 hover:bg-rose-600 hover:text-white transition-all duration-300 rounded-full px-8 py-3 bg-transparent inline-flex items-center">
+                Khám phá
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Video Discovery Section */}
+      <section className="py-20 bg-gradient-to-br from-rose-600 to-pink-600 text-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="grid lg:grid-cols-2 gap-12 items-center"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="space-y-6">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-balance">
+                Tìm kiếm các ý tưởng từ những video
+              </h2>
+              <p className="text-lg text-white/90 text-pretty leading-relaxed">
+                Khám phá nguồn cảm hứng không giới hạn từ các video đa dạng trên mạng, để tạo ra những ý tưởng mới và
+                sáng tạo.
+              </p>
+              <button className="bg-white text-rose-600 hover:bg-white/90 transition-all duration-300 rounded-full px-8 py-3 inline-flex items-center">
+                Khám phá
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </button>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="relative">
+              <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
+                <motion.div className="relative" whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="rounded-lg shadow-md w-full aspect-square object-cover"
+                  >
+                    <source
+                      src={videoPinCapAI}
+                      type="video/mp4"
+                    />
+                  </video>
+                </motion.div>
+                <motion.div className="relative mt-4" whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="rounded-lg shadow-md w-full aspect-square object-cover"
+                  >
+                    <source
+                      src={videoPinCapAI}
+                      type="video/mp4"
+                    />
+                  </video>
+                </motion.div>
+              </div>
+              <motion.div
+                className="absolute -bottom-4 -left-4 bg-white text-rose-600 p-3 rounded-full shadow-lg"
+                animate={{ rotate: [0, -10, 10, 0] }}
+                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+              >
+                <Video className="w-6 h-6" />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-16"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-balance">
+              Công cụ AI{" "}
+              <span className="bg-gradient-to-r from-rose-700 via-pink-500 to-rose-700 bg-clip-text text-transparent">
+                diệu kỳ
+              </span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto text-pretty">
+              Trải nghiệm sức mạnh của trí tuệ nhân tạo trong việc chỉnh sửa và tạo nội dung
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-8"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {[
+              {
+                icon: Sparkles,
+                title: "AI Chỉnh sửa thông minh",
+                description: "Tự động cải thiện chất lượng hình ảnh và video với công nghệ AI tiên tiến",
+              },
+              {
+                icon: ImageIcon,
+                title: "Tìm kiếm trực quan",
+                description: "Khám phá nội dung thông qua tìm kiếm bằng hình ảnh và nhận diện thông minh",
+              },
+              {
+                icon: Zap,
+                title: "Xử lý nhanh chóng",
+                description: "Tốc độ xử lý siêu nhanh giúp bạn tiết kiệm thời gian và nâng cao hiệu suất",
+              },
+            ].map((feature, index) => (
+              <motion.div key={index} variants={fadeInUp}>
+                <div className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-2 border border-gray-200 rounded-lg bg-white">
+                  <div className="p-8 text-center">
+                    <motion.div className="mb-6" whileHover={{ scale: 1.1, rotate: 5 }} transition={{ duration: 0.3 }}>
+                      <feature.icon className="w-12 h-12 mx-auto text-rose-600" />
+                    </motion.div>
+                    <h3 className="text-xl font-bold mb-4 text-gray-900">{feature.title}</h3>
+                    <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-rose-600 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="max-w-3xl mx-auto"
+          >
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-white text-balance"
+            >
+              Sẵn sàng khám phá thế giới sáng tạo?
+            </motion.h2>
+            <motion.p variants={fadeInUp} className="text-xl text-white mb-8 text-pretty">
+              Tham gia cùng hàng triệu người dùng đang tìm kiếm cảm hứng mỗi ngày
+            </motion.p>
+            <motion.div variants={fadeInUp}>
+              <button className="bg-white text-rose-600 hover:bg-white/90 px-12 py-4 text-lg rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl inline-flex items-center">
+                Bắt đầu miễn phí
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  )
+}

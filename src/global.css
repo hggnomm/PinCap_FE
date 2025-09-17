@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+:root {
+  /* PinCap brand colors */
+  --primary: #a25772;
+  --secondary: #d42364;
+  --accent: #ec4899;
+  --background: #ffffff;
+  --foreground: #475569;
+  --border: #e2e8f0;
+}

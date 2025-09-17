@@ -241,7 +241,7 @@ const Login: React.FC = () => {
             name="login_form"
             initialValues={{ remember: rememberMe }}
             onFinish={onLogin}
-            className="form"
+            className="form gap-3"
           >
             <Row className="form-field">
               <span>Email</span>
