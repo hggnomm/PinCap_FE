@@ -7,7 +7,8 @@ import { LogoIcon } from "../../assets/img";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MailOutlined, CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
-
+import { ROUTES } from "../../constants/routes"
+import "./index.less"
 // List of common passwords to disallow
 const commonPasswords = ["123456", "password", "admin", "qwerty", "welcome", "123456789", "12345678", "111111", "abc123"];
 
@@ -25,7 +26,7 @@ const Register = () => {
   const [isResending, setIsResending] = useState(false);
 
   const onSwitchLogin = () => {
-    navigate("/login");
+    navigate(ROUTES.LOGIN);
   };
 
   // Calculate password strength score and feedback
@@ -159,7 +160,7 @@ const Register = () => {
             transition={{ duration: 1, ease: "easeInOut" }}
             src={LogoIcon}
             style={{ width: "10%", cursor: "pointer" }}
-            onClick={() => navigate("/home")}
+            onClick={() => navigate(ROUTES.HOME)}
           />
         </Row>
         <Row className="text-header">

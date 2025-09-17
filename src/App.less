@@ -1,5 +1,10 @@
 
 .App {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
   .main-container {
     margin-top: 70px;
     min-height: calc(100vh - 70px);
@@ -28,14 +33,24 @@ button {
   }
 }
 
-* {
-  margin: 0;
-  padding: 0;
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-body {
+/* Only reset margin/padding for specific elements, not all */
+body,
+h1, h2, h3, h4, h5, h6,
+p,
+figure,
+blockquote,
+dl, dd {
   margin: 0;
+  padding: 0;
+}
+
+body {
   font-family: "Roboto", sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

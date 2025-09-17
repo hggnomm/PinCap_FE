@@ -12,6 +12,7 @@ import { addToken } from "../../store/authSlice";
 import { motion } from "framer-motion";
 import { LoginRequest } from "Auth/LoginRequest";
 import "./index.less";
+import { ROUTES } from "../../constants/routes"
 
 interface LoginFormValues {
   email: string;
@@ -102,14 +103,14 @@ const Login: React.FC = () => {
   };
 
   const onSwitchCreate = () => {
-    navigate("/register");
+    navigate(ROUTES.REGISTER);
   };
 
   const handleLoginSuccess = (data: LoginRequest) => {
     localStorage.setItem("token", data.token || "");
     dispatch(addToken(data.token || ""));
     resetLoginAttempts();
-    navigate("/home");
+    navigate(ROUTES.HOME);
   };
 
   const formatRemainingTime = (seconds: number) => {
@@ -148,7 +149,7 @@ const Login: React.FC = () => {
         }
 
         resetLoginAttempts();
-        navigate("/home");
+        navigate(ROUTES.HOME);
       } else {
         // Handle failed login attempt
         const attempts =
@@ -216,7 +217,7 @@ const Login: React.FC = () => {
             transition={{ duration: 1, ease: "easeInOut" }}
             src={LogoIcon}
             style={{ width: "10%", cursor: "pointer" }}
-            onClick={() => navigate("/home")}
+            onClick={() => navigate(ROUTES.HOME)}
           />
         </Row>
         <Row className="text-header">

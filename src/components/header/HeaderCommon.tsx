@@ -82,7 +82,7 @@ const HeaderCommon = () => {
   const isAuthenticated = tokenPayload?.id || localStorage.getItem("token");
 
   return (
-    <Row className="main-header">
+    <Row className="main-header !z-50">
       <Col
         className="left-header"
         onClick={() => (isAuthenticated ? navigate(ROUTES.PINCAP_HOME) : navigate(ROUTES.LOGIN))}
@@ -127,7 +127,7 @@ const HeaderCommon = () => {
 
             <Space direction="vertical" className="logo-avatar">
               <Dropdown
-                menu={{ items: menuItems }}
+                menu={{ items: menuItems as any }}
                 placement="bottomRight"
                 trigger={["click"]}
                 className="dropdown_item"
