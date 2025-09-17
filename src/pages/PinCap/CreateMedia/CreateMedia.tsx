@@ -7,7 +7,7 @@ import {
   getDetailMedia,
   getMyMedias,
   updatedMedia,
-} from "../../../api/media";
+} from "@/api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

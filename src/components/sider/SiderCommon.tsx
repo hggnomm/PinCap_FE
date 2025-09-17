@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "./index.less";
-import iconAI from "../../assets/img/PinCap/ai-technology-img.png";
+import iconAI from "@/assets/img/PinCap/ai-technology-img.png";
 import styled from "styled-components";
 
 const CreateMediaBtn = styled(Menu.Item)`

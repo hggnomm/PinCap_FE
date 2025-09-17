@@ -11,6 +11,7 @@
     "moduleResolution": "node",                    /* Use Node's module resolution algorithm. */
     "baseUrl": "./",                              /* Base directory to resolve non-relative module names. */
     "paths": {
+      "@/*": ["src/*"],                           /* @ alias for src directory */
       "*": ["node_modules/*", "src/types/*"]      /* Customize module resolution. */
     },
     "typeRoots": [

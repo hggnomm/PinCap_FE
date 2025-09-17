@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Select, Checkbox, Space } from 'antd';
-import { useFormValidation } from '../../hooks/useFormValidation';
-import { loginSchema, LoginFormData } from '../../validation';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { loginSchema, LoginFormData } from '@/validation';
 import ValidationError from '../ValidationError/ValidationError';
 
 const FormExample: React.FC = () => {

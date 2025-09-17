@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import "./DetailAlbum.less";
 import { useLocation, useNavigate } from "react-router";
-import MediaList from "../../../components/viewPin/ViewPinComponent";
+import MediaList from "@/components/viewPin/ViewPinComponent";
 import {
   deleteMyAlbum,
   getDetailAlbum,
   updateMyAlbum,
-} from "../../../api/album";
+} from "@/api/album";
 import { Album } from "type";
 import { toast } from "react-toastify";
-import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import { LockFilled, MoreOutlined, PlusOutlined } from "@ant-design/icons/lib";
-import ModalComponent from "../../../components/modal/ModalComponent";
+import ModalComponent from "@/components/modal/ModalComponent";
 import { Form, Input } from "antd";
-import FieldItem from "../../../components/form/fieldItem/FieldItem";
-import CheckboxWithDescription from "../../../components/form/checkbox/CheckBoxComponent";
+import FieldItem from "@/components/form/fieldItem/FieldItem";
+import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
 import { UpdateAlbumRequest } from "Album/AlbumRequest";
-import Loading from "../../../components/loading/Loading";
+import Loading from "@/components/loading/Loading";
 
 const DetailAlbum = () => {
   const location = useLocation();

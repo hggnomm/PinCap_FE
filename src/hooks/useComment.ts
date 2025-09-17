@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as comments from '../api/comments';
+import * as comments from '@/api/comments';
 
 export const useComment = () => {
   const queryClient = useQueryClient();

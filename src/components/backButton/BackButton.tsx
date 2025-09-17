@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import back from "../../assets/img/PinCap/back.png";
+import back from "@/assets/img/PinCap/back.png";
 import "./BackButton.less";
 
 const BackButton = () => {

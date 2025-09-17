@@ -1,7 +1,7 @@
 import { Collapse } from "antd";
 import React from "react";
-import { formatTime } from "../../../../utils/utils";
-import { Media } from "../../../../types/type";
+import { formatTime } from "@/utils/utils";
+import { Media } from "@/types/type";
 import "./ListComments.less";
 
 const ListComments = ({ media }: { media: Media }) => {

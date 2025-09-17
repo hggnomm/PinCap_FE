@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { getDetailMedia } from "../../../api/media";
+import { getDetailMedia } from "@/api/media";
 import { Divider } from "antd/es";
 import { Media } from "type";
-import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import { EllipsisOutlined } from "@ant-design/icons/lib";
-import ModalComponent from "../../../components/modal/ModalComponent";
+import ModalComponent from "@/components/modal/ModalComponent";
 import { toast } from "react-toastify";
 
 interface DraftMediaProps {

@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import * as auth from '../api/auth';
-import { ROUTES } from '../constants/routes';
-import { LoginFormData, RegisterFormData } from '../validation';
+import * as auth from '@/api/auth';
+import { ROUTES } from '@/constants/routes';
+import { LoginFormData, RegisterFormData } from '@/validation';
 
 export const useAuth = () => {
   const queryClient = useQueryClient();

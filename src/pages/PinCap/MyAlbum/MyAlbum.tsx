@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import "./MyAlbum.less";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
-import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
-import { createMyAlbum, getMyAlbumData } from "../../../api/album";
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
+import { createMyAlbum, getMyAlbumData } from "@/api/album";
 import { Album } from "type";
 import { useNavigate } from "react-router";
-import ModalComponent from "../../../components/modal/ModalComponent";
+import ModalComponent from "@/components/modal/ModalComponent";
 import { Col, Form, Input, Row } from "antd";
-import FieldItem from "../../../components/form/fieldItem/FieldItem";
-import CheckboxWithDescription from "../../../components/form/checkbox/CheckBoxComponent";
+import FieldItem from "@/components/form/fieldItem/FieldItem";
+import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
 import { CreateAlbumRequest } from "Album/AlbumRequest";
 import { toast } from "react-toastify";
-import Loading from "../../../components/loading/Loading";
+import Loading from "@/components/loading/Loading";
 import AlbumCard from "./AlbumCard/AlbumCard";
 
 const MyAlbum = () => {

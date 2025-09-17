@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { decodedToken } from '../../utils/utils';
-import { ROUTES } from '../../constants/routes';
+import { decodedToken } from '@/utils/utils';
+import { ROUTES } from '@/constants/routes';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 interface ProtectedRouteProps {

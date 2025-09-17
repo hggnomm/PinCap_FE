@@ -1,8 +1,8 @@
 import { motion, useScroll, useTransform } from "framer-motion"
 import { ArrowRight, Sparkles, ImageIcon, Video, Zap } from "lucide-react"
 import { useRef } from "react"
-import videoPinCapAI from "../../assets/videos/VideoPinCapAI.mp4"
-import { ROUTES } from "../../constants/routes"
+import videoPinCapAI from "@/assets/videos/VideoPinCapAI.mp4"
+import { ROUTES } from "@/constants/routes"
 import { useNavigate } from "react-router-dom"
 
 const fadeInUp = {

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as media from '../api/media';
-import { CreateMediaFormData, UpdateMediaFormData } from '../validation';
+import * as media from '@/api/media';
+import { CreateMediaFormData, UpdateMediaFormData } from '@/validation';
 
 export const useMedia = () => {
   const queryClient = useQueryClient();

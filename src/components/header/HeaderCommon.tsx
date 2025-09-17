@@ -14,12 +14,12 @@ import {
 import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import Notification from "../notification";
-import { LogoIcon, TextIcon } from "../../assets/img";
-import iconChatbot from "../../assets/img/PinCap/chatbot.png";
+import { LogoIcon, TextIcon } from "@/assets/img";
+import iconChatbot from "@/assets/img/PinCap/chatbot.png";
 import Chatbot from "../chatbot";
-import { addToken } from "../../store/authSlice";
+import { addToken } from "@/store/authSlice";
 import "./index.less";
-import { ROUTES } from "../../constants/routes";
+import { ROUTES } from "@/constants/routes";
 
 interface UserInfo {
   name: string;

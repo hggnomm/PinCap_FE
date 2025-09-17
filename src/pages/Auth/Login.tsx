@@ -3,16 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { notification, Checkbox, Col, Row, Form, Input, Button } from "antd";
 import { useDispatch } from "react-redux";
 
-import LoginImage from "../../assets/img/PinCap/login_page_image.jpg";
-import { LogoIcon } from "../../assets/img";
-import GoogleIcon from "../../assets/img/PinCap/googleIcon.png";
+import LoginImage from "@/assets/img/PinCap/login_page_image.jpg";
+import { LogoIcon } from "@/assets/img";
+import GoogleIcon from "@/assets/img/PinCap/googleIcon.png";
 import Title from "antd/es/typography/Title";
-import { login } from "../../api/auth";
-import { addToken } from "../../store/authSlice";
+import { login } from "@/api/auth";
+import { addToken } from "@/store/authSlice";
 import { motion } from "framer-motion";
 import { LoginRequest } from "Auth/LoginRequest";
 import "./index.less";
-import { ROUTES } from "../../constants/routes"
+import { ROUTES } from "@/constants/routes"
 
 interface LoginFormValues {
   email: string;

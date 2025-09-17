@@ -6,8 +6,8 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { addMessage, setTyping } from "../../store/chatSlice";
+import { RootState } from "@/store/store";
+import { addMessage, setTyping } from "@/store/chatSlice";
 import "./index.less";
 import { CloseCircleOutlined } from "@ant-design/icons";
 

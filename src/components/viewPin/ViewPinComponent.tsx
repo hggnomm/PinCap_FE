@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./ViewPinComponent.less";
-import PinMedia from "../../pages/PinCap/PinMedia/PinMedia";
-import Loading from "../../components/loading/Loading";
+import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
+import Loading from "@/components/loading/Loading";
 import { motion } from "framer-motion";
 import { Media } from "type";
 import { useInfiniteQuery } from "@tanstack/react-query";

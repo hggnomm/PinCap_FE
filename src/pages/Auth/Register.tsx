@@ -1,13 +1,13 @@
 import { Button, Col, Form, Input, notification, Row, Progress } from "antd";
-import { register } from "../../api/auth";
+import { register } from "@/api/auth";
 import React, { useState } from "react";
 import Title from "antd/es/typography/Title";
-import RegisterImage from "../../assets/img/PinCap/register_page_image.jpg";
-import { LogoIcon } from "../../assets/img";
+import RegisterImage from "@/assets/img/PinCap/register_page_image.jpg";
+import { LogoIcon } from "@/assets/img";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MailOutlined, CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
-import { ROUTES } from "../../constants/routes"
+import { ROUTES } from "@/constants/routes"
 import "./index.less"
 // List of common passwords to disallow
 const commonPasswords = ["123456", "password", "admin", "qwerty", "welcome", "123456789", "12345678", "111111", "abc123"];

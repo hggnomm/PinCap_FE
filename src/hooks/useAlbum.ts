@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as album from '../api/album';
-import { CreateAlbumFormData, UpdateAlbumFormData } from '../validation';
+import * as album from '@/api/album';
+import { CreateAlbumFormData, UpdateAlbumFormData } from '@/validation';
 
 export const useAlbum = () => {
   const queryClient = useQueryClient();

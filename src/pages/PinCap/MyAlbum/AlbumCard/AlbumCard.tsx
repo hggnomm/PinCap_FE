@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import "./AlbumCard.less";
 import { EditFilled, LockFilled } from "@ant-design/icons";
 import { Album } from "type";
-import ModalComponent from "../../../../components/modal/ModalComponent";
+import ModalComponent from "@/components/modal/ModalComponent";
 import { Form, Input } from "antd";
 import { toast } from "react-toastify";
-import FieldItem from "../../../../components/form/fieldItem/FieldItem";
-import CheckboxWithDescription from "../../../../components/form/checkbox/CheckBoxComponent";
+import FieldItem from "@/components/form/fieldItem/FieldItem";
+import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
 import { UpdateAlbumRequest } from "Album/AlbumRequest";
-import { deleteMyAlbum, updateMyAlbum } from "../../../../api/album";
+import { deleteMyAlbum, updateMyAlbum } from "@/api/album";
 import { useNavigate } from "react-router";
 
 interface AlbumCardProps {

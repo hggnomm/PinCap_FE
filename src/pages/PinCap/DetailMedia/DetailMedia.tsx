@@ -4,25 +4,25 @@ import {
   getAllMedias,
   getDetailMedia,
   mediaReactions,
-} from "../../../api/media";
+} from "@/api/media";
 
 import { DownOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
-import download from "../../../assets/img/PinCap/download.png";
-import more from "../../../assets/img/PinCap/more.png";
+import download from "@/assets/img/PinCap/download.png";
+import more from "@/assets/img/PinCap/more.png";
 import { Dropdown, Input, Menu, notification } from "antd";
-import Loading from "../../../components/loading/Loading";
+import Loading from "@/components/loading/Loading";
 
 import "./index.less";
-import { addMediasToAlbum, getMyAlbumData } from "../../../api/album";
-import { followOrBlockUser, unfollowOrUnblockUser } from "../../../api/users";
-import { Album, Media } from "../../../types/type";
-import { FeelingType, getImageReactionWithId } from "../../../utils/utils";
+import { addMediasToAlbum, getMyAlbumData } from "@/api/album";
+import { followOrBlockUser, unfollowOrUnblockUser } from "@/api/users";
+import { Album, Media } from "@/types/type";
+import { FeelingType, getImageReactionWithId } from "@/utils/utils";
 import Comment from "./Comment/Comment";
 import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
-import BackButton from "../../../components/backButton/BackButton";
-import MediaList from "../../../components/viewPin/ViewPinComponent";
+import BackButton from "@/components/backButton/BackButton";
+import MediaList from "@/components/viewPin/ViewPinComponent";
 import ListComments from "./ListComments/ListComments";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";

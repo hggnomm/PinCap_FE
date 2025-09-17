@@ -14,15 +14,15 @@ import React, { useEffect, useState } from "react";
 import "./index.less";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, FreeMode, Pagination } from "swiper/modules";
-import Image1 from "../../../assets/img/ImagesAI/img1.png";
-import Image2 from "../../../assets/img/ImagesAI/img2.png";
-import Image3 from "../../../assets/img/ImagesAI/img3.png";
-import Image4 from "../../../assets/img/ImagesAI/img4.png";
-import Image5 from "../../../assets/img/ImagesAI/img5.png";
+import Image1 from "@/assets/img/ImagesAI/img1.png";
+import Image2 from "@/assets/img/ImagesAI/img2.png";
+import Image3 from "@/assets/img/ImagesAI/img3.png";
+import Image4 from "@/assets/img/ImagesAI/img4.png";
+import Image5 from "@/assets/img/ImagesAI/img5.png";
 import { motion } from "framer-motion";
-import { options, sizeOptions } from "../../../utils/options";
-import { createAIImage } from "../../../api/ai";
-import Loading from "../../../components/loading/Loading";
+import { options, sizeOptions } from "@/utils/options";
+import { createAIImage } from "@/api/ai";
+import Loading from "@/components/loading/Loading";
 
 interface IRequest {
   textInput: string;

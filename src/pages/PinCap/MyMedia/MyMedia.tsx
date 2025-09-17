@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "./MyMedia.less";
-import ButtonCircle from "../../../components/buttonCircle/ButtonCircle";
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
-import MediaList from "../../../components/viewPin/ViewPinComponent";
-import { getMyMedias } from "../../../api/media";
+import MediaList from "@/components/viewPin/ViewPinComponent";
+import { getMyMedias } from "@/api/media";
 import { useNavigate } from "react-router";
 
 const MyMedia = () => {
