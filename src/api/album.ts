@@ -55,7 +55,8 @@ export const addMediasToAlbum = async (request: any) => {
     const res = await apiClient.post("/api/albums/add-medias", request);
     return res.data;
   } catch (error) {
-    return error;
+    console.log(error);
+    throw error;
   }
 };
 

@@ -6,17 +6,16 @@ import {
   mediaReactions,
 } from "@/api/media";
 
-import { DownOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import download from "@/assets/img/PinCap/download.png";
 import more from "@/assets/img/PinCap/more.png";
-import { Dropdown, Input, Menu, notification } from "antd";
+import { notification } from "antd";
 import Loading from "@/components/loading/Loading";
+import AlbumDropdown from "@/components/albumDropdown";
 
 import "./index.less";
-import { addMediasToAlbum, getMyAlbumData } from "@/api/album";
 import { followOrBlockUser, unfollowOrUnblockUser } from "@/api/users";
-import { Album, Media } from "@/types/type";
+import { Media } from "@/types/type";
 import { FeelingType, getImageReactionWithId } from "@/utils/utils";
 import Comment from "./Comment/Comment";
 import { useSelector } from "react-redux";
@@ -32,13 +31,10 @@ interface TokenPayload {
 
 const DetailMedia = () => {
   const [media, setMedia] = useState<Media | null>(null);
-  const [albumData, setAlbumData] = useState<Album[]>([]);
-  const [filteredAlbumData, setFilteredAlbumData] = useState<Album[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   const id = location.state?.mediaId;
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
 
 
@@ -57,39 +53,12 @@ const DetailMedia = () => {
     }
   };
 
-  const fetchAlbumData = async () => {
-    try {
-      const response = await getMyAlbumData();
-      if (response && response.data) {
-        setAlbumData(response.data); // Set all album data
-        setFilteredAlbumData(response.data); // Initially show all albums
-      }
-    } catch (error) {
-      setError("Lỗi khi tải album: " + error);
-    }
-  };
-
   useEffect(() => {
     if (id) {
       window.scrollTo(0, 0);
       fetchMediaDetail(id);
     }
   }, [id]);
-
-  useEffect(() => {
-    fetchAlbumData();
-  }, []);
-
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-
-    const normalizedSearchTerm = value.toLowerCase();
-
-    const filteredAlbums = albumData.filter(
-      (album) => album.album_name.toLowerCase().includes(normalizedSearchTerm) //
-    );
-    setFilteredAlbumData(filteredAlbums);
-  };
 
   const handleWithOwnerUser = async () => {
     const request = "FOLLOWING";
@@ -195,82 +164,7 @@ const DetailMedia = () => {
     }
   };
 
-  const [api, contextHolder] = notification.useNotification();
 
-  const handleSaveMediaInAlbum = async (
-    albumId: string,
-    album_name: string
-  ) => {
-    try {
-      const request = {
-        album_id: albumId,
-        medias_id: [id],
-      };
-      const response = await addMediasToAlbum(request);
-
-      if (response.status === 422) {
-        api.warning({
-          message: `Cannot save media`,
-          description:
-            response.message ||
-            "This media is already associated with this album.",
-          placement: "top",
-        });
-      } else {
-        api.success({
-          message: "Success",
-          description: `Media has been successfully saved to ${album_name}.`,
-          placement: "top",
-        });
-      }
-    } catch (error) {
-      api.error({
-        message: "Error",
-        description: `Failed to save media to ${album_name}. Please try again.`,
-        placement: "top",
-      });
-    }
-  };
-
-  const albumMenu = (
-    <>
-      {contextHolder}
-      <div className="menu-album">
-        <div className="top-menu-album">
-          <span>Album</span>
-        </div>
-        <Input
-          placeholder="Search album..."
-          allowClear
-          onChange={(e) => handleSearch(e.target.value)} // Khi gõ trực tiếp
-          className="search-album"
-          value={searchTerm} // Đồng bộ hóa giá trị tìm kiếm
-        />
-        <Menu className="list-album">
-          {filteredAlbumData.map((album) => (
-            <Menu.Item className="item-album" key={album.id}>
-              <div className="album-info">
-                <div className="img-album">
-                  {album.image_cover && (
-                    <img src={album.image_cover} alt={album.album_name} />
-                  )}
-                </div>
-                <span>{album.album_name}</span>
-              </div>
-              <button
-                className="save-button"
-                onClick={() =>
-                  handleSaveMediaInAlbum(album.id, album.album_name)
-                }
-              >
-                <p>Save</p>
-              </button>
-            </Menu.Item>
-          ))}
-        </Menu>
-      </div>
-    </>
-  );
 
   return (
     <Loading isLoading={loading} error={error}>
@@ -325,21 +219,24 @@ const DetailMedia = () => {
                     <img src={more} alt="more" />
                   </button>
                 </div>
-                <div className="action-right">
-                  <Dropdown
-                    overlay={albumMenu} // Pass the dynamically fetched album data to the dropdown
-                    placement="bottomLeft"
-                    trigger={["click"]}
-                    onOpenChange={fetchAlbumData} // Fetch album data when the dropdown is clicked
-                    className="dropdown_item"
-                  >
-                    <button className="album">
-                      Album
-                      <DownOutlined
-                        style={{ marginLeft: "5px", fontWeight: "600" }}
-                      />
-                    </button>
-                  </Dropdown>
+                <div className="action-right flex">
+                  <AlbumDropdown
+                    mediaId={id}
+                    componentId={`detail-media-${id}`}
+                    position="bottom-left"
+                    trigger={
+                      <button className="album">
+                        Album
+                        <svg 
+                          className="inline-block ml-1 w-4 h-4" 
+                          fill="currentColor" 
+                          viewBox="0 0 20 20"
+                        >
+                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    }
+                  />
 
                   <button className="save">Save</button>
                 </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal } from "antd";
+import clsx from "clsx";
 import "./ModalComponent.less";
 
 interface ModalComponentProps {
@@ -13,6 +14,8 @@ interface ModalComponentProps {
     cancelLabel?: string;
   };
   children: React.ReactNode;
+  className?: string;
+  bodyClassName?: string;
 }
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
@@ -23,11 +26,13 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   onConfirm,
   buttonLabels = { confirmLabel: "Confirm", cancelLabel: "Close" },
   children,
+  className,
+  bodyClassName,  
 }) => {
   return (
     <Modal
       title={titleDefault}
-      className="modal-component"
+      className={clsx("modal-component", className)}
       centered
       open={visible}
       onCancel={onCancel}
@@ -49,7 +54,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
         </div>
       )}
 
-      <div className="modal-body">{children}</div>
+      <div className={clsx("modal-body", bodyClassName)}>{children}</div>
     </Modal>
   );
 };

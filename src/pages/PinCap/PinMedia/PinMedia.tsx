@@ -17,6 +17,7 @@ import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
+import AlbumDropdown from "@/components/albumDropdown";
 
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
@@ -48,6 +49,9 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     if (modalVisible && isFirstOpen) {
@@ -135,18 +139,24 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     }
   };
 
+
   return (
     <>
       <motion.div
         className="box"
-        onClick={() =>
-          navigate(`/media/${data?.id}`, { state: { mediaId: data?.id } })
-        }
+        onClick={() => {
+          // Block navigation when modal is open
+          if (!modalOpen) {
+            navigate(`/media/${data?.id}`, { state: { mediaId: data?.id } });
+          }
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 1 }}
         style={{ position: "relative", overflow: "hidden" }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
       >
         {data?.type === "VIDEO" ? (
           <video autoPlay loop muted>
@@ -168,7 +178,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             top: 0,
             left: 0,
             right: 0,
-            bottom: 3,
+            bottom: 5,
             backgroundColor: "rgba(0, 0, 0, 0.4)",
             opacity: 0,
             transition: "opacity 0.3s",
@@ -176,14 +186,6 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             borderRadius: "15px",
           }}
         >
-          <div
-            className="save-button right-top"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent event propagation when the button is clicked
-            }}
-          >
-            <p>Save</p>
-          </div>
           {isEditMedia && (
             <div
               className="right-bottom circle-button"
@@ -196,6 +198,25 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             </div>
           )}
         </motion.div>
+        
+        {/* AlbumDropdown positioned outside overlay to avoid opacity issues */}
+        {(isHovered || dropdownOpen) && (
+          <AlbumDropdown
+            mediaId={data.id}
+            componentId={`pin-media-${data.id}`}
+            position="bottom-right"
+            className="absolute top-2 right-2 z-10"
+            onOpen={() => setDropdownOpen(true)}
+            onClose={() => setDropdownOpen(false)}
+            onModalOpen={() => setModalOpen(true)}
+            onModalClose={() => setModalOpen(false)}
+            trigger={
+              <div className="save-button right-top">
+                <p>Save</p>
+              </div>
+            }
+          />
+        )}
       </motion.div>
 
       {/* MODAL */}

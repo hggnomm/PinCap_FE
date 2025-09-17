@@ -37,8 +37,8 @@ import { useInView } from "react-intersection-observer";
  * - enabled: Boolean để enable/disable query (default: true)
  */
 interface MediaListProps {
-  queryKey: string[];
-  queryFn: (pageParam: number) => Promise<Media[]>;
+  queryKey?: string[];
+  queryFn?: (pageParam: number) => Promise<Media[]>;
   medias?: Media[];
   isEditMedia?: boolean;
   enabled?: boolean;
@@ -64,14 +64,14 @@ const MediaList: React.FC<MediaListProps> = ({
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey,
-    queryFn: ({ pageParam }) => queryFn(pageParam),
+    queryKey: queryKey || [],
+    queryFn: ({ pageParam }) => queryFn?.(pageParam) || Promise.resolve([]),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const nextPage = lastPage.length ? allPages.length + 1 : undefined;
       return nextPage;
     },
-    enabled: !propMedias && enabled,
+    enabled: !propMedias && enabled && !!queryKey && !!queryFn,
   });
 
   useEffect(() => {

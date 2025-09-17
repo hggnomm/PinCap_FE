@@ -2,56 +2,73 @@
 alwaysApply: true
 ---
 
-# Rule: Tailwind-only cursor
+# Rule: Tailwind-only styling with clsx
 
 - **ID:** react19-tailwind-cursor
 - **Scope:** src/**/*.tsx, src/**/*.jsx
 - **Description:**  
-  Enforce that all cursor styles use Tailwind utility classes (`cursor-pointer`, `cursor-wait`, etc.).
-  ❌ No inline `style={{ cursor: ... }}`  
-  ❌ No raw CSS `cursor:` declarations  
-  ✅ Always prefer Tailwind `cursor-*` utilities.
+  Enforce that ALL styles use Tailwind utility classes with clsx for dynamic classes.
+  ❌ No inline `style={{ cursor: ... }}` or any inline styles
+  ❌ No raw CSS files or CSS-in-JS  
+  ❌ No .less/.scss files for new components
+  ✅ Always use Tailwind utilities with clsx for conditional classes
 
 ## Checks
 
-### ❌ Inline style
-- Pattern: `style={{*cursor*}}`
-- Message: "Do not use inline cursor styles. Use Tailwind cursor-* utilities instead."
+### ❌ Inline styles (any property)
+- Pattern: `style={{.*}}`
+- Message: "Do not use inline styles. Use Tailwind utilities with clsx instead."
 - Severity: error
 
-### ❌ Raw CSS
-- Pattern: `cursor:`
-- Where: `*.css`
-- Message: "Do not set cursor in raw CSS. Use Tailwind cursor-* utilities instead."
+### ❌ Raw CSS/LESS files
+- Pattern: `import.*\.less|import.*\.css|import.*\.scss`
+- Message: "Do not import CSS/LESS files. Use Tailwind utilities with clsx instead."
 - Severity: error
 
-### ✅ Encourage Tailwind
-- Pattern: `className=*`
-- Message: "Use Tailwind cursor-* utilities (e.g. cursor-pointer, cursor-grab)."
+### ❌ CSS declarations in files
+- Pattern: `cursor:|background:|color:|margin:|padding:`
+- Where: `*.css, *.less, *.scss`
+- Message: "Do not write CSS declarations. Use Tailwind utilities instead."
+- Severity: error
+
+### ✅ Encourage Tailwind with clsx
+- Pattern: `className=`
+- Message: "Use Tailwind utilities. For dynamic classes, use clsx(). Example: className={clsx('base-class', { 'conditional-class': condition })}"
+- Severity: info
+
+### ✅ Clsx for conditional styling
+- Message: "For conditional classes: import clsx from 'clsx' and use className={clsx('base', { 'active': isActive })}"
 - Severity: info
 
 ---
 
-# Rule: Use Tailwind Color Tokens
+# Rule: Tailwind Color Tokens Only
 
 - **ID:** react19-tailwind-colors
-- **Scope:** src/**/*.tsx, src/**/*.jsx
+- **Scope:** src/**/*.tsx, src/**/*.jsx, src/**/*.css, src/**/*.less
 - **Description:**  
-  Enforce using Tailwind color utilities instead of hardcoded colors.
-  ❌ No hardcoded hex colors `#a25772`  
+  Enforce using ONLY Tailwind color utilities. No hardcoded colors anywhere.
+  ❌ No hardcoded hex colors `#a25772` anywhere
   ❌ No inline color styles `style={{ color: '#...' }}`  
-  ✅ Always use Tailwind color utilities or CSS custom properties.
+  ❌ No CSS color declarations
+  ✅ Use Tailwind color utilities with clsx for dynamic colors
 
 ## Checks
 
-### ❌ Hardcoded hex colors
+### ❌ Hardcoded hex colors (anywhere)
 - Pattern: `#[0-9a-fA-F]{3,6}`
-- Message: "Use Tailwind color utilities instead of hardcoded hex colors."
-- Severity: warning
+- Message: "NEVER use hardcoded hex colors. Use Tailwind color utilities instead."
+- Severity: error
 
-### ❌ Inline color styles
-- Pattern: `style={{.*color.*#[0-9a-fA-F]{3,6}.*}}`
-- Message: "Use Tailwind color utilities instead of inline color styles."
+### ❌ Inline color styles  
+- Pattern: `style={{.*color.*}}`
+- Message: "Do not use inline color styles. Use Tailwind color utilities with clsx instead."
+- Severity: error
+
+### ❌ CSS color properties
+- Pattern: `color:|background-color:|border-color:`
+- Where: `*.css, *.less, *.scss`
+- Message: "Do not set colors in CSS. Use Tailwind color utilities instead."
 - Severity: error
 
 ### ✅ PinCap Brand Colors (Recommended)
