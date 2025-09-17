@@ -151,6 +151,7 @@ const MyAlbum = () => {
         onCancel={handleCancel}
         onConfirm={handleConfirm}
         buttonLabels={{ confirmLabel: "Create", cancelLabel: "Cancel" }}
+        className="!w-[600px]"
       >
         <div className="create-album">
           <Form form={form} layout="vertical">

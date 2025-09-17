@@ -10,13 +10,11 @@ import {
 import { Album } from "type";
 import { toast } from "react-toastify";
 import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import { LockFilled, MoreOutlined, PlusOutlined } from "@ant-design/icons/lib";
-import ModalComponent from "@/components/modal/ModalComponent";
-import { Form, Input } from "antd";
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
+import { LockFilled, MoreOutlined } from "@ant-design/icons/lib";
 import { UpdateAlbumRequest } from "Album/AlbumRequest";
 import Loading from "@/components/loading/Loading";
+import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
+import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";
 
 const DetailAlbum = () => {
   const location = useLocation();
@@ -25,12 +23,10 @@ const DetailAlbum = () => {
   const [error, setError] = useState<string | null>(null);
   const [albumData, setAlbumData] = useState<Album | null>(null);
   const [isFetchData, setIsFetchData] = useState<boolean>(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false); // Modal confirm delete
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const navigate = useNavigate();
-
-  const [privacy, setPrivacy] = useState(false);
-  const [form] = Form.useForm();
 
   useEffect(() => {
     if (albumId) {
@@ -41,22 +37,6 @@ const DetailAlbum = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (modalVisible) {
-      form.resetFields(); // Reset form fields each time the modal is opened
-      if (albumData) {
-        setPrivacy(albumData.privacy === "PRIVATE"); // Set privacy based on album's current privacy status
-
-        form.setFieldsValue({
-          album_name: albumData.album_name, // Set the album name in the form
-        });
-      }
-    }
-  }, [modalVisible, albumData, form]);
-
-  const handleCancel = () => {
-    setModalVisible(false);
-  };
 
   const fetchDetailAlbums = async () => {
     setLoading(true);
@@ -76,55 +56,39 @@ const DetailAlbum = () => {
     }
   };
 
-  const handleConfirm = async () => {
+  const handleEditAlbum = async (albumRequest: UpdateAlbumRequest) => {
     try {
-      const formValues = await form.validateFields();
-      const albumRequest: UpdateAlbumRequest = {
-        album_name: formValues.album_name,
-        privacy: privacy ? "0" : "1",
-      };
-
-      console.log("Album Request:", albumRequest);
-      setModalVisible(false);
-
       const response = await updateMyAlbum(albumId, albumRequest);
-
       if (response) {
+        setEditModalVisible(false);
         fetchDetailAlbums();
+        toast.success("Album updated successfully!");
       }
     } catch (error) {
-      console.error("Validation failed:", error);
-      toast.error(
-        "Validation failed: Please check the form fields and try again."
-      );
+      console.error("Update failed:", error);
+      toast.error("Failed to update album. Please try again.");
     }
   };
-  const handlePrivacyChange = (e: any) => {
-    setPrivacy(e.target.checked);
-  };
 
-  const handleDeleteAction = () => {
-    setDeleteModalVisible(true); // Mở modal xác nhận xóa
-    setModalVisible(false); // Ẩn modal chính
-  };
-
-  const deleteAlbum = async () => {
+  const handleDeleteAlbum = async () => {
     try {
       const response = await deleteMyAlbum(albumId);
-
       if (response) {
-        handleCancel();
+        setDeleteModalVisible(false);
         navigate("/album");
-        toast.success("Album deleted successfully!"); // Hiển thị thông báo thành công
+        toast.success("Album deleted successfully!");
       } else {
         toast.error("Failed to delete the album. Please try again.");
       }
     } catch (error) {
       console.error("Error deleting album:", error);
-      toast.error(
-        "An error occurred while deleting the album. Please try again."
-      );
+      toast.error("An error occurred while deleting the album. Please try again.");
     }
+  };
+
+  const handleInviteCollaborators = () => {
+    setInviteModalVisible(false);
+    toast.info("Invite functionality will be implemented later");
   };
   return (
     <Loading isLoading={loading} error={error}>
@@ -143,6 +107,10 @@ const DetailAlbum = () => {
             {albumData?.description && (
               <p className="album_description">{albumData?.description}</p>
             )}
+            
+            <CollaboratorsSection
+              onAddCollaborator={() => setInviteModalVisible(true)}
+            />
           </div>
           <div>
             <ButtonCircle
@@ -162,7 +130,7 @@ const DetailAlbum = () => {
                   key: "1",
                   title: "Edit Album",
                   onClick: () => {
-                    setModalVisible(true);
+                    setEditModalVisible(true);
                   },
                 },
               ]}
@@ -177,74 +145,39 @@ const DetailAlbum = () => {
 
         {isFetchData && <MediaList medias={albumData?.medias} isEditMedia />}
 
-        <ModalComponent
-          title="Edit Your Album"
-          visible={modalVisible}
-          onCancel={handleCancel}
-          onConfirm={handleConfirm}
-          buttonLabels={{ confirmLabel: "Update", cancelLabel: "Cancel" }}
-        >
-          <div className="create-album">
-            <Form form={form} layout="vertical">
-              <FieldItem
-                label="Name"
-                name="album_name"
-                rules={[
-                  { required: true, message: "Please input the album title!" },
-                ]}
-                placeholder="Like 'Places to Go' or 'Recipes to Make'"
-              >
-                <Input />
-              </FieldItem>
+        {/* Edit Album Modal */}
+        <EditAlbumModal
+          visible={editModalVisible}
+          album={albumData}
+          onCancel={() => setEditModalVisible(false)}
+          onConfirm={handleEditAlbum}
+          onDeleteClick={() => {
+            setEditModalVisible(false);
+            setDeleteModalVisible(true);
+          }}
+          onInviteCollaborators={() => {
+            setEditModalVisible(false);
+            setInviteModalVisible(true);
+          }}
+        />
 
-              <CheckboxWithDescription
-                title="Keep this album private"
-                description="So only you and collaborator can see it."
-                value={privacy}
-                onChange={handlePrivacyChange}
-                name="privacy"
-              />
-            </Form>
-            {/* Phần xóa album */}
-            <div className="delete-action" onClick={handleDeleteAction}>
-              <p className="title-delele">Delete album</p>
-              <p className="des-delete">
-                You have 7 days to restore a deleted Album. After that, it will
-                be permanently deleted.
-              </p>
-            </div>
-          </div>
-        </ModalComponent>
-
-        {/* Modal xác nhận xóa album */}
-        <ModalComponent
-          titleDefault="Delete this album?"
+        {/* Delete Album Modal */}
+        <DeleteAlbumModal
           visible={deleteModalVisible}
-          onCancel={handleCancel}
-          onConfirm={deleteAlbum}
-          buttonLabels={{ confirmLabel: "Delete", cancelLabel: "Cancel" }}
-        >
-          <div
-            style={{
-              marginBottom: 20,
-              marginTop: 20,
-            }}
-          >
-            Are you sure you want to delete this album
-            <p
-              style={{
-                fontWeight: 500,
-                fontSize: "1.1em",
-                display: "inline",
-                marginRight: "5px",
-                marginLeft: "5px",
-              }}
-            >
-              {albumData?.album_name}?
-            </p>
-            This action cannot be undone.
-          </div>
-        </ModalComponent>
+          album={albumData}
+          onCancel={() => {
+            setDeleteModalVisible(false);
+            setEditModalVisible(true);
+          }}
+          onConfirm={handleDeleteAlbum}
+        />
+
+        {/* Invite Collaborators Modal */}
+        <InviteCollaboratorsModal
+          visible={inviteModalVisible}
+          onCancel={() => setInviteModalVisible(false)}
+          onConfirm={handleInviteCollaborators}
+        />
       </div>
     </Loading>
   );

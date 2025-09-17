@@ -268,6 +268,7 @@ const CreateMedia: React.FC = () => {
     setImageUrl(media.media_url);
     setIsSelectedDraft(true);
     setFileList([]);
+    setTags(media.tags_name || []);
   };
 
   return (
@@ -378,6 +379,7 @@ const CreateMedia: React.FC = () => {
                 </Select>
               </Form.Item>
             </div>
+            {!isSelectedDraft && (
             <div className="field-item-create">
               <span className="text-label">Tags</span>
               <Form.Item name="tags_name">
@@ -388,7 +390,7 @@ const CreateMedia: React.FC = () => {
                       ? "Maximum 10 cards, no more can be added"
                       : "Search for tags or create new ones"
                   }
-                  disabled={tags.length >= 10 || !fileList.length}
+                  disabled={tags.length >= 10 || (!fileList.length && !isSelectedDraft)}
                 />
               </Form.Item>
               <div className="tags-display">
@@ -401,9 +403,10 @@ const CreateMedia: React.FC = () => {
                   >
                     {tag}
                   </Tag>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </Col>
         </Form>
       </Row>
