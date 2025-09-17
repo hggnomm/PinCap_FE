@@ -1,3 +1,34 @@
+---
+alwaysApply: true
+---
+
+# Rule: Tailwind-only cursor
+
+- **ID:** react19-tailwind-cursor
+- **Scope:** src/**/*.tsx, src/**/*.jsx
+- **Description:**  
+  Enforce that all cursor styles use Tailwind utility classes (`cursor-pointer`, `cursor-wait`, etc.).
+  ❌ No inline `style={{ cursor: ... }}`  
+  ❌ No raw CSS `cursor:` declarations  
+  ✅ Always prefer Tailwind `cursor-*` utilities.
+
+## Checks
+
+### ❌ Inline style
+- Pattern: `style={{*cursor*}}`
+- Message: "Do not use inline cursor styles. Use Tailwind cursor-* utilities instead."
+- Severity: error
+
+### ❌ Raw CSS
+- Pattern: `cursor:`
+- Where: `*.css`
+- Message: "Do not set cursor in raw CSS. Use Tailwind cursor-* utilities instead."
+- Severity: error
+
+### ✅ Encourage Tailwind
+- Pattern: `className=*`
+- Message: "Use Tailwind cursor-* utilities (e.g. cursor-pointer, cursor-grab)."
+- Severity: info
 # Rule: Tailwind-only cursor
 
 - **ID:** react19-tailwind-cursor
