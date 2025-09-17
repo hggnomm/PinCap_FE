@@ -62,4 +62,61 @@ export type Album = {
   updated_at: string;
   users: User[];
   medias: Media[];
+  allUser?: User[];
+};
+
+export type Tag = {
+  id: string;
+  tag_name: string;
+  latestMediaUrl: string;
+};
+
+export type ReportReason = {
+  id: string;
+  title: string;
+  description: string;
+};
+
+export type Notification = {
+  id: string;
+  title: string;
+  content: string;
+  is_read: boolean;
+  link: string;
+  notification_type: string;
+  created_at: string;
+  sender: {
+    id: string;
+    name: string | null;
+    avatar: string;
+  };
+};
+
+export type UserReaction = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  avatar: string;
+  is_following?: boolean;
+  feeling?: Feeling;
+};
+
+export type PrivacyOptions = {
+  PUBLIC: number;
+  PRIVATE: number;
+};
+
+export type PaginatedResponse<T> = {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+};
+
+export type MediaFeeling = {
+  id: string;
+  feeling_type: string;
+  icon_url: string;
+  total: number;
 };

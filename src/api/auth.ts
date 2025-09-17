@@ -1,6 +1,6 @@
 import axios from "axios";
 import apiClient from "./apiClient";
-const baseUrl = import.meta.env.VITE_BASE_API as string;
+const baseUrl = (import.meta as any).env.VITE_BASE_API as string;
 
 export const login = async (data: any) => {
   var config = {
@@ -64,6 +64,56 @@ export const getCurrentUser = async () => {
 export const logout = async () => {
   try {
     const response = await apiClient.post('/api/auth/logout');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Verify email with token
+export const verifyEmail = async (token: string) => {
+  try {
+    const response = await apiClient.get(`/api/auth/verify-email/${token}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Resend verification email
+export const resendVerifyEmail = async (email: string) => {
+  try {
+    const response = await apiClient.post('/api/auth/resend-verify-email', { email });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Forgot password
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await apiClient.post('/api/auth/forgot-password', { email });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Reset password
+export const resetPassword = async (data: { token: string; password: string }) => {
+  try {
+    const response = await apiClient.post('/api/auth/reset-password', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get Google OAuth URL
+export const getGoogleOAuthUrl = async () => {
+  try {
+    const response = await apiClient.get('/api/auth/google/url');
     return response.data;
   } catch (error) {
     throw error;

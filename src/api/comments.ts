@@ -71,7 +71,7 @@ export const toggleCommentReaction = async (data: { commentId: string; feelingId
   }
 };
 
-export const toggleReplyReaction = async (data: { replyId: string; feelingId: string }) => {
+export const toggleReplyReaction = async (data: { commentId: string; feelingId: string }) => {
   try {
     const response = await apiClient.post('/api/medias/comment/reply/reactions', data);
     return response.data;

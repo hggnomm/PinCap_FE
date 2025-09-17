@@ -20,6 +20,22 @@ import DetailAlbum from "./pages/PinCap/DetailAlbum/DetailAlbum";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { ROUTES } from "./constants/routes";
 import { useAuth } from "./hooks";
+import { Navigate } from "react-router-dom";
+
+const HomeRouteHandler = () => {
+  const { user } = useAuth();
+  
+  if (user) {
+    return <Navigate to={ROUTES.PINCAP_HOME} replace />;
+  }
+  
+  return (
+    <>
+      <HeaderCommon />
+      <Home />
+    </>
+  );
+};
 
 const App = () => {
   const { isLoadingUser } = useAuth();
@@ -45,12 +61,7 @@ const App = () => {
           <Route path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.REGISTER} element={<Register />} />
 
-          <Route path={ROUTES.HOME} element={
-            <>
-              <HeaderCommon />
-              <Home />
-            </>
-          } />
+          <Route path={ROUTES.HOME} element={<HomeRouteHandler />} />
 
           <Route
             path="*"

@@ -58,3 +58,80 @@ export const addMediasToAlbum = async (request: any) => {
     return error;
   }
 };
+
+// Get albums by user ID with pagination and filters
+export const getAlbumsByUserId = async (params: {
+  user_id: string;
+  per_page?: number;
+  page?: number;
+  query?: string;
+  order_key?: string;
+  order_type?: string;
+}) => {
+  try {
+    const res = await apiClient.get("/api/albums", { params });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Get all public albums with pagination and search
+export const getAllAlbums = async (params?: {
+  per_page?: number;
+  page?: number;
+  query?: string;
+  order_key?: string;
+  order_type?: string;
+}) => {
+  try {
+    const res = await apiClient.get("/api/albums/all", { params });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Get my albums where I'm a member
+export const getMyAlbumMember = async (params?: {
+  per_page?: number;
+  page?: number;
+  query?: string;
+  order_key?: string;
+  order_type?: string;
+}) => {
+  try {
+    const res = await apiClient.get("/api/albums/my-album-member", { params });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Remove medias from album
+export const removeMediasFromAlbum = async (data: {
+  album_id: string;
+  medias_id: string[];
+}) => {
+  try {
+    const res = await apiClient.delete("/api/albums/remove-medias", { data });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Invite user to album
+export const inviteUserToAlbum = async (albumId: string, userId: string) => {
+  try {
+    const res = await apiClient.post(`/api/albums/${albumId}/invite/${userId}`);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
