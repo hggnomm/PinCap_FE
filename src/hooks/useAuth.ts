@@ -8,11 +8,14 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  const token = localStorage.getItem('token');
+
   const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user'],
     queryFn: auth.getCurrentUser,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!token, // Only run query if token exists
   });
 
   const loginMutation = useMutation({
