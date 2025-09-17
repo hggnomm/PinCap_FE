@@ -29,30 +29,43 @@ alwaysApply: true
 - Pattern: `className=*`
 - Message: "Use Tailwind cursor-* utilities (e.g. cursor-pointer, cursor-grab)."
 - Severity: info
-# Rule: Tailwind-only cursor
 
-- **ID:** react19-tailwind-cursor
+---
+
+# Rule: Use Tailwind Color Tokens
+
+- **ID:** react19-tailwind-colors
 - **Scope:** src/**/*.tsx, src/**/*.jsx
 - **Description:**  
-  Enforce that all cursor styles use Tailwind utility classes (`cursor-pointer`, `cursor-wait`, etc.).
-  ❌ No inline `style={{ cursor: ... }}`  
-  ❌ No raw CSS `cursor:` declarations  
-  ✅ Always prefer Tailwind `cursor-*` utilities.
+  Enforce using Tailwind color utilities instead of hardcoded colors.
+  ❌ No hardcoded hex colors `#a25772`  
+  ❌ No inline color styles `style={{ color: '#...' }}`  
+  ✅ Always use Tailwind color utilities or CSS custom properties.
 
 ## Checks
 
-### ❌ Inline style
-- Pattern: `style={{*cursor*}}`
-- Message: "Do not use inline cursor styles. Use Tailwind cursor-* utilities instead."
+### ❌ Hardcoded hex colors
+- Pattern: `#[0-9a-fA-F]{3,6}`
+- Message: "Use Tailwind color utilities instead of hardcoded hex colors."
+- Severity: warning
+
+### ❌ Inline color styles
+- Pattern: `style={{.*color.*#[0-9a-fA-F]{3,6}.*}}`
+- Message: "Use Tailwind color utilities instead of inline color styles."
 - Severity: error
 
-### ❌ Raw CSS
-- Pattern: `cursor:`
-- Where: `*.css`
-- Message: "Do not set cursor in raw CSS. Use Tailwind cursor-* utilities instead."
-- Severity: error
+### ✅ PinCap Brand Colors (Recommended)
+- `text-rose-600` → Primary brand color (#a25772)
+- `bg-rose-600` → Primary background
+- `border-rose-600` → Primary border
+- `text-pink-600` → Secondary color (#d42364)
+- `bg-pink-600` → Secondary background
+- `text-pink-400` → Accent color (#ec4899)
+- `bg-gray-50` → Light background
+- `text-gray-600` → Body text
+- `border-gray-200` → Light border
 
-### ✅ Encourage Tailwind
-- Pattern: `className=*`
-- Message: "Use Tailwind cursor-* utilities (e.g. cursor-pointer, cursor-grab)."
-- Severity: info
+### ✅ CSS Custom Properties (Alternative)
+- `text-[var(--primary)]` → CSS custom property
+- `bg-[var(--secondary)]` → CSS custom property
+- `border-[var(--border)]` → CSS custom property
