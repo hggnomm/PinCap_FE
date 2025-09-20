@@ -4,6 +4,11 @@ export type User = {
   last_name: string;
   email: string;
   avatar: string;
+  background: string;
+  phone: string | null;
+  role: string;
+  followers_count: number;
+  followees_count: number;
   isFollowing?: boolean;
 };
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import * as auth from '@/api/auth';
 import { ROUTES } from '@/constants/routes';
 import { LoginFormData, RegisterFormData } from '@/validation';
+import { User } from '@/types/type';
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -10,7 +11,7 @@ export const useAuth = () => {
 
   const token = localStorage.getItem('token');
 
-  const { data: user, isLoading: isLoadingUser } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ['user'],
     queryFn: auth.getCurrentUser,
     retry: false,
@@ -50,13 +51,13 @@ export const useAuth = () => {
     user,
     isLoadingUser,
     isAuthenticated,
-    login: loginMutation.mutate,
+    login: loginMutation.mutateAsync,
     loginLoading: loginMutation.isPending,
     loginError: loginMutation.error,
-    register: registerMutation.mutate,
+    register: registerMutation.mutateAsync,
     registerLoading: registerMutation.isPending,
     registerError: registerMutation.error,
-    logout: logoutMutation.mutate,
+    logout: logoutMutation.mutateAsync,
     logoutLoading: logoutMutation.isPending,
   };
 };

@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
 import {
   Avatar,
   Button,
   Col,
   Dropdown,
   Input,
-  MenuProps,
   Row,
   Space,
   Tooltip,
@@ -17,30 +15,15 @@ import Notification from "../notification";
 import { LogoIcon, TextIcon } from "@/assets/img";
 import iconChatbot from "@/assets/img/PinCap/chatbot.png";
 import Chatbot from "../chatbot";
-import { addToken } from "@/store/authSlice";
+import { useAuth } from "@/hooks/useAuth";
+import { User } from "@/types/type";
 import "./index.less";
 import { ROUTES } from "@/constants/routes";
 
-interface UserInfo {
-  name: string;
-  email: string;
-}
-
 const HeaderCommon = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
-  const [userInfor, setUserInfor] = useState<UserInfo>({ name: "", email: "" });
-  const tokenPayload = useSelector((state: any) => state.auth);
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (tokenPayload?.name && tokenPayload?.email) {
-      setUserInfor({
-        name: tokenPayload.name,
-        email: tokenPayload.email,
-      });
-    }
-  }, [tokenPayload]);
 
   // Toggle chatbot visibility
   const toggleChatbot = () => {
@@ -49,18 +32,24 @@ const HeaderCommon = () => {
 
   // Handle user logout
   const logoutHandle = () => {
-    localStorage.removeItem("token");
-    dispatch(addToken(null));
-    navigate(ROUTES.LOGIN);
+    logout();
   };
 
   const menuItems = [
     {
       key: "1",
       label: (
-        <div style={{ padding: "2px 8px", minWidth: 200 }}>
-          <div style={{ fontWeight: "bold" }}>{userInfor.name}</div>
-          <div>{userInfor.email}</div>
+        <div 
+          className="p-2 min-w-48 cursor-pointer hover:bg-gray-50 rounded-md transition-colors"
+          onClick={() => navigate(ROUTES.PROFILE)}
+        >
+          <div className="font-bold text-gray-900">
+            {user?.first_name && user?.last_name 
+              ? `${user.first_name} ${user.last_name}`
+              : user?.first_name || user?.last_name
+            }
+          </div>
+          <div className="text-gray-600">{user?.email || 'user@example.com'}</div>
         </div>
       ),
     },
@@ -69,7 +58,7 @@ const HeaderCommon = () => {
       key: "3",
       label: (
         <Button
-          style={{ width: "100%", textAlign: "left", color: "black" }}
+          className="w-full text-left text-gray-900 hover:text-gray-700"
           onClick={logoutHandle}
           type="link"
         >
@@ -79,13 +68,13 @@ const HeaderCommon = () => {
     },
   ];
 
-  const isAuthenticated = tokenPayload?.id || localStorage.getItem("token");
+  // Remove this line as we now use isAuthenticated from useAuth hook
 
   return (
     <Row className="main-header !z-50">
       <Col
         className="left-header"
-        onClick={() => (isAuthenticated ? navigate(ROUTES.PINCAP_HOME) : navigate(ROUTES.LOGIN))}
+        onClick={() => navigate(isAuthenticated ? ROUTES.PINCAP_HOME : ROUTES.LOGIN)}
       >
         <img className="logo-icon" src={LogoIcon} alt="Logo" />
         {isAuthenticated && (
@@ -105,7 +94,7 @@ const HeaderCommon = () => {
       )}
 
       <Col className="right-header">
-        {isAuthenticated ? (
+        {isAuthenticated && (
           <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
             <Tooltip title="Pinbot: Virtual Assistant" placement="bottom">
               <div className="chatbot-btn" onClick={toggleChatbot}>
@@ -135,23 +124,25 @@ const HeaderCommon = () => {
                 <Space>
                   <Avatar
                     className="avatar"
-                    src="https://imagedelivery.net/LBWXYQ-XnKSYxbZ-NuYGqQ/543c6373-55ce-4fb2-b282-dbb0e43c1500/avatarhd"
+                    src={user?.avatar || "https://imagedelivery.net/LBWXYQ-XnKSYxbZ-NuYGqQ/543c6373-55ce-4fb2-b282-dbb0e43c1500/avatarhd"}
                   />
-                  <DownOutlined style={{ fontSize: "12px" }} />
+                  <DownOutlined className="text-xs" />
                 </Space>
               </Dropdown>
             </Space>
           </Col>
-        ) : (
+        )}
+        
+        {!isAuthenticated && (
           <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
             <Button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate(ROUTES.LOGIN)}
               className="button-auth-sign-in"
             >
               Sign in
             </Button>
             <Button
-              onClick={() => navigate("/register")}
+              onClick={() => navigate(ROUTES.REGISTER)}
               className="button-auth-sign-up"
             >
               Sign up

@@ -18,20 +18,20 @@
   .ant-input {
     padding: 0.6rem 0.8rem;
     border-radius: 15px;
-    border: 2px solid rgb(167, 166, 166); /* Default border color */
+    border: 2px solid rgb(167, 166, 166) !important; /* Default border color */
     transition: border-color 0.3s ease, box-shadow 0.3s ease,
       border-width 0.3s ease; /* Smooth transition for border width */
   }
 
   /* Focused input border color and increased border width */
   .ant-input:focus {
-    outline: 2px solid #a25772; /* New red-pink border color when focused */
+    border: 2px solid #a25772 !important; /* New red-pink border color when focused */
     box-shadow: 0 0 0 2px rgba(162, 87, 114, 0.2); /* Glowing red-pink effect on focus */
     color: #000;
   }
 
   /* Hover input border color */
   .ant-input:hover {
-    border-color: #a25772; /* Red-pink border color on hover */
+    border-color: #a25772 !important; /* Red-pink border color on hover */
   }
 }
