@@ -14,7 +14,7 @@ export const updateAlbumSchema = z.object({
     .min(1, 'Album name is required')
     .max(100, 'Album name must be less than 100 characters')
     .optional(),
-  image_cover: z.string().optional(),
+  image_cover: z.string().url('Must be a valid URL').optional(),
   description: z
     .string()
     .max(500, 'Description must be less than 500 characters')

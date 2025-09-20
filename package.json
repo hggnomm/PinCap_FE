@@ -14,6 +14,8 @@
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@google/generative-ai": "^0.21.0",
+    "@pqina/pintura": "^8.92.19",
+    "@pqina/react-pintura": "^9.0.4",
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-query": "^5.66.0",
     "antd": "^5.5.2",

@@ -80,6 +80,7 @@
         width: 100%;
 
         .draft-img {
+          position: relative;
           padding: 1rem;
           background-color: #f1f0ef;
           border-radius: 7px;
@@ -89,6 +90,19 @@
             width: 100%;
             height: 100%;
             border-radius: 7px;
+          }
+
+          // Edit button styling
+          .ant-btn-circle {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
 
@@ -111,6 +125,21 @@
               font-size: 12px;
               color: #666;
             }
+          }
+        }
+
+        // FilePond container with edit button
+        .relative {
+          .ant-btn-circle {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
       }

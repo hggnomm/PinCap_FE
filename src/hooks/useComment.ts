@@ -59,15 +59,15 @@ export const useComment = () => {
   return {
     getComments,
     getReplies,
-    createComment: createComment.mutate,
+    createComment: createComment.mutateAsync,
     createCommentLoading: createComment.isPending,
     createCommentError: createComment.error,
-    replyComment: replyComment.mutate,
+    replyComment: replyComment.mutateAsync,
     replyCommentLoading: replyComment.isPending,
     replyCommentError: replyComment.error,
-    toggleCommentReaction: toggleCommentReaction.mutate,
+    toggleCommentReaction: toggleCommentReaction.mutateAsync,
     toggleCommentReactionLoading: toggleCommentReaction.isPending,
-    toggleReplyReaction: toggleReplyReaction.mutate,
+    toggleReplyReaction: toggleReplyReaction.mutateAsync,
     toggleReplyReactionLoading: toggleReplyReaction.isPending,
   };
 };

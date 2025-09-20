@@ -12,6 +12,8 @@ export const ROUTES = {
   MY_ALBUM: '/album',
   ALBUM_DETAIL: '/album/:id',
   MY_MEDIA: '/my-media',
+  PROFILE: '/profile',
+  EDIT_PROFILE: '/profile/edit',
 } as const;
 
 export const PUBLIC_ROUTES = [
@@ -28,6 +30,8 @@ export const PROTECTED_ROUTES = [
   ROUTES.MY_ALBUM,
   ROUTES.ALBUM_DETAIL,
   ROUTES.MY_MEDIA,
+  ROUTES.PROFILE,
+  ROUTES.EDIT_PROFILE,
 ] as const;
 
 export type RouteType = typeof ROUTES[keyof typeof ROUTES];

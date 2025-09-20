@@ -1,6 +1,7 @@
 export interface CreateAlbumRequest {
   album_name: string;
   privacy: string;
+  image_cover?: string | File;
 }
 
 export interface UpdateAlbumRequest {

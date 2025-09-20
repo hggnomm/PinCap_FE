@@ -17,6 +17,7 @@ export const useUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', 'profile'] });
     },
+    retry: false,
   });
 
   const getRelationships = (relationship: 'followers' | 'followees') => {
@@ -33,6 +34,7 @@ export const useUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', 'relationships'] });
     },
+    retry: false,
   });
 
   const unfollowOrUnblockUser = useMutation({
@@ -41,6 +43,7 @@ export const useUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', 'relationships'] });
     },
+    retry: false,
   });
 
   const getUserProfile = (id: string) => {
@@ -90,20 +93,21 @@ export const useUser = () => {
   const reportUser = useMutation({
     mutationFn: (data: { user_id: string; reason_report_id?: string; other_reasons?: string }) =>
       users.reportUser(data),
+    retry: false,
   });
 
   return {
     getMyProfile,
-    updateMyProfile: updateMyProfile.mutate,
+    updateMyProfile: updateMyProfile.mutateAsync,
     updateMyProfileLoading: updateMyProfile.isPending,
     updateMyProfileError: updateMyProfile.error,
     
     getRelationships,
-    followOrBlockUser: followOrBlockUser.mutate,
+    followOrBlockUser: followOrBlockUser.mutateAsync,
     followOrBlockLoading: followOrBlockUser.isPending,
     followOrBlockError: followOrBlockUser.error,
     
-    unfollowOrUnblockUser: unfollowOrUnblockUser.mutate,
+    unfollowOrUnblockUser: unfollowOrUnblockUser.mutateAsync,
     unfollowOrUnblockLoading: unfollowOrUnblockUser.isPending,
     unfollowOrUnblockError: unfollowOrUnblockUser.error,
     
@@ -112,7 +116,7 @@ export const useUser = () => {
     searchUsers,
     findUsers,
     getReportReasons,
-    reportUser: reportUser.mutate,
+    reportUser: reportUser.mutateAsync,
     reportUserLoading: reportUser.isPending,
     reportUserError: reportUser.error,
   };

@@ -287,7 +287,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
                 {filteredAlbums.map((album: Album) => (
                   <div
                     key={album.id}
-                    className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 flex items-center justify-between"
+                    className="px-3 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 flex items-center justify-between"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSaveToAlbum(album.id, album.album_name);
@@ -298,11 +298,11 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
                         <img
                           src={album.thumbnail_url || album.image_cover}
                           alt={album.album_name}
-                          className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                          className="w-14 h-14 !rounded-md object-cover flex-shrink-0"
                         />
                       )}
                       {!(album.thumbnail_url || album.image_cover) && (
-                        <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-14 h-14 bg-gray-200 rounded-md flex items-center justify-center flex-shrink-0">
                           <span className="text-center text-gray-400 text-xs">No Image</span>
                         </div>
                       )}

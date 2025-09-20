@@ -5,11 +5,8 @@ import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import { createMyAlbum, getMyAlbumData } from "@/api/album";
 import { Album } from "type";
 import { useNavigate } from "react-router";
-import ModalComponent from "@/components/modal/ModalComponent";
-import { Col, Form, Input, Row } from "antd";
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
-import { CreateAlbumRequest } from "Album/AlbumRequest";
+import CreateAlbumModal from "@/components/modal/album/CreateAlbumModal";
+import { Col, Row } from "antd";
 import { toast } from "react-toastify";
 import Loading from "@/components/loading/Loading";
 import AlbumCard from "./AlbumCard/AlbumCard";
@@ -17,7 +14,6 @@ import AlbumCard from "./AlbumCard/AlbumCard";
 const MyAlbum = () => {
   const [activeButton, setActiveButton] = useState("created");
   const [albumData, setAlbumData] = useState<Album[]>([]);
-  const [privacy, setPrivacy] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,47 +44,39 @@ const MyAlbum = () => {
 
   // MODAL COMPONENTS
   const [modalVisible, setModalVisible] = useState(false);
-  const [form] = Form.useForm();
+  const [createLoading, setCreateLoading] = useState(false);
 
   const handleCancel = () => {
     setModalVisible(false);
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (data: { 
+    album_name: string; 
+    privacy: string; 
+  }) => {
+    setCreateLoading(true);
     try {
-      const formValues = await form.validateFields();
-      const albumRequest: CreateAlbumRequest = {
-        album_name: formValues.album_name,
-        privacy: privacy ? "0" : "1",
+      const albumRequest = {
+        album_name: data.album_name,
+        privacy: data.privacy,
       };
 
       console.log("Album Request:", albumRequest);
-      setModalVisible(false);
 
       const response = await createMyAlbum(albumRequest);
 
       if (response) {
         fetchAlbums(); // Fetch the albums after creating a new one
         setModalVisible(false);
+        toast.success("Album created successfully!");
       }
     } catch (error) {
-      console.error("Validation failed:", error);
-      toast.error(
-        "Validation failed: Please check the form fields and try again."
-      );
+      console.error("Create album failed:", error);
+      toast.error("Failed to create album. Please try again.");
+    } finally {
+      setCreateLoading(false);
     }
   };
-
-  const handlePrivacyChange = (e: any) => {
-    setPrivacy(e.target.checked);
-  };
-
-  useEffect(() => {
-    if (modalVisible) {
-      form.resetFields(); // Reset form fields each time the modal is opened
-      setPrivacy(false); // Reset privacy to false when opening the modal
-    }
-  }, [modalVisible, form]);
 
   return (
     <div className="album-container">
@@ -145,37 +133,12 @@ const MyAlbum = () => {
       </div>
 
       {/* Modal để tạo album mới */}
-      <ModalComponent
-        title="Create New Album"
+      <CreateAlbumModal
         visible={modalVisible}
         onCancel={handleCancel}
         onConfirm={handleConfirm}
-        buttonLabels={{ confirmLabel: "Create", cancelLabel: "Cancel" }}
-        className="!w-[600px]"
-      >
-        <div className="create-album">
-          <Form form={form} layout="vertical">
-            <FieldItem
-              label="Name"
-              name="album_name"
-              rules={[
-                { required: true, message: "Please input the album title!" },
-              ]}
-              placeholder="Like 'Places to Go' or 'Recipes to Make'"
-            >
-              <Input />
-            </FieldItem>
-
-            <CheckboxWithDescription
-              title="Keep this album private"
-              description="So only you and collaborator can see it."
-              value={privacy}
-              onChange={handlePrivacyChange}
-              name="privacy"
-            />
-          </Form>
-        </div>
-      </ModalComponent>
+        loading={createLoading}
+      />
     </div>
   );
 };

@@ -11,9 +11,10 @@ import { login } from "@/api/auth";
 import { addToken } from "@/store/authSlice";
 import { motion } from "framer-motion";
 import { LoginRequest } from "Auth/LoginRequest";
+import { loginSchema } from "@/validation/auth";
+import { useFormValidation } from "@/hooks";
 import "./index.less";
-import { ROUTES } from "@/constants/routes"
-
+import { ROUTES } from "@/constants/routes";
 interface LoginFormValues {
   email: string;
   password: string;
@@ -28,6 +29,8 @@ const Login: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isAccountLocked, setIsAccountLocked] = useState(false);
   const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
+  const { validate, validateField, getFieldError } =
+    useFormValidation(loginSchema);
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -131,6 +134,15 @@ const Login: React.FC = () => {
       return;
     }
 
+    // Validate form data with Zod
+    if (!validate(values)) {
+      api.warning({
+        message: "Validation Error",
+        description: "Please check your input and try again.",
+      });
+      return;
+    }
+
     try {
       const { email, password, remember } = values;
 
@@ -152,6 +164,25 @@ const Login: React.FC = () => {
         navigate(ROUTES.HOME);
       } else {
         // Handle failed login attempt
+        if (process.env.VITE_DEBUG_LOGIN === "true") {
+          const attempts =
+            parseInt(localStorage.getItem("loginAttempts") || "0") + 1;
+          localStorage.setItem("loginAttempts", attempts.toString());
+
+          // If reached max attempts, lock account
+          if (attempts >= 5) {
+            const lockExpiry = Date.now() + 60 * 60 * 1000; // 1 hour lock
+            localStorage.setItem("loginLockExpiry", lockExpiry.toString());
+            setIsAccountLocked(true);
+            setLockTimeRemaining(60 * 60); // 3600 seconds = 1 hour
+
+            // Error notification will be shown automatically by apiClient interceptor
+          }
+        }
+      }
+    } catch (error: any) {
+      // Handle login error
+      if (process.env.VITE_DEBUG_LOGIN === "true") {
         const attempts =
           parseInt(localStorage.getItem("loginAttempts") || "0") + 1;
         localStorage.setItem("loginAttempts", attempts.toString());
@@ -162,37 +193,7 @@ const Login: React.FC = () => {
           localStorage.setItem("loginLockExpiry", lockExpiry.toString());
           setIsAccountLocked(true);
           setLockTimeRemaining(60 * 60); // 3600 seconds = 1 hour
-
-          api.error({
-            message: "Account Locked",
-            description:
-              "Too many failed login attempts. Your account has been locked for 1 hour.",
-          });
         }
-      }
-    } catch (error: any) {
-      // Handle login error
-      const attempts =
-        parseInt(localStorage.getItem("loginAttempts") || "0") + 1;
-      localStorage.setItem("loginAttempts", attempts.toString());
-
-      // If reached max attempts, lock account
-      if (attempts >= 5) {
-        const lockExpiry = Date.now() + 60 * 60 * 1000; // 1 hour lock
-        localStorage.setItem("loginLockExpiry", lockExpiry.toString());
-        setIsAccountLocked(true);
-        setLockTimeRemaining(60 * 60); // 3600 seconds = 1 hour
-
-        api.error({
-          message: "Account Locked",
-          description:
-            "Too many failed login attempts. Your account has been locked for 1 hour.",
-        });
-      } else {
-        api.error({
-          message: "Login Failed",
-          description: `${error.message} (${5 - attempts} attempts remaining)`,
-        });
       }
     }
   };
@@ -248,11 +249,16 @@ const Login: React.FC = () => {
               <span>Email</span>
               <Form.Item
                 name="email"
+                validateStatus={getFieldError("email") ? "error" : ""}
+                help={getFieldError("email")}
                 rules={[
                   { required: true, message: "Please input your email!" },
                 ]}
               >
-                <Input />
+                <Input
+                  onChange={(e) => validateField("email", e.target.value)}
+                  onBlur={(e) => validateField("email", e.target.value)}
+                />
               </Form.Item>
             </Row>
 
@@ -260,11 +266,16 @@ const Login: React.FC = () => {
               <span>Password</span>
               <Form.Item
                 name="password"
+                validateStatus={getFieldError("password") ? "error" : ""}
+                help={getFieldError("password")}
                 rules={[
                   { required: true, message: "Please input your password!" },
                 ]}
               >
-                <Input.Password />
+                <Input.Password
+                  onChange={(e) => validateField("password", e.target.value)}
+                  onBlur={(e) => validateField("password", e.target.value)}
+                />
               </Form.Item>
             </Row>
 

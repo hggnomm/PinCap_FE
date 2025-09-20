@@ -65,11 +65,13 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
       >
         <div className="img-container">
           {album.image_cover && (
-            <img
-              src={album.image_cover}
-              alt="Album preview"
-              className="album-cover"
-            />
+            <div className="flex items-center justify-center w-full h-full">
+              <img
+                src={album.image_cover}
+                alt="Album preview"
+                className="max-h-full max-w-full rounded-[15px]"
+              />
+            </div>
           )}
           <div className="overlay">
             <div

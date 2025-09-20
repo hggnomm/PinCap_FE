@@ -12,7 +12,7 @@ export const useFormValidation = <T extends z.ZodSchema>(schema: T) => {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
+        error.issues.forEach((err: any) => {
           const field = err.path.join('.');
           newErrors[field] = err.message;
         });
@@ -24,12 +24,13 @@ export const useFormValidation = <T extends z.ZodSchema>(schema: T) => {
 
   const validateField = (field: string, value: unknown): boolean => {
     try {
-      schema.pick({ [field]: true } as any).parse({ [field]: value });
+      const fieldSchema = (schema as any).pick({ [field]: true });
+      fieldSchema.parse({ [field]: value });
       setErrors(prev => ({ ...prev, [field]: '' }));
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const fieldError = error.errors.find(err => err.path[0] === field);
+        const fieldError = error.issues.find((err: any) => err.path[0] === field);
         if (fieldError) {
           setErrors(prev => ({ ...prev, [field]: fieldError.message }));
         }
@@ -42,15 +43,10 @@ export const useFormValidation = <T extends z.ZodSchema>(schema: T) => {
     return errors[field] || '';
   };
 
-  const clearErrors = () => {
-    setErrors({});
-  };
-
   return {
     errors,
     validate,
     validateField,
     getFieldError,
-    clearErrors,
   };
 };

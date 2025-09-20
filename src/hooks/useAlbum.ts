@@ -48,13 +48,13 @@ export const useAlbum = () => {
   return {
     getAlbumList,
     getAlbumById,
-    createAlbum: createAlbumMutation.mutate,
+    createAlbum: createAlbumMutation.mutateAsync,
     createAlbumLoading: createAlbumMutation.isPending,
     createAlbumError: createAlbumMutation.error,
-    updateAlbum: updateAlbumMutation.mutate,
+    updateAlbum: updateAlbumMutation.mutateAsync,
     updateAlbumLoading: updateAlbumMutation.isPending,
     updateAlbumError: updateAlbumMutation.error,
-    deleteAlbum: deleteAlbumMutation.mutate,
+    deleteAlbum: deleteAlbumMutation.mutateAsync,
     deleteAlbumLoading: deleteAlbumMutation.isPending,
     deleteAlbumError: deleteAlbumMutation.error,
   };
