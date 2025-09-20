@@ -1,4 +1,5 @@
 import axios from "axios";
+import { showApiError } from "@/utils/errorHandler";
 
 const baseUrl = import.meta.env.VITE_BASE_API;
 
@@ -27,31 +28,41 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    let errorData = {
+      status: 500,
+      message: "An unknown error occurred",
+      errors: []
+    };
+
     if (error.response) {
       const status = error.response.status;
       const message = error.response.data.message || "An error occurred";
-      console.log(`Error ${status}: ${message}`);
-
-      // if (status === 401) {
-      // }
-
-      return Promise.reject({
+      const errors = error.response.data.errors || [];
+      
+      errorData = {
         status: status,
         message: message,
-      });
+        errors: errors,
+      };
     } else if (error.request) {
-      console.log("Network Error: No response from server");
-      return Promise.reject({
+      errorData = {
         status: 500,
         message: "Network Error: No response from server",
-      });
+        errors: [],
+      };
     } else {
-      console.log(`Error: ${error.message}`);
-      return Promise.reject({
+      errorData = {
         status: 500,
         message: error.message || "An unknown error occurred",
-      });
+        errors: [],
+      };
     }
+
+    if (!error.config?.skipErrorNotification) {
+      showApiError(errorData);
+    }
+
+    return Promise.reject(errorData);
   }
 );
 

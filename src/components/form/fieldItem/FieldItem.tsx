@@ -7,7 +7,9 @@ interface FieldItemProps {
   name?: string; 
   rules?: any[]; 
   children: React.ReactNode; 
-  placeholder?: string; 
+  placeholder?: string;
+  validateStatus?: 'success' | 'warning' | 'error' | 'validating' | '';
+  help?: string;
 }
 
 const FieldItem: React.FC<FieldItemProps> = ({
@@ -16,11 +18,18 @@ const FieldItem: React.FC<FieldItemProps> = ({
   rules,
   children,
   placeholder,
+  validateStatus,
+  help,
 }) => {
   return (
     <div className="field-item">
       <span className="text-label">{label}</span>
-      <Form.Item name={name} rules={rules}>
+      <Form.Item 
+        name={name} 
+        rules={rules}
+        validateStatus={validateStatus}
+        help={help}
+      >
         {React.cloneElement(children as React.ReactElement, {
           placeholder: placeholder,
         })}
