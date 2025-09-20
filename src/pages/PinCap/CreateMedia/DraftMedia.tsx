@@ -28,7 +28,7 @@ const DraftMedia = ({
     if (isSelectedMedia?.id !== media.id) {
       setIsSelectedMedia(media);
     }
-    const fetchedDetailMedia = await getDetailMedia(media.id);
+    const fetchedDetailMedia = await getDetailMedia(media.id, true);
 
     if (fetchedDetailMedia) {
       setDetailMedia(fetchedDetailMedia);

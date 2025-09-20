@@ -63,9 +63,13 @@ export const updatedMedia = async (mediaId: string, request: any) => {
   }
 };
 
-export const getDetailMedia = async (id: any) => {
+export const getDetailMedia = async (id: any, tag_flg?: boolean) => {
   try {
-    const res = await apiClient.get(`/api/medias/${id}`);
+    const res = await apiClient.get(`/api/medias/${id}`, {
+      params: {
+        tag_flg: tag_flg,
+      },
+    });
     return res.data;
   } catch (error) {
     console.log(error);

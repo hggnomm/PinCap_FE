@@ -25,6 +25,8 @@ import DraftMedia from "./DraftMedia";
 import { Media } from "type";
 import ProgressiveImage from "react-progressive-image";
 import { MediaFormValues } from "Media/MediaRequest";
+import ImageEditor from "@/components/imageEditor";
+import { EditOutlined } from "@ant-design/icons";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -58,6 +60,10 @@ const CreateMedia: React.FC = () => {
   const [drafts, setDrafts] = useState<any[]>([]);
   const [loadingDrafts, setLoadingDrafts] = useState<boolean>(false);
   const [draftId, setDraftId] = useState<string>("");
+  
+  // Image Editor states
+  const [isImageEditorVisible, setIsImageEditorVisible] = useState<boolean>(false);
+  const [editingImageSrc, setEditingImageSrc] = useState<string>("");
 
   useEffect(() => {
     fetchDrafts();
@@ -271,6 +277,46 @@ const CreateMedia: React.FC = () => {
     setTags(media.tags_name || []);
   };
 
+  const handleOpenImageEditor = () => {
+    let imageSrc = "";
+    
+    if (imageUrl) {
+      // For draft images, use the existing imageUrl
+      imageSrc = imageUrl;
+    } else if (fileList.length > 0) {
+      // For newly uploaded files, create object URL
+      imageSrc = URL.createObjectURL(fileList[0]);
+    }
+    
+    if (imageSrc) {
+      setEditingImageSrc(imageSrc);
+      setIsImageEditorVisible(true);
+    }
+  };
+
+  const handleImageEdited = (editedBlob: Blob) => {
+    // Convert blob to file
+    const editedFile = new File([editedBlob], "edited-image.jpg", {
+      type: "image/jpeg",
+    });
+    
+    // Update file list with edited image
+    setFileList([editedFile]);
+    
+    // Clear draft image URL since we now have a new edited file
+    setImageUrl("");
+    setIsSelectedDraft(false);
+    
+    // Close editor
+    setIsImageEditorVisible(false);
+    setEditingImageSrc("");
+  };
+
+  const handleCloseImageEditor = () => {
+    setIsImageEditorVisible(false);
+    setEditingImageSrc("");
+  };
+
   return (
     <div className="create-media-container">
       <div className="field-create-media">
@@ -336,20 +382,32 @@ const CreateMedia: React.FC = () => {
                 </ProgressiveImage>
               </div>
             ) : (
-              <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
-                <FilePond
-                  files={fileList}
-                  onupdatefiles={(fileItems) =>
-                    setFileList(fileItems.map((item): any => item.file))
-                  }
-                  allowMultiple={false}
-                  maxFileSize="50MB"
-                  acceptedFileTypes={["image/*", "video/*"]}
-                  labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
-                  imagePreviewMaxHeight={1000}
-                  imagePreviewMarkupShow
-                />
-              </Form.Item>
+              <div className="relative">
+                <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
+                  <FilePond
+                    files={fileList}
+                    onupdatefiles={(fileItems) =>
+                      setFileList(fileItems.map((item): any => item.file))
+                    }
+                    allowMultiple={false}
+                    maxFileSize="50MB"
+                    acceptedFileTypes={["image/*", "video/*"]}
+                    labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
+                    imagePreviewMaxHeight={1000}
+                    imagePreviewMarkupShow
+                  />
+                </Form.Item>
+                {fileList.length > 0 && (
+                  <Button
+                    type="primary"
+                    shape="circle"
+                    icon={<EditOutlined />}
+                    onClick={handleOpenImageEditor}
+                    className="absolute top-2 right-2 !bg-rose-600 hover:!bg-rose-700 !border-rose-600 hover:!border-rose-700 shadow-lg z-10"
+                    size="large"
+                  />
+                )}
+              </div>
             )}
           </Col>
 
@@ -379,7 +437,6 @@ const CreateMedia: React.FC = () => {
                 </Select>
               </Form.Item>
             </div>
-            {!isSelectedDraft && (
             <div className="field-item-create">
               <span className="text-label">Tags</span>
               <Form.Item name="tags_name">
@@ -406,7 +463,6 @@ const CreateMedia: React.FC = () => {
                   ))}
                 </div>
               </div>
-            )}
           </Col>
         </Form>
       </Row>
@@ -426,6 +482,14 @@ const CreateMedia: React.FC = () => {
           loadingDrafts={loadingDrafts}
         />
       </Drawer>
+
+      {/* Image Editor Modal */}
+      <ImageEditor
+        isVisible={isImageEditorVisible}
+        imageSrc={editingImageSrc}
+        onClose={handleCloseImageEditor}
+        onImageEdited={handleImageEdited}
+      />
     </div>
   );
 };
