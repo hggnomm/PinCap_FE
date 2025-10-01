@@ -56,6 +56,13 @@ export const useMedia = () => {
     },
   });
 
+  const mediaReactionMutation = useMutation({
+    mutationFn: (data: { mediaId: string; feelingId: string }) => media.mediaReactions(data),
+    onSuccess: (_, { mediaId }) => {
+      queryClient.invalidateQueries({ queryKey: ['media', mediaId] });
+    },
+  });
+
   return {
     getMediaList,
     getMediaById,
@@ -69,5 +76,8 @@ export const useMedia = () => {
     deleteMedia: deleteMediaMutation.mutateAsync,
     deleteMediaLoading: deleteMediaMutation.isPending,
     deleteMediaError: deleteMediaMutation.error,
+    mediaReaction: mediaReactionMutation.mutateAsync,
+    mediaReactionLoading: mediaReactionMutation.isPending,
+    mediaReactionError: mediaReactionMutation.error,
   };
 };

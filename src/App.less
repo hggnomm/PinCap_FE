@@ -96,3 +96,47 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.custom-scroll-bar {
+  /* For Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgb(244 114 182) rgb(248 250 252); /* pink-400 gray-50 */
+
+  /* For Webkit browsers (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgb(248 250 252); /* gray-50 */
+    border-radius: 4px;
+    border: 1px solid rgb(226 232 240); /* gray-200 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgb(244 114 182) 0%, rgb(236 72 153) 100%); /* pink-400 to pink-500 */
+    border-radius: 4px;
+    border: 1px solid rgb(241 245 249); /* gray-100 */
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(180deg, rgb(236 72 153) 0%, rgb(219 39 119) 100%); /* pink-500 to pink-600 */
+      transform: scale(1.1);
+      box-shadow: 0 2px 4px rgba(219, 39, 119, 0.3); /* pink-600 shadow */
+    }
+
+    &:active {
+      background: rgb(219 39 119); /* pink-600 */
+      transform: scale(0.95);
+    }
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: rgb(248 250 252); /* gray-50 */
+    border: 1px solid rgb(226 232 240); /* gray-200 */
+  }
+
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+}
