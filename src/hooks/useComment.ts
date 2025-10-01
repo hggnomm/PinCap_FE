@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import * as comments from '@/api/comments';
 
 export const useComment = () => {
@@ -8,6 +8,22 @@ export const useComment = () => {
     return useQuery({
       queryKey: ['comments', mediaId, page],
       queryFn: () => comments.getComments(mediaId, page),
+      enabled: !!mediaId,
+      staleTime: 5 * 60 * 1000,
+    });
+  };
+
+  const getInfiniteComments = (mediaId: string) => {
+    return useInfiniteQuery({
+      queryKey: ['comments', mediaId, 'infinite'],
+      queryFn: ({ pageParam }) => comments.getComments(mediaId, pageParam),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage, allPages) => {
+        if (lastPage?.current_page < lastPage?.last_page) {
+          return lastPage.current_page + 1;
+        }
+        return undefined;
+      },
       enabled: !!mediaId,
       staleTime: 5 * 60 * 1000,
     });
@@ -29,6 +45,7 @@ export const useComment = () => {
       queryClient.invalidateQueries({ queryKey: ['comments', media_id] });
       queryClient.invalidateQueries({ queryKey: ['media', media_id] });
     },
+    retry: false, 
   });
 
   const replyComment = useMutation({
@@ -49,7 +66,7 @@ export const useComment = () => {
   });
 
   const toggleReplyReaction = useMutation({
-    mutationFn: (data: { replyId: string; feelingId: string }) =>
+    mutationFn: (data: { commentId: string; feelingId: string }) =>
       comments.toggleReplyReaction(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['replies'] });
@@ -58,6 +75,7 @@ export const useComment = () => {
 
   return {
     getComments,
+    getInfiniteComments,
     getReplies,
     createComment: createComment.mutateAsync,
     createCommentLoading: createComment.isPending,

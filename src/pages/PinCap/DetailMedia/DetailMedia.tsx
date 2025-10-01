@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import {
-  getAllMedias,
-  getDetailMedia,
-  mediaReactions,
-} from "@/api/media";
+import { getAllMedias } from "@/api/media";
 
 import { motion } from "framer-motion";
 import download from "@/assets/img/PinCap/download.png";
@@ -14,7 +10,6 @@ import Loading from "@/components/loading/Loading";
 import AlbumDropdown from "@/components/albumDropdown";
 
 import "./index.less";
-import { followOrBlockUser, unfollowOrUnblockUser } from "@/api/users";
 import { Media } from "@/types/type";
 import { FeelingType, getImageReactionWithId } from "@/utils/utils";
 import Comment from "./Comment/Comment";
@@ -25,38 +20,37 @@ import MediaList from "@/components/viewPin/ViewPinComponent";
 import ListComments from "./ListComments/ListComments";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
+import { useMedia } from "@/hooks/useMedia";
+import { useUser } from "@/hooks/useUser";
 interface TokenPayload {
   id: string;
 }
 
 const DetailMedia = () => {
-  const [media, setMedia] = useState<Media | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   const id = location.state?.mediaId;
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
+  
+  const { mediaReaction, mediaReactionLoading } = useMedia();
+  const { followOrBlockUser: followUser, unfollowOrUnblockUser: unfollowUser } = useUser();
+  
+  const { data: mediaData, isLoading: loading, error: queryError } = useMedia().getMediaById(id);
+  
+  const [media, setMedia] = useState<Media | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-
-  const fetchMediaDetail = async (idMedia: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const detail = await getDetailMedia(idMedia);
-      if (detail) {
-        setMedia(detail);
-      }
-    } catch (error) {
-      setError("Lỗi khi lấy chi tiết media: " + error);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (mediaData) {
+      setMedia(mediaData);
     }
-  };
+    if (queryError) {
+      setError("Lỗi khi lấy chi tiết media: " + queryError.message);
+    }
+  }, [mediaData, queryError]);
 
   useEffect(() => {
     if (id) {
       window.scrollTo(0, 0);
-      fetchMediaDetail(id);
     }
   }, [id]);
 
@@ -70,7 +64,7 @@ const DetailMedia = () => {
           return;
         }
 
-        await unfollowOrUnblockUser({
+        await unfollowUser({
           followeeId: media.ownerUser.id,
           status: request,
         });
@@ -95,7 +89,7 @@ const DetailMedia = () => {
         return;
       }
 
-      const response = await followOrBlockUser({
+      const response = await followUser({
         followeeId: media.ownerUser.id,
         status: request,
       });
@@ -131,8 +125,8 @@ const DetailMedia = () => {
         newReactionCount = (media?.reaction_user_count || 0) + 1;
       }
 
-      // Gọi API để cập nhật phản ứng
-      const response = await mediaReactions({
+      // Use React Query hook instead of direct API call
+      const response = await mediaReaction({
         mediaId: id,
         feelingId: feelingId,
       });
@@ -164,8 +158,6 @@ const DetailMedia = () => {
     }
   };
 
-
-
   return (
     <Loading isLoading={loading} error={error}>
       <motion.div
@@ -181,14 +173,14 @@ const DetailMedia = () => {
         <div className="detail-media">
           <BackButton />
           <div className="left-view">
-            {media &&
-              (media.type === "IMAGE" ? (
-                <Zoom>
-                  <img src={media.media_url} alt={media.media_name} />
-                </Zoom>
-              ) : (
-                <video src={media.media_url} controls autoPlay muted />
-              ))}
+            {media && media.type === "IMAGE" && (
+              <Zoom>
+                <img src={media.media_url} alt={media.media_name} />
+              </Zoom>
+            )}
+            {media && media.type !== "IMAGE" && (
+              <video src={media.media_url} controls autoPlay muted />
+            )}
           </div>
           <div className="right-view">
             <div className="right-top-view">
@@ -201,7 +193,14 @@ const DetailMedia = () => {
                       alignItems: "center",
                     }}
                   >
-                    <button onClick={() => handleReaction()}>
+                    <button 
+                      onClick={() => handleReaction()}
+                      disabled={mediaReactionLoading}
+                      style={{
+                        opacity: mediaReactionLoading ? 0.6 : 1,
+                        cursor: mediaReactionLoading ? 'not-allowed' : 'pointer'
+                      }}
+                    >
                       <img
                         src={getImageReactionWithId(
                           media?.reaction?.feeling_id
@@ -243,7 +242,7 @@ const DetailMedia = () => {
               </div>
             </div>
 
-            <div className="main-view">
+            <div className="main-view custom-scroll-bar">
               {media?.media_name && (
                 <div className="media_name">
                   <span>{media.media_name}</span>
@@ -265,16 +264,16 @@ const DetailMedia = () => {
                     </>
                   )}
                 </div>
-                {media?.ownerUser.id !== tokenPayload.id &&
-                  (media?.ownerUser?.isFollowing ? (
-                    <button onClick={handleWithOwnerUser} className="following">
-                      Following
-                    </button>
-                  ) : (
-                    <button onClick={handleWithOwnerUser} className="follow">
-                      Follow
-                    </button>
-                  ))}
+                {media?.ownerUser.id !== tokenPayload.id && media?.ownerUser?.isFollowing && (
+                  <button onClick={handleWithOwnerUser} className="following">
+                    Following
+                  </button>
+                )}
+                {media?.ownerUser.id !== tokenPayload.id && !media?.ownerUser?.isFollowing && (
+                  <button onClick={handleWithOwnerUser} className="follow">
+                    Follow
+                  </button>
+                )}
               </div>
 
               {media?.description && (
@@ -283,9 +282,10 @@ const DetailMedia = () => {
                 </div>
               )}
               <div className="comments">
-                {media?.is_comment ? (
-                  media?.userComments && <ListComments media={media} />
-                ) : (
+                {media?.is_comment && media?.userComments && (
+                  <ListComments media={media} />
+                )}
+                {!media?.is_comment && (
                   <p className="no_comment">
                     Comments are turned off for this Media
                   </p>
@@ -293,7 +293,7 @@ const DetailMedia = () => {
               </div>
             </div>
             <div className="right-bottom-view">
-              {media?.is_comment && <Comment />}
+              {media?.is_comment && <Comment mediaId={id} />}
             </div>
           </div>
         </div>

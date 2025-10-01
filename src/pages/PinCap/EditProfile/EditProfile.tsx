@@ -11,6 +11,7 @@ import FieldItem from "@/components/form/fieldItem/FieldItem"
 import { ArrowLeft, Save, Upload, X } from "lucide-react"
 import { ROUTES } from "@/constants/routes"
 import { Form, Input } from "antd"
+import { toast } from "react-toastify"
 
 const { TextArea } = Input
 
@@ -25,15 +26,13 @@ const EditProfile = () => {
 
   const handleSubmit = async (values: any) => {
     try {
-      // Use React Query mutateAsync - it will throw on 4xx/5xx responses
       await updateMyProfile(values)
-      
-      // This only runs if mutation succeeds
+      toast.success("Profile updated successfully!")
       navigate(ROUTES.PROFILE)
       
     } catch (error: any) {
       console.error("Error updating profile:", error)
-      // Error handling is done by your notification system
+      toast.error("Failed to update profile. Please try again.")
     }
   }
 
@@ -154,17 +153,17 @@ const EditProfile = () => {
                        <Input size="large" />
                      </FieldItem>
 
-                     <FieldItem 
-                       label="Email Address"
-                       name="email"
-                       placeholder="Enter your email"
-                       rules={[
-                         { required: true, message: 'Please input your email!' },
-                         { type: 'email', message: 'Please enter a valid email!' }
-                       ]}
-                     >
-                       <Input size="large" />
-                     </FieldItem>
+                    <FieldItem 
+                      label="Email Address"
+                      name="email"
+                      placeholder="Enter your email"
+                      rules={[
+                        { required: true, message: 'Please input your email!' },
+                        { type: 'email', message: 'Please enter a valid email!' }
+                      ]}
+                    >
+                      <Input size="large" disabled />
+                    </FieldItem>
 
                      <FieldItem 
                        label="Phone Number"
