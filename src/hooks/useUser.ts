@@ -14,8 +14,24 @@ export const useUser = () => {
 
   const updateMyProfile = useMutation({
     mutationFn: (data: any) => users.updateMyProfile(data),
-    onSuccess: () => {
+    onSuccess: (updatedData) => {
       queryClient.invalidateQueries({ queryKey: ['user', 'profile'] });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
+      queryClient.invalidateQueries({ queryKey: ['replies'] });
+      
+      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: ['my-media'] });
+      
+      queryClient.invalidateQueries({ queryKey: ['albums'] });
+      queryClient.invalidateQueries({ queryKey: ['album'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      
+      if (updatedData) {
+        queryClient.setQueryData(['user', 'profile'], updatedData);
+        queryClient.setQueryData(['user'], updatedData);
+      }
     },
     retry: false,
   });
