@@ -204,7 +204,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
           <AlbumDropdown
             mediaId={data.id}
             componentId={`pin-media-${data.id}`}
-            position="bottom-right"
+            position="click"
             className="absolute top-2 right-2 z-10"
             onOpen={() => setDropdownOpen(true)}
             onClose={() => setDropdownOpen(false)}

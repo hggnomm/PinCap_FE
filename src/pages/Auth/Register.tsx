@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, notification, Row, Progress } from "antd";
-import { register } from "@/api/auth";
+import { register, resendVerifyEmail } from "@/api/auth";
 import React, { useState } from "react";
 import Title from "antd/es/typography/Title";
 import RegisterImage from "@/assets/img/PinCap/register_page_image.jpg";
@@ -131,19 +131,30 @@ const Register = () => {
   };
 
   const handleResendEmail = async () => {
+    if (!userEmail) {
+      notification.error({
+        message: "Error",
+        description: "No email address found. Please try registering again.",
+      });
+      return;
+    }
+
     setIsResending(true);
     try {
-      // Simulate resend email API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await resendVerifyEmail(userEmail);
       
       notification.success({
         message: "Email Sent",
-        description: "We've sent a new verification email to your inbox.",
+        description: response.message || "We've sent a new verification email to your inbox.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error resending verification email:", error);
+      
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to resend verification email";
+      
       notification.error({
         message: "Failed to resend",
-        description: "Please try again later.",
+        description: errorMessage,
       });
     } finally {
       setIsResending(false);

@@ -223,7 +223,7 @@ const DetailMedia = () => {
                   <AlbumDropdown
                     mediaId={id}
                     componentId={`detail-media-${id}`}
-                    position="bottom-left"
+                    position="click"
                     trigger={
                       <button className="album">
                         Album

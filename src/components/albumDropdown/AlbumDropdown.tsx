@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "react-toastify";
 import { addMediasToAlbum } from "@/api/album";
 import clsx from "clsx";
@@ -23,7 +24,7 @@ interface AlbumDropdownProps {
   componentId?: string;
   trigger: React.ReactNode;
   className?: string;
-  position?: "bottom-left" | "bottom-right" | "top-left" | "top-right";
+  position?: "bottom-left" | "bottom-right" | "top-left" | "top-right" | "click";
   onSuccess?: () => void;
   onOpen?: () => void;
   onClose?: () => void;
@@ -46,6 +47,8 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const [searchTerm, setSearchTerm] = useState("");
+  const [originalClickPosition, setOriginalClickPosition] = useState<{ x: number; y: number } | null>(null);
+  const [initialScrollPosition, setInitialScrollPosition] = useState({ x: 0, y: 0 });
   
   // Create album modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -68,6 +71,8 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
     const closeDropdown = () => {
       setShowDropdown(false);
       setSearchTerm("");
+      setOriginalClickPosition(null);
+      setInitialScrollPosition({ x: 0, y: 0 });
       onClose?.();
     };
     
@@ -91,26 +96,84 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         const triggerElement = document.querySelector(`.album-dropdown-trigger-${componentId}`);
         const isInsideTrigger = triggerElement && triggerElement.contains(target);
         
-        // Check if click is inside dropdown menu
+        // Check if click is inside dropdown menu (now rendered in portal)
         const dropdownMenuElements = document.querySelectorAll('.album-dropdown-menu');
         const isInsideDropdown = Array.from(dropdownMenuElements).some(menu => menu.contains(target));
         
-        // Only close if click is outside both trigger and dropdown
-        if (!isInsideTrigger && !isInsideDropdown) {
+        // Check if click is inside any modal (to prevent closing when modal opens)
+        const isInsideModal = target.closest('.ant-modal') || target.closest('[role="dialog"]');
+        
+        // Only close if click is outside both trigger, dropdown, and modals
+        if (!isInsideTrigger && !isInsideDropdown && !isInsideModal) {
           setShowDropdown(false);
           setSearchTerm("");
+          setOriginalClickPosition(null);
+          setInitialScrollPosition({ x: 0, y: 0 });
           currentOpenDropdown = null;
           onClose?.();
         }
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    // Add event listener to document for portal-rendered dropdown
+    document.addEventListener('click', handleClickOutside, true);
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('click', handleClickOutside, true);
     };
   }, [showDropdown, componentId]);
 
+  // Handle scroll events to reposition dropdown
+  useEffect(() => {
+    const handleScroll = () => {
+      if (showDropdown && originalClickPosition && position === "click") {
+        // For click position, maintain the original click position relative to scroll
+        const currentScrollX = window.scrollX || document.documentElement.scrollLeft;
+        const currentScrollY = window.scrollY || document.documentElement.scrollTop;
+        
+        const scrollDeltaX = currentScrollX - initialScrollPosition.x;
+        const scrollDeltaY = currentScrollY - initialScrollPosition.y;
+        
+        setDropdownPosition(prev => ({
+          top: prev.top + scrollDeltaY,
+          left: prev.left + scrollDeltaX
+        }));
+        
+        // Update initial scroll position for next calculation
+        setInitialScrollPosition({ x: currentScrollX, y: currentScrollY });
+      } else if (showDropdown && position !== "click") {
+        // For non-click positions, recalculate based on trigger element
+        const triggerElement = document.querySelector(`.album-dropdown-trigger-${componentId}`) as HTMLElement;
+        if (triggerElement) {
+          const newPosition = calculateDropdownPosition(triggerElement);
+          setDropdownPosition(newPosition);
+        }
+      }
+    };
+
+    const handleResize = () => {
+      if (showDropdown) {
+        const triggerElement = document.querySelector(`.album-dropdown-trigger-${componentId}`) as HTMLElement;
+        if (triggerElement) {
+          const newPosition = calculateDropdownPosition(triggerElement, 
+            position === "click" && originalClickPosition ? 
+            { pageX: originalClickPosition.x, pageY: originalClickPosition.y } as React.MouseEvent : 
+            undefined
+          );
+          setDropdownPosition(newPosition);
+        }
+      }
+    };
+
+    if (showDropdown) {
+      window.addEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll, true);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [showDropdown, componentId, position, originalClickPosition, initialScrollPosition]);
 
   const handleSaveToAlbum = async (albumId: string, albumName: string) => {
     try {
@@ -123,6 +186,8 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         toast.success(`Media saved to "${albumName}" successfully!`);
         setShowDropdown(false);
         setSearchTerm("");
+        setOriginalClickPosition(null);
+        setInitialScrollPosition({ x: 0, y: 0 });
         currentOpenDropdown = null;
         onClose?.();
         onSuccess?.();
@@ -165,46 +230,71 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
     onModalClose?.();
   };
 
-  const calculateDropdownPosition = (triggerElement: HTMLElement) => {
+  const calculateDropdownPosition = (triggerElement: HTMLElement, clickEvent?: React.MouseEvent) => {
     const rect = triggerElement.getBoundingClientRect();
-    const dropdownWidth = 350; // Based on the original design
-    const dropdownHeight = 400; // Approximate max height
+    const dropdownWidth = 350;
+    const dropdownHeight = 400;
     const margin = 8;
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const scrollX = window.scrollX || document.documentElement.scrollLeft;
     
-    let top = rect.bottom + margin;
-    let left = rect.left;
+    let top: number;
+    let left: number;
     
-    // Position based on prop
-    switch (position) {
-      case "bottom-right":
-        left = rect.right - dropdownWidth;
-        break;
-      case "bottom-left":
-        left = rect.left;
-        break;
-      case "top-right":
-        top = rect.top - dropdownHeight - margin;
-        left = rect.right - dropdownWidth;
-        break;
-      case "top-left":
-        top = rect.top - dropdownHeight - margin;
-        left = rect.left;
-        break;
+    // If position is "click", use click coordinates
+    if (position === "click" && clickEvent) {
+      // Use page coordinates (including scroll)
+      top = clickEvent.pageY + margin;
+      left = clickEvent.pageX - dropdownWidth / 2; // Center dropdown on click
+    } else {
+      // Default positioning based on trigger element (convert to page coordinates)
+      top = rect.bottom + scrollY + margin;
+      left = rect.left + scrollX;
+      
+      // Position based on prop
+      switch (position) {
+        case "bottom-right":
+          left = rect.right + scrollX - dropdownWidth;
+          break;
+        case "bottom-left":
+          left = rect.left + scrollX;
+          break;
+        case "top-right":
+          top = rect.top + scrollY - dropdownHeight - margin;
+          left = rect.right + scrollX - dropdownWidth;
+          break;
+        case "top-left":
+          top = rect.top + scrollY - dropdownHeight - margin;
+          left = rect.left + scrollX;
+          break;
+      }
     }
     
-    // Adjust if dropdown would go off screen
-    if (left < margin) {
-      left = margin;
+    // Adjust if dropdown would go off screen horizontally
+    if (left < margin + scrollX) {
+      left = margin + scrollX;
     }
-    if (left + dropdownWidth > window.innerWidth - margin) {
-      left = window.innerWidth - dropdownWidth - margin;
+    if (left + dropdownWidth > window.innerWidth + scrollX - margin) {
+      left = window.innerWidth + scrollX - dropdownWidth - margin;
     }
     
-    if (top + dropdownHeight > window.innerHeight - margin) {
-      top = rect.top - dropdownHeight - margin;
+    // Adjust if dropdown would go off screen vertically
+    if (top + dropdownHeight > window.innerHeight + scrollY - margin) {
+      // Try to position above the trigger or click point
+      if (position === "click" && clickEvent) {
+        top = clickEvent.pageY - dropdownHeight - margin;
+      } else {
+        top = rect.top + scrollY - dropdownHeight - margin;
+      }
     }
-    if (top < margin) {
-      top = rect.bottom + margin;
+    
+    // Ensure dropdown doesn't go above viewport
+    if (top < margin + scrollY) {
+      if (position === "click" && clickEvent) {
+        top = clickEvent.pageY + margin;
+      } else {
+        top = rect.bottom + scrollY + margin;
+      }
     }
     
     return { top, left };
@@ -224,8 +314,22 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
     // Only open dropdown if it's not already open
     if (!showDropdown) {
       const triggerElement = e.currentTarget as HTMLElement;
-      const position = calculateDropdownPosition(triggerElement);
-      setDropdownPosition(position);
+      
+      // Store original click position and scroll position for click positioning
+      if (position === "click") {
+        setOriginalClickPosition({ x: e.pageX, y: e.pageY });
+        setInitialScrollPosition({ 
+          x: window.scrollX || document.documentElement.scrollLeft,
+          y: window.scrollY || document.documentElement.scrollTop
+        });
+      }
+      
+      // Pass the click event only if position is "click"
+      const calculatedPosition = calculateDropdownPosition(
+        triggerElement, 
+        position === "click" ? e : undefined
+      );
+      setDropdownPosition(calculatedPosition);
       
       // React Query will handle the data fetching automatically
       setShowDropdown(true);
@@ -245,13 +349,14 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         {trigger}
       </div>
 
-      {showDropdown && (
+      {showDropdown && createPortal(
         <div 
-          className="album-dropdown-menu fixed w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] max-h-96 flex flex-col"
+          className="album-dropdown-menu absolute w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] max-h-96 flex flex-col"
           style={{
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
             width: '350px', // Match original design
+            position: 'absolute',
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -352,6 +457,8 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
                 // Hide dropdown when opening create modal
                 setShowDropdown(false);
                 setSearchTerm("");
+                setOriginalClickPosition(null);
+                setInitialScrollPosition({ x: 0, y: 0 });
                 currentOpenDropdown = null;
                 onClose?.();
                 onModalOpen?.();
@@ -364,7 +471,8 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
               <span className="text-sm font-medium">Create Album</span>
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
       
       {/* Create Album Modal */}
