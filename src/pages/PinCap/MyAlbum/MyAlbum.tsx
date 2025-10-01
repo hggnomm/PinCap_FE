@@ -132,7 +132,6 @@ const MyAlbum = () => {
         </Loading>
       </div>
 
-      {/* Modal để tạo album mới */}
       <CreateAlbumModal
         visible={modalVisible}
         onCancel={handleCancel}

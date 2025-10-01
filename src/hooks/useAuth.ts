@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import * as auth from '@/api/auth';
 import { ROUTES } from '@/constants/routes';
 import { LoginFormData, RegisterFormData } from '@/validation';
@@ -11,13 +12,21 @@ export const useAuth = () => {
 
   const token = localStorage.getItem('token');
 
-  const { data: user, isLoading: isLoadingUser } = useQuery<User>({
+  const { data: user, isLoading: isLoadingUser, error } = useQuery<User>({
     queryKey: ['user'],
     queryFn: auth.getCurrentUser,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!token, // Only run query if token exists
   });
+
+  useEffect(() => {
+    if (error && (error as any)?.status === 401) {
+      localStorage.removeItem('token');
+      queryClient.clear();
+      navigate(ROUTES.LOGIN);
+    }
+  }, [error, queryClient, navigate]);
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginFormData) => auth.login(data),
