@@ -1,7 +1,8 @@
 import axios from "axios";
 import { showApiError } from "@/utils/errorHandler";
+import { ROUTES } from "@/constants/routes";
 
-const baseUrl = import.meta.env.VITE_BASE_API;
+const baseUrl = (import.meta as any).env.VITE_BASE_API;
 
 const apiClient = axios.create({
   baseURL: baseUrl,
@@ -44,6 +45,16 @@ apiClient.interceptors.response.use(
         message: message,
         errors: errors,
       };
+
+      if (status === 401) {
+        localStorage.removeItem("token");
+        const currentPath = window.location.pathname;
+        if (!currentPath.includes(ROUTES.LOGIN) && !currentPath.includes(ROUTES.REGISTER)) {
+          window.location.href = ROUTES.LOGIN;
+        }
+        
+        return Promise.reject(errorData);
+      }
     } else if (error.request) {
       errorData = {
         status: 500,
