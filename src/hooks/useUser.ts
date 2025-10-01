@@ -80,14 +80,14 @@ export const useUser = () => {
     });
   };
 
-  const searchUsers = (target: string) => {
-    return useQuery({
-      queryKey: ['users', 'search', target],
-      queryFn: () => users.searchUsers(target),
-      enabled: !!target,
-      staleTime: 5 * 60 * 1000,
-    });
-  };
+  // const searchUsers = (target: string) => {
+  //   return useQuery({
+  //     queryKey: ['users', 'search', target],
+  //     queryFn: () => users.searchUsers(target),
+  //     enabled: !!target,
+  //     staleTime: 5 * 60 * 1000,
+  //   });
+  // };
 
   const findUsers = (target: string) => {
     return useQuery({
@@ -129,7 +129,7 @@ export const useUser = () => {
     
     getUserProfile,
     getUserRelationships,
-    searchUsers,
+    // searchUsers,
     findUsers,
     getReportReasons,
     reportUser: reportUser.mutateAsync,

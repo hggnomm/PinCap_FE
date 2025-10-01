@@ -45,6 +45,14 @@ export const useAlbum = () => {
     },
   });
 
+  const inviteUserToAlbumMutation = useMutation({
+    mutationFn: ({ albumId, userId }: { albumId: string; userId: string }) =>
+      album.inviteUserToAlbum(albumId, userId),
+    onSuccess: (_, { albumId }) => {
+      queryClient.invalidateQueries({ queryKey: ['album', albumId] });
+    },
+  });
+
   return {
     getAlbumList,
     getAlbumById,
@@ -57,5 +65,6 @@ export const useAlbum = () => {
     deleteAlbum: deleteAlbumMutation.mutateAsync,
     deleteAlbumLoading: deleteAlbumMutation.isPending,
     deleteAlbumError: deleteAlbumMutation.error,
+    inviteUserToAlbum: inviteUserToAlbumMutation.mutateAsync,
   };
 };

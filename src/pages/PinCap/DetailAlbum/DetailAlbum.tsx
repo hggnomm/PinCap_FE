@@ -177,6 +177,7 @@ const DetailAlbum = () => {
           visible={inviteModalVisible}
           onCancel={() => setInviteModalVisible(false)}
           onConfirm={handleInviteCollaborators}
+          albumId={albumId}
         />
       </div>
     </Loading>

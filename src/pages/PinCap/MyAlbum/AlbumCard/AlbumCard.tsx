@@ -130,6 +130,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
         visible={inviteModalVisible}
         onCancel={() => setInviteModalVisible(false)}
         onConfirm={handleInviteCollaborators}
+        albumId={album.id}
       />
     </>
   );
