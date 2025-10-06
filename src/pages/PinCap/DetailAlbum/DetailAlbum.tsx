@@ -109,6 +109,7 @@ const DetailAlbum = () => {
             )}
             
             <CollaboratorsSection
+              collaborators={albumData?.allUser || []}
               onAddCollaborator={() => setInviteModalVisible(true)}
             />
           </div>
@@ -177,6 +178,7 @@ const DetailAlbum = () => {
           visible={inviteModalVisible}
           onCancel={() => setInviteModalVisible(false)}
           onConfirm={handleInviteCollaborators}
+          albumId={albumId}
         />
       </div>
     </Loading>

@@ -7,7 +7,7 @@ import LoginImage from "@/assets/img/PinCap/login_page_image.jpg";
 import { LogoIcon } from "@/assets/img";
 import GoogleIcon from "@/assets/img/PinCap/googleIcon.png";
 import Title from "antd/es/typography/Title";
-import { login } from "@/api/auth";
+import { login, getGoogleOAuthUrl } from "@/api/auth";
 import { addToken } from "@/store/authSlice";
 import { motion } from "framer-motion";
 import { LoginRequest } from "Auth/LoginRequest";
@@ -198,6 +198,21 @@ const Login: React.FC = () => {
     }
   };
 
+  // Hàm xử lý đăng nhập Google
+  const handleGoogleLogin = async () => {
+    try {
+      const response = await getGoogleOAuthUrl();
+      if (response?.url) {
+        window.location.href = response.url;
+      }
+    } catch (error: any) {
+      api.error({
+        message: "Google Login Error",
+        description: "Unable to connect to Google. Please try again later.",
+      });
+    }
+  };
+
   return (
     <Row className="main-page">
       <Col xs={0} md={14} className="left-login">
@@ -299,7 +314,10 @@ const Login: React.FC = () => {
                 Login
               </Button>
 
-              <Button className="button btn-login-icon" disabled>
+              <Button 
+                className="button btn-login-icon" 
+                onClick={handleGoogleLogin}
+              >
                 <img src={GoogleIcon} alt="" />
                 <span>Continue with Google</span>
               </Button>

@@ -8,8 +8,7 @@ import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponen
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
 import MediaThumbnailSelector from "@/components/mediaThumbnailSelector/MediaThumbnailSelector";
 import type { Album } from "type";
-import type { UpdateAlbumRequest } from "Album/AlbumRequest";
-import { updateAlbumSchema } from "@/validation/album";
+import { updateAlbumSchema, UpdateAlbumFormData } from "@/validation/album";
 import { useFormValidation } from "@/hooks";
 import { useAlbum } from "@/hooks/useAlbum";
 
@@ -17,7 +16,7 @@ interface EditAlbumModalProps {
   visible: boolean;
   album: Album | null;
   onCancel: () => void;
-  onConfirm: (albumRequest: UpdateAlbumRequest) => Promise<void>;
+  onConfirm: (albumRequest: UpdateAlbumFormData) => Promise<void>;
   onDeleteClick: () => void;
   onInviteCollaborators: () => void;
   loading?: boolean;
@@ -228,6 +227,7 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
 
         {/* Collaborators Section */}
         <CollaboratorsSection
+          collaborators={detailAlbum?.allUser ?? []}
           onAddCollaborator={onInviteCollaborators}
           className="mt-6"
           showLearnMore={false}

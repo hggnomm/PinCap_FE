@@ -11,7 +11,12 @@ export const getMyProfile = async () => {
 
 export const updateMyProfile = async (data: any) => {
   try {
-    const response = await apiClient.post('/api/users/my-profile', data);
+    const isFormData = data instanceof FormData;
+    const response = await apiClient.post('/api/users/my-profile', data, {
+      headers: isFormData ? {
+        'Content-Type': 'multipart/form-data',
+      } : undefined,
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -78,10 +83,10 @@ export const searchUsers = async (target: string) => {
   }
 };
 
-export const findUsers = async (target: string) => {
+export const findUsers = async (target: string, albumId?: string | null) => {
   try {
     const response = await apiClient.get('/api/users/find', {
-      params: { target }
+      params: { target, album_id: albumId }
     });
     return response.data;
   } catch (error) {

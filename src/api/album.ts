@@ -1,16 +1,18 @@
 import apiClient from "./apiClient"; // Đường dẫn tới tệp apiClient
 
-export const getMyAlbumData = async () => {
+export const getMyAlbumData = async (params?: {
+  per_page?: number;
+  page?: number;
+  query?: string;
+  order_key?: string;
+  order_type?: string;
+}) => {
   try {
-    const res = await apiClient.get("/api/albums/my-album", {
-      params: {
-        per_page: 10,
-        page: 1,
-      },
-    });
+    const res = await apiClient.get("/api/albums/my-album", { params });
     return res.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -130,6 +132,28 @@ export const removeMediasFromAlbum = async (data: {
 export const inviteUserToAlbum = async (albumId: string, userId: string) => {
   try {
     const res = await apiClient.post(`/api/albums/${albumId}/invite/${userId}`);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Accept album invitation
+export const acceptAlbumInvitation = async (albumId: string) => {
+  try {
+    const res = await apiClient.post(`/api/albums/${albumId}/accept-invitation`);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+// Reject album invitation
+export const rejectAlbumInvitation = async (albumId: string) => {
+  try {
+    const res = await apiClient.post(`/api/albums/${albumId}/reject-invitation`);
     return res.data;
   } catch (error) {
     console.log(error);

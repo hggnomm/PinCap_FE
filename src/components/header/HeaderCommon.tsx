@@ -16,7 +16,6 @@ import { LogoIcon, TextIcon } from "@/assets/img";
 import iconChatbot from "@/assets/img/PinCap/chatbot.png";
 import Chatbot from "../chatbot";
 import { useAuth } from "@/hooks/useAuth";
-import { User } from "@/types/type";
 import "./index.less";
 import { ROUTES } from "@/constants/routes";
 
@@ -101,7 +100,7 @@ const HeaderCommon = () => {
                 <img
                   src={iconChatbot}
                   alt="Chatbot"
-                  style={{ width: "16px" }}
+                  className="w-4 object-contain block"
                 />
               </div>
             </Tooltip>
