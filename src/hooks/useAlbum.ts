@@ -13,6 +13,14 @@ export const useAlbum = () => {
     });
   };
 
+  const getAlbumMemberList = () => {
+    return useQuery({
+      queryKey: ['album-members'],
+      queryFn: () => album.getMyAlbumMember(),
+      staleTime: 5 * 60 * 1000,
+    });
+  };
+
   const getAlbumById = (id: string) => {
     return useQuery({
       queryKey: ['album', id],
@@ -26,6 +34,7 @@ export const useAlbum = () => {
     mutationFn: (data: CreateAlbumFormData) => album.createMyAlbum(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['albums'] });
+      queryClient.invalidateQueries({ queryKey: ['album-members'] });
     },
   });
 
@@ -34,6 +43,7 @@ export const useAlbum = () => {
       album.updateMyAlbum(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['albums'] });
+      queryClient.invalidateQueries({ queryKey: ['album-members'] });
       queryClient.invalidateQueries({ queryKey: ['album', id] });
     },
   });
@@ -42,6 +52,7 @@ export const useAlbum = () => {
     mutationFn: (id: string) => album.deleteMyAlbum(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['albums'] });
+      queryClient.invalidateQueries({ queryKey: ['album-members'] });
     },
   });
 
@@ -50,6 +61,7 @@ export const useAlbum = () => {
       album.inviteUserToAlbum(albumId, userId),
     onSuccess: (_, { albumId }) => {
       queryClient.invalidateQueries({ queryKey: ['albums'] });
+      queryClient.invalidateQueries({ queryKey: ['album-members'] });
       queryClient.invalidateQueries({ queryKey: ['album', albumId] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
@@ -59,6 +71,7 @@ export const useAlbum = () => {
     mutationFn: (albumId: string) => album.acceptAlbumInvitation(albumId),
     onSuccess: (_, albumId) => {
       queryClient.invalidateQueries({ queryKey: ['albums'] });
+      queryClient.invalidateQueries({ queryKey: ['album-members'] });
       queryClient.invalidateQueries({ queryKey: ['album', albumId] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
@@ -73,6 +86,7 @@ export const useAlbum = () => {
 
   return {
     getAlbumList,
+    getAlbumMemberList,
     getAlbumById,
     createAlbum: createAlbumMutation.mutateAsync,
     createAlbumLoading: createAlbumMutation.isPending,
