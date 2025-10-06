@@ -35,6 +35,7 @@ const Login: React.FC = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const verifiedToken = params.get("verified-token");
+  const googleToken = params.get("google-token");
 
   useEffect(() => {
     if (verifiedToken) {
@@ -44,6 +45,17 @@ const Login: React.FC = () => {
         password: "",
         remember: false,
       });
+      return;
+    }
+
+    if (googleToken) {
+      handleLoginSuccess({
+        token: googleToken,
+        email: "",
+        password: "",
+        remember: false,
+      });
+      return;
     }
 
     const savedEmail = localStorage.getItem("rememberedEmail");
@@ -79,7 +91,7 @@ const Login: React.FC = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [form, verifiedToken, isAccountLocked, lockTimeRemaining]);
+  }, [form, verifiedToken, googleToken, isAccountLocked, lockTimeRemaining]);
 
   const checkAccountLockStatus = () => {
     const lockExpiryTime = localStorage.getItem("loginLockExpiry");
