@@ -27,7 +27,16 @@ export const markAsRead = async (notificationId: string) => {
 
 export const markAllAsRead = async () => {
   try {
-    const response = await apiClient.put('/api/notifications/mark-all-read');
+    const response = await apiClient.put('/api/notifications/mark-read-all');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteNotification = async (notificationId: string) => {
+  try {
+    const response = await apiClient.delete(`/api/notifications/${notificationId}`);
     return response.data;
   } catch (error) {
     throw error;

@@ -3,10 +3,10 @@ import "./AlbumCard.less";
 import { EditFilled, LockFilled } from "@ant-design/icons";
 import { Album } from "type";
 import { toast } from "react-toastify";
-import { UpdateAlbumRequest } from "Album/AlbumRequest";
-import { deleteMyAlbum, updateMyAlbum } from "@/api/album";
+import { UpdateAlbumFormData } from "@/validation/album";
 import { useNavigate } from "react-router";
 import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";
+import { useAlbum } from "@/hooks/useAlbum";
 
 interface AlbumCardProps {
   album: Album;
@@ -18,15 +18,16 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const navigate = useNavigate();
+  const { updateAlbum, updateAlbumLoading, deleteAlbum, deleteAlbumLoading } = useAlbum();
 
-  const handleEditAlbum = async (albumRequest: UpdateAlbumRequest) => {
+  const handleEditAlbum = async (albumRequest: UpdateAlbumFormData) => {
     try {
-      const response = await updateMyAlbum(album.id, albumRequest);
-      if (response) {
-        setEditModalVisible(false);
-        fetchAlbums();
-        toast.success("Album updated successfully!");
-      }
+      await updateAlbum({ 
+        id: album.id, 
+        data: albumRequest
+      });
+      setEditModalVisible(false);
+      toast.success("Album updated successfully!");
     } catch (error) {
       console.error("Update failed:", error);
       toast.error("Failed to update album. Please try again.");
@@ -35,14 +36,9 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
 
   const handleDeleteAlbum = async () => {
     try {
-      const response = await deleteMyAlbum(album.id);
-      if (response) {
-        setDeleteModalVisible(false);
-        fetchAlbums();
-        toast.success("Album deleted successfully!");
-      } else {
-        toast.error("Failed to delete the album. Please try again.");
-      }
+      await deleteAlbum(album.id);
+      setDeleteModalVisible(false);
+      toast.success("Album deleted successfully!");
     } catch (error) {
       console.error("Error deleting album:", error);
       toast.error("An error occurred while deleting the album. Please try again.");
@@ -112,6 +108,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
           setEditModalVisible(false);
           setInviteModalVisible(true);
         }}
+        loading={updateAlbumLoading}
       />
 
       {/* Delete Album Modal */}

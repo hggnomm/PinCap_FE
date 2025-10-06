@@ -7,11 +7,17 @@ export const useNotification = () => {
   const getMyNotifications = (page = 1, perPage = 20, filters?: {
     notification_type?: string;
     is_read?: number;
+  }, options?: {
+    enabled?: boolean;
   }) => {
     return useQuery({
       queryKey: ['notifications', page, perPage, filters],
       queryFn: () => notifications.getMyNotifications(page, perPage, filters),
-      staleTime: 2 * 60 * 1000, // 2 minutes for notifications
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes - keep cache longer
+      refetchOnWindowFocus: false, // Don't refetch when window focus
+      refetchOnMount: false, // Don't refetch on mount if data exists
+      enabled: options?.enabled !== false, // Allow manual control
     });
   };
 
@@ -29,11 +35,20 @@ export const useNotification = () => {
     },
   });
 
+  const deleteNotification = useMutation({
+    mutationFn: (notificationId: string) => notifications.deleteNotification(notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+
   return {
     getMyNotifications,
     markAsRead: markAsRead.mutate,
     markAsReadLoading: markAsRead.isPending,
     markAllAsRead: markAllAsRead.mutate,
     markAllAsReadLoading: markAllAsRead.isPending,
+    deleteNotification: deleteNotification.mutate,
+    deleteNotificationLoading: deleteNotification.isPending,
   };
 };

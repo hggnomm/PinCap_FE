@@ -23,7 +23,11 @@ const FieldItem: React.FC<FieldItemProps> = ({
 }) => {
   return (
     <div className="field-item">
-      <span className="text-label">{label}</span>
+      {label && (
+        <label className="text-label">
+          {label}
+        </label>
+      )}
       <Form.Item 
         name={name} 
         rules={rules}

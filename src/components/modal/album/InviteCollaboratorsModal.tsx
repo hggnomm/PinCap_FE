@@ -4,6 +4,7 @@ import clsx from "clsx";
 import ModalComponent from "@/components/modal/ModalComponent";
 import { useUser } from "@/hooks/useUser";
 import { useAlbum } from "@/hooks/useAlbum";
+import { ALBUM_INVITATION_STATUS } from "@/constants/constants";
 
 const useDebounce = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -44,7 +45,7 @@ const InviteCollaboratorsModal: React.FC<InviteCollaboratorsModalProps> = ({
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const searchQuery = findUsers(debouncedSearchTerm);
+  const searchQuery = findUsers(debouncedSearchTerm, albumId);
   const users = searchQuery.data?.data || [];
 
   useEffect(() => {
@@ -60,6 +61,25 @@ const InviteCollaboratorsModal: React.FC<InviteCollaboratorsModalProps> = ({
       setInvitedUsers((prev) => new Set(prev).add(userId));
     } catch (error) {
       console.error("Failed to invite user:", error);
+    }
+  };
+
+  const getButtonStatus = (user: any) => {
+    const status = user.invitation_status || user.status;
+    
+    if (invitedUsers.has(user.id)) {
+      return { text: "Invited", status: ALBUM_INVITATION_STATUS.INVITED };
+    }
+
+    switch (status) {
+      case ALBUM_INVITATION_STATUS.INVITED:
+        return { text: "Invited", status: ALBUM_INVITATION_STATUS.INVITED };
+      case ALBUM_INVITATION_STATUS.ACCEPTED:
+        return { text: "Accepted", status: ALBUM_INVITATION_STATUS.ACCEPTED };
+      case ALBUM_INVITATION_STATUS.REJECTED:
+        return { text: "Invite Again", status: ALBUM_INVITATION_STATUS.REJECTED };
+      default:
+        return { text: "Invite", status: null };
     }
   };
 
@@ -107,42 +127,58 @@ const InviteCollaboratorsModal: React.FC<InviteCollaboratorsModalProps> = ({
 
           {users.length > 0 && (
             <div className="space-y-2">
-              {users.map((user: any) => (
-                <div
-                  key={user.id}
-                  className="relative flex items-center p-3 pr-24 border border-gray-200 rounded-lg hover:bg-gray-50"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center">
-                      {user.avatar ? (
-                        <img
-                          src={user.avatar}
-                          alt={user.name}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <User className="w-5 h-5 text-rose-600" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleInviteUser(user.id)}
-                    className={clsx(
-                      "!absolute right-3 !px-4 !py-2 rounded-lg text-sm font-medium transition-colors",
-                      invitedUsers.has(user.id)
-                        ? "!bg-green-100 text-green-600 cursor-not-allowed"
-                        : "!bg-rose-600 text-white hover:bg-rose-700"
-                    )}
+              {users.map((user: any) => {
+                const { text, status } = getButtonStatus(user);
+                const isDisabled = status !== null && status !== ALBUM_INVITATION_STATUS.REJECTED;
+                
+                return (
+                  <div
+                    key={user.id}
+                    className="relative flex items-center p-3 pr-24 border border-gray-200 rounded-lg hover:bg-gray-50"
                   >
-                    {invitedUsers.has(user.id) ? "Invited" : "Invite"}
-                  </button>
-                </div>
-              ))}
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.name}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-5 h-5 text-rose-600" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{user.name}</p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => !isDisabled && handleInviteUser(user.id)}
+                      disabled={isDisabled}
+                      className={clsx(
+                        "!absolute right-3 !px-4 !py-2 rounded-lg text-sm font-medium transition-colors",
+                        {
+                          "!bg-amber-100 text-amber-700 cursor-not-allowed": 
+                            status === ALBUM_INVITATION_STATUS.INVITED,
+                          
+                          "!bg-green-100 text-green-700 cursor-not-allowed": 
+                            status === ALBUM_INVITATION_STATUS.ACCEPTED,
+                          
+                          "!bg-gray-100 text-gray-700 hover:!bg-gray-200": 
+                            status === ALBUM_INVITATION_STATUS.REJECTED,
+                          
+                          "!bg-rose-600 text-white hover:!bg-rose-700": 
+                            status === null,
+                        }
+                      )}
+                    >
+                      {text}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
 

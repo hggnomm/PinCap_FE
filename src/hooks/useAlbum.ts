@@ -49,7 +49,25 @@ export const useAlbum = () => {
     mutationFn: ({ albumId, userId }: { albumId: string; userId: string }) =>
       album.inviteUserToAlbum(albumId, userId),
     onSuccess: (_, { albumId }) => {
+      queryClient.invalidateQueries({ queryKey: ['albums'] });
       queryClient.invalidateQueries({ queryKey: ['album', albumId] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+
+  const acceptAlbumInvitationMutation = useMutation({
+    mutationFn: (albumId: string) => album.acceptAlbumInvitation(albumId),
+    onSuccess: (_, albumId) => {
+      queryClient.invalidateQueries({ queryKey: ['albums'] });
+      queryClient.invalidateQueries({ queryKey: ['album', albumId] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+
+  const rejectAlbumInvitationMutation = useMutation({
+    mutationFn: (albumId: string) => album.rejectAlbumInvitation(albumId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
 
@@ -66,5 +84,9 @@ export const useAlbum = () => {
     deleteAlbumLoading: deleteAlbumMutation.isPending,
     deleteAlbumError: deleteAlbumMutation.error,
     inviteUserToAlbum: inviteUserToAlbumMutation.mutateAsync,
+    acceptAlbumInvitation: acceptAlbumInvitationMutation.mutateAsync,
+    acceptAlbumInvitationLoading: acceptAlbumInvitationMutation.isPending,
+    rejectAlbumInvitation: rejectAlbumInvitationMutation.mutateAsync,
+    rejectAlbumInvitationLoading: rejectAlbumInvitationMutation.isPending,
   };
 };

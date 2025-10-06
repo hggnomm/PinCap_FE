@@ -4,18 +4,9 @@ import * as users from '@/api/users';
 export const useUser = () => {
   const queryClient = useQueryClient();
 
-  const getMyProfile = () => {
-    return useQuery({
-      queryKey: ['user', 'profile'],
-      queryFn: users.getMyProfile,
-      staleTime: 5 * 60 * 1000,
-    });
-  };
-
   const updateMyProfile = useMutation({
     mutationFn: (data: any) => users.updateMyProfile(data),
     onSuccess: (updatedData) => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'profile'] });
       queryClient.invalidateQueries({ queryKey: ['user'] });
       
       queryClient.invalidateQueries({ queryKey: ['comments'] });
@@ -29,7 +20,6 @@ export const useUser = () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       
       if (updatedData) {
-        queryClient.setQueryData(['user', 'profile'], updatedData);
         queryClient.setQueryData(['user'], updatedData);
       }
     },
@@ -38,7 +28,7 @@ export const useUser = () => {
 
   const getRelationships = (relationship: 'followers' | 'followees') => {
     return useQuery({
-      queryKey: ['user', 'relationships', relationship],
+      queryKey: ['relationships', relationship],
       queryFn: () => users.getRelationships(relationship),
       staleTime: 5 * 60 * 1000,
     });
@@ -48,7 +38,11 @@ export const useUser = () => {
     mutationFn: (data: { followeeId: string; status: 'FOLLOWING' | 'BLOCK' }) =>
       users.followOrBlockUser(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'relationships'] });
+      queryClient.invalidateQueries({ queryKey: ['relationships'] });
+      queryClient.invalidateQueries({ 
+        queryKey: ['user'],
+        refetchType: 'none' // Mark as stale but don't refetch immediately
+      });
     },
     retry: false,
   });
@@ -57,14 +51,18 @@ export const useUser = () => {
     mutationFn: (data: { followeeId: string; status: 'FOLLOWING' | 'BLOCK' }) =>
       users.unfollowOrUnblockUser(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'relationships'] });
+      queryClient.invalidateQueries({ queryKey: ['relationships'] });
+      queryClient.invalidateQueries({ 
+        queryKey: ['user'],
+        refetchType: 'none' // Mark as stale but don't refetch immediately
+      });
     },
     retry: false,
   });
 
   const getUserProfile = (id: string) => {
     return useQuery({
-      queryKey: ['user', 'profile', id],
+      queryKey: ['profile', id],
       queryFn: () => users.getUserProfile(id),
       enabled: !!id,
       staleTime: 5 * 60 * 1000,
@@ -73,7 +71,7 @@ export const useUser = () => {
 
   const getUserRelationships = (userId: string, relationship: 'followers' | 'followees') => {
     return useQuery({
-      queryKey: ['user', 'relationships', userId, relationship],
+      queryKey: ['relationships', userId, relationship],
       queryFn: () => users.getUserRelationships(userId, relationship),
       enabled: !!userId,
       staleTime: 5 * 60 * 1000,
@@ -89,10 +87,10 @@ export const useUser = () => {
   //   });
   // };
 
-  const findUsers = (target: string) => {
+  const findUsers = (target: string, albumId?: string | null) => {
     return useQuery({
-      queryKey: ['users', 'find', target],
-      queryFn: () => users.findUsers(target),
+      queryKey: ['users', 'find', target, albumId],
+      queryFn: () => users.findUsers(target, albumId),
       enabled: !!target,
       staleTime: 5 * 60 * 1000,
     });
@@ -113,7 +111,6 @@ export const useUser = () => {
   });
 
   return {
-    getMyProfile,
     updateMyProfile: updateMyProfile.mutateAsync,
     updateMyProfileLoading: updateMyProfile.isPending,
     updateMyProfileError: updateMyProfile.error,

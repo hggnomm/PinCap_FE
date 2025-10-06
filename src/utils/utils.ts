@@ -64,7 +64,7 @@ export const getImageReactionWithId = (id?: string): string => {
 export const formatTime = (dateString: string): string => {
   const pastDate = new Date(dateString);
   const now = new Date();
-  const seconds = Math.floor((now.getTime() - pastDate.getTime()) / 1000);
+  const totalSeconds = Math.floor((now.getTime() - pastDate.getTime()) / 1000);
 
   const ONE_MINUTE = 60;
   const ONE_HOUR = ONE_MINUTE * 60;
@@ -72,19 +72,44 @@ export const formatTime = (dateString: string): string => {
   const ONE_WEEK = ONE_DAY * 7;
   const ONE_YEAR = ONE_DAY * 365;
 
-  if (seconds < ONE_MINUTE) {
+  if (totalSeconds < ONE_MINUTE) {
     return "Just now";
   }
 
-  const years = Math.floor(seconds / ONE_YEAR);
-  if (years > 0) return `${years}y`;
+  // Calculate each time unit
+  const years = Math.floor(totalSeconds / ONE_YEAR);
+  const weeks = Math.floor((totalSeconds % ONE_YEAR) / ONE_WEEK);
+  const days = Math.floor((totalSeconds % ONE_WEEK) / ONE_DAY);
+  const hours = Math.floor((totalSeconds % ONE_DAY) / ONE_HOUR);
+  const minutes = Math.floor((totalSeconds % ONE_HOUR) / ONE_MINUTE);
+  const seconds = Math.floor(totalSeconds % ONE_MINUTE);
 
-  const weeks = Math.floor(seconds / ONE_WEEK);
-  if (weeks > 0) return `${weeks}w`;
+  // Return two most significant units
+  if (years > 0) {
+    if (weeks > 0) return `${years}y ${weeks}w`;
+    if (days > 0) return `${years}y ${days}d`;
+    return `${years}y`;
+  }
 
-  const hours = Math.floor(seconds / ONE_HOUR);
-  if (hours > 0) return `${hours}h`;
+  if (weeks > 0) {
+    if (days > 0) return `${weeks}w ${days}d`;
+    return `${weeks}w`;
+  }
 
-  const minutes = Math.floor(seconds / ONE_MINUTE);
-  return `${minutes}m`;
+  if (days > 0) {
+    if (hours > 0) return `${days}d ${hours}h`;
+    return `${days}d`;
+  }
+
+  if (hours > 0) {
+    if (minutes > 0) return `${hours}h ${minutes}m`;
+    return `${hours}h`;
+  }
+
+  if (minutes > 0) {
+    if (seconds > 0) return `${minutes}m ${seconds}s`;
+    return `${minutes}m`;
+  }
+
+  return `${seconds}s`;
 };

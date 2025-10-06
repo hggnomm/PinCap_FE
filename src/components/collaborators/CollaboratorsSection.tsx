@@ -4,7 +4,9 @@ import { CustomTooltip } from "@/components/tooltip"
 
 interface Collaborator {
   id: string
-  name: string
+  name?: string
+  first_name?: string
+  last_name?: string
   avatar?: string
 }
 
@@ -25,12 +27,19 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
   showLearnMore = false,
   className = "",
 }) => {
-  const displayCollaborators = collaborators.length > 0 && collaborators.slice(0, maxDisplay) ||
-    Array.from({ length: Math.min(maxDisplay, 5) }, (_, index) => ({
-      id: `dummy-${index}`,
-      name: `User ${index + 1}`,
-      avatar: undefined,
-    }))
+  const displayCollaborators = collaborators.slice(0, maxDisplay)
+
+  if (collaborators.length === 0) {
+    return null
+  }
+
+  const getCollaboratorName = (collaborator: Collaborator) => {
+    if (collaborator.name) return collaborator.name
+    if (collaborator.first_name && collaborator.last_name) {
+      return `${collaborator.first_name} ${collaborator.last_name}`
+    }
+    return collaborator.first_name || collaborator.last_name || "Unknown"
+  }
 
   return (
     <div className={clsx("my-8", className)}>
@@ -48,7 +57,7 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
           {displayCollaborators.map((collaborator, index) => (
             <CustomTooltip
               key={collaborator.id}
-              title={collaborator.name}
+              title={getCollaboratorName(collaborator)}
               placement="top"
             >
               <div
@@ -62,7 +71,7 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
                     {collaborator.avatar && (
                       <img
                         src={collaborator.avatar || "/placeholder.svg"}
-                        alt={collaborator.name}
+                        alt={getCollaboratorName(collaborator)}
                         className="w-full h-full object-cover"
                       />
                     )}
