@@ -22,11 +22,12 @@ import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
 import DraftMedia from "./DraftMedia";
-import { Media } from "type";
 import ProgressiveImage from "react-progressive-image";
-import { MediaFormValues } from "Media/MediaRequest";
+import { MediaFormValues } from "@/types/Media/MediaRequest";
+import { Media } from "@/types/type";
 import ImageEditor from "@/components/imageEditor";
 import { EditOutlined } from "@ant-design/icons";
+import { MediaResponse } from "@/types/Media/MediaResponse";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -170,14 +171,12 @@ const CreateMedia: React.FC = () => {
     setTextCreateDraft(true);
 
     try {
-      const response = formValue.id
+      const response: MediaResponse = formValue.id
         ? await updatedMedia(formValue.id, { ...mediaData})
         : await createMedia(mediaData);
 
-      if (response) {
-        if (!draftId) {
-          fetchDrafts(true);
-        }
+      if (response?.media?.id) {
+        setDraftId(response.media.id);
       } else {
         toast.error("An unexpected error occurred.");
       }
