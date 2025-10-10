@@ -9,5 +9,5 @@ export interface MediaFormValues {
   tags_name?: string[];
   is_created?: boolean;
   is_comment: number;
-  tag_flg: boolean;
+  tag_flg?: boolean;
 }
