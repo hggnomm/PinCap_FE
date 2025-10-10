@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./index.less";
+import "./FilePond.less";
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 import Title from "antd/es/typography/Title";
 import {
@@ -11,6 +12,7 @@ import {
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import clsx from "clsx";
 
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -20,9 +22,9 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginImageEdit from "filepond-plugin-image-edit";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+// @ts-ignore
 import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
 import DraftMedia from "./DraftMedia";
-import ProgressiveImage from "react-progressive-image";
 import { MediaFormValues } from "@/types/Media/MediaRequest";
 import { Media } from "@/types/type";
 import ImageEditor from "@/components/imageEditor";
@@ -65,6 +67,7 @@ const CreateMedia: React.FC = () => {
   // Image Editor states
   const [isImageEditorVisible, setIsImageEditorVisible] = useState<boolean>(false);
   const [editingImageSrc, setEditingImageSrc] = useState<string>("");
+  const [editingImageIndex, setEditingImageIndex] = useState<number>(-1);
 
   useEffect(() => {
     fetchDrafts();
@@ -276,19 +279,20 @@ const CreateMedia: React.FC = () => {
     setTags(media.tags_name || []);
   };
 
-  const handleOpenImageEditor = () => {
+  const handleOpenImageEditor = (index: number = 0) => {
     let imageSrc = "";
     
-    if (imageUrl) {
-      // For draft images, use the existing imageUrl
+    if (imageUrl && index === 0) {
+      // For draft images, use the existing imageUrl (only for first image)
       imageSrc = imageUrl;
-    } else if (fileList.length > 0) {
-      // For newly uploaded files, create object URL
-      imageSrc = URL.createObjectURL(fileList[0]);
+    } else if (fileList.length > index) {
+      // For newly uploaded files, create object URL for specific index
+      imageSrc = URL.createObjectURL(fileList[index]);
     }
     
     if (imageSrc) {
       setEditingImageSrc(imageSrc);
+      setEditingImageIndex(index);
       setIsImageEditorVisible(true);
     }
   };
@@ -299,46 +303,74 @@ const CreateMedia: React.FC = () => {
       type: "image/jpeg",
     });
     
-    // Update file list with edited image
-    setFileList([editedFile]);
-    
-    // Clear draft image URL since we now have a new edited file
-    setImageUrl("");
-    setIsSelectedDraft(false);
+    if (editingImageIndex === 0 && imageUrl) {
+      // If editing the first image and it's a draft image
+      setFileList([editedFile]);
+      setImageUrl("");
+      setIsSelectedDraft(false);
+    } else {
+      // If editing a file from fileList
+      const newFileList = [...fileList];
+      newFileList[editingImageIndex] = editedFile;
+      setFileList(newFileList);
+    }
     
     // Close editor
     setIsImageEditorVisible(false);
     setEditingImageSrc("");
+    setEditingImageIndex(-1);
   };
 
   const handleCloseImageEditor = () => {
     setIsImageEditorVisible(false);
     setEditingImageSrc("");
+    setEditingImageIndex(-1);
   };
+
+  useEffect(() => {
+    const addEditButtons = () => {
+      const filepondItems = document.querySelectorAll('.filepond--item');
+      filepondItems.forEach((item, index) => {
+        if (item.querySelector('.edit-button')) {
+          return;
+        }
+        
+        const imagePreview = item.querySelector('.filepond--image-preview');
+        if (imagePreview) {
+          const editButton = document.createElement('button');
+          editButton.className = 'edit-button absolute top-2 right-2 !bg-rose-600 hover:!bg-rose-700 !border-rose-600 hover:!border-rose-700 shadow-lg z-10 !p-2 rounded-full flex items-center justify-center border-0 cursor-pointer transition-all duration-200';
+          editButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="16" height="16"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+          editButton.onclick = (e) => {
+            e.stopPropagation();
+            handleOpenImageEditor(index);
+          };
+          (item as HTMLElement).style.position = 'relative';
+          item.appendChild(editButton);
+        }
+      });
+    };
+
+    const timer = setTimeout(addEditButtons, 100);
+    
+    return () => clearTimeout(timer);
+  }, [fileList]);
 
   return (
     <div className="create-media-container">
       <div className="field-create-media">
         <div>
-          <Title level={4} style={{ margin: 0 }}>
+          <Title level={4} className="m-0">
             Create Media
           </Title>
         </div>
         <div>
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {isLoadCreateDraft &&
-              (textCreateDraft ? (
-                <div className="text-draft-change">Saving changes...</div>
-              ) : (
-                <div className="text-draft-change">Changes saved!</div>
-              ))}
+          <div className="flex gap-2.5 justify-center items-center">
+            {isLoadCreateDraft && textCreateDraft && (
+              <div className="text-draft-change">Saving changes...</div>
+            )}
+            {isLoadCreateDraft && !textCreateDraft && (
+              <div className="text-draft-change">Changes saved!</div>
+            )}
             <Button onClick={handleGenerateClick} className="btn-publish-media">
               Publish
             </Button>
@@ -361,56 +393,72 @@ const CreateMedia: React.FC = () => {
         <Form
           form={form}
           disabled={isFormDisabled} // Disable form khi isFormDisabled = true
-          className={`form-create-media ${isLoad ? "set-opacity" : ""}`}
+          className={clsx(
+            "form-create-media",
+            {
+              "set-opacity": isLoad,
+              "!flex-col": fileList.length >= 2,
+              "!flex-row": fileList.length <= 1
+            }
+          )}
           onValuesChange={handleFormChange} // Gọi khi có thay đổi
         >
-          <Col md={24} xl={10} className="upload-image">
-            {imageUrl ? (
-              <div className="draft-img">
-                <ProgressiveImage src={imageUrl} placeholder={imageUrl}>
-                  {(src: any, loading: any) => (
-                    <img
-                      style={{
-                        filter: loading ? "blur(20px)" : "none",
-                        transition: "filter 0.3s",
-                      }}
-                      src={src}
-                      alt="media preview"
-                    />
-                  )}
-                </ProgressiveImage>
+          <Col 
+            md={24} 
+            xl={fileList.length >= 2 ? 24 : 10} 
+            className={clsx("upload-image", {
+              "!w-full !px-8": fileList.length >= 2,
+            })}
+          >
+            {imageUrl && (
+              <div className="draft-img relative">
+                <img
+                  className="transition-all duration-300"
+                  src={imageUrl}
+                  alt="media preview"
+                />
+                {/* <Button
+                  type="primary"
+                  shape="circle"
+                  icon={<EditOutlined />}
+                  onClick={() => handleOpenImageEditor(0)}
+                  className="absolute top-2 right-2 !bg-rose-600 hover:!bg-rose-700 !border-rose-600 hover:!border-rose-700 shadow-lg z-10 !p-2"
+                  size="large"
+                /> */}
               </div>
-            ) : (
-              <div className="relative">
+            )}
+            {!imageUrl && (
+              <div className={clsx("relative", {
+                "filepond-grid-wrapper": fileList.length >= 2
+              })}>
                 <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
                   <FilePond
                     files={fileList}
                     onupdatefiles={(fileItems) =>
                       setFileList(fileItems.map((item): any => item.file))
                     }
-                    allowMultiple={false}
+                    allowMultiple={true}
+                    maxFiles={10}
                     maxFileSize="50MB"
                     acceptedFileTypes={["image/*", "video/*"]}
-                    labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
-                    imagePreviewMaxHeight={1000}
+                    labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
+                    imagePreviewMaxHeight={350}
                     imagePreviewMarkupShow
+                    itemInsertLocation="after"
                   />
                 </Form.Item>
-                {fileList.length > 0 && (
-                  <Button
-                    type="primary"
-                    shape="circle"
-                    icon={<EditOutlined />}
-                    onClick={handleOpenImageEditor}
-                    className="absolute top-2 right-2 !bg-rose-600 hover:!bg-rose-700 !border-rose-600 hover:!border-rose-700 shadow-lg z-10"
-                    size="large"
-                  />
-                )}
+               
               </div>
             )}
           </Col>
 
-          <Col md={24} xl={14} className="field-input">
+          <Col 
+            md={24} 
+            xl={fileList.length >= 2 ? 24 : 14} 
+            className={clsx("field-input", {
+              "!w-full !px-8": fileList.length >= 2
+            })}
+          >
             <div className="field-item-create">
               <span className="text-label">Title</span>
               <Form.Item name="media_name">
@@ -479,6 +527,7 @@ const CreateMedia: React.FC = () => {
           onSelectMedia={handleSelectMedia}
           drafts={drafts}
           loadingDrafts={loadingDrafts}
+          onDraftDeleted={fetchDrafts}
         />
       </Drawer>
 

@@ -16,6 +16,7 @@ interface ModalComponentProps {
   children: React.ReactNode;
   className?: string;
   bodyClassName?: string;
+  confirmLoading?: boolean;
 }
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
@@ -27,7 +28,8 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   buttonLabels = { confirmLabel: "Confirm", cancelLabel: "Close" },
   children,
   className,
-  bodyClassName,  
+  bodyClassName,
+  confirmLoading = false,
 }) => {
   return (
     <Modal
@@ -39,10 +41,20 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       transitionName=""
       maskTransitionName=""
       footer={[
-        <button className="cancel" key="cancel" onClick={onCancel}>
+        <button 
+          className="cancel" 
+          key="cancel" 
+          onClick={onCancel}
+          disabled={confirmLoading}
+        >
           {buttonLabels.cancelLabel}
         </button>,
-        <button className="confirm" key="confirm" onClick={onConfirm}>
+        <button 
+          className={clsx("confirm", { "opacity-50 cursor-not-allowed": confirmLoading })}
+          key="confirm" 
+          onClick={onConfirm}
+          disabled={confirmLoading}
+        >
           {buttonLabels.confirmLabel}
         </button>,
       ]}

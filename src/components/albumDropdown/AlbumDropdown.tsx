@@ -6,6 +6,8 @@ import clsx from "clsx";
 import { CreateAlbumModal } from "@/components/modal/album";
 import { useAlbum } from "@/hooks/useAlbum";
 import { CreateAlbumFormData } from "@/validation";
+import { BaseTabs } from "@/components/baseTabs";
+import { ALBUM_TABS } from "@/constants/constants";
 
 // Global state to track which dropdown is open
 let currentOpenDropdown: string | null = null;
@@ -54,17 +56,28 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
   const [showCreateModal, setShowCreateModal] = useState(false);
   
   // Use React Query for albums
-  const { getAlbumList, createAlbum, createAlbumLoading } = useAlbum();
-  const { data: albumsResponse, isLoading: loading, refetch } = getAlbumList();
-  const albums = albumsResponse?.data || [];
+  const { getAlbumList, getAlbumMemberList, createAlbum, createAlbumLoading } = useAlbum();
+  const { data: myAlbumsResponse, isLoading: myAlbumsLoading } = getAlbumList();
+  const { data: sharedAlbumsResponse, isLoading: sharedAlbumsLoading } = getAlbumMemberList();
+  
+  const myAlbums = myAlbumsResponse?.data ?? [];
+  const sharedAlbums = sharedAlbumsResponse?.data ?? [];
+  
+  const [activeTab, setActiveTab] = useState<string>(ALBUM_TABS.MY_ALBUMS);
   
   // Generate unique component ID
-  const componentId = providedId || `album-dropdown-${mediaId}-${Math.random().toString(36).substr(2, 9)}`;
+  const componentId = providedId ?? `album-dropdown-${mediaId}-${Math.random().toString(36).substr(2, 9)}`;
   
-  // Filter albums based on search term
-  const filteredAlbums = albums.filter((album: Album) =>
+  const filteredMyAlbums = myAlbums.filter((album: Album) =>
     album.album_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  const filteredSharedAlbums = sharedAlbums.filter((album: Album) =>
+    album.album_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  const currentAlbums = activeTab === ALBUM_TABS.MY_ALBUMS ? filteredMyAlbums : filteredSharedAlbums;
+  const currentLoading = activeTab === ALBUM_TABS.MY_ALBUMS ? myAlbumsLoading : sharedAlbumsLoading;
 
   // Register close function and handle global dropdown management
   useEffect(() => {
@@ -378,18 +391,35 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
             />
           </div>
           
+          <div className="flex-shrink-0 border-b border-gray-100">
+            <BaseTabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              items={[
+                {
+                  key: ALBUM_TABS.MY_ALBUMS,
+                  label: ALBUM_TABS.MY_ALBUMS,
+                },
+                {
+                  key: ALBUM_TABS.SHARED_ALBUMS,
+                  label: ALBUM_TABS.SHARED_ALBUMS,
+                },
+              ]}
+            />
+          </div>
+          
           {/* Content */}
           <div className="flex-1 overflow-y-auto">
-            {loading && (
+            {currentLoading && (
               <div className="p-4 text-center">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-rose-600 mx-auto"></div>
                 <p className="text-sm text-gray-500 mt-2">Loading albums...</p>
               </div>
             )}
             
-            {!loading && filteredAlbums.length > 0 && (
+            {!currentLoading && currentAlbums.length > 0 && (
               <div className="py-2">
-                {filteredAlbums.map((album: Album) => (
+                {currentAlbums.map((album: Album) => (
                   <div
                     key={album.id}
                     className="px-3 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 flex items-center justify-between"
@@ -431,17 +461,23 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
               </div>
             )}
             
-            {!loading && filteredAlbums.length === 0 && (
+            {!currentLoading && currentAlbums.length === 0 && (
               <div className="p-4 text-center">
                 {searchTerm && (
                   <>
                     <p className="text-sm text-gray-500">No albums found for "{searchTerm}"</p>
                   </>
                 )}
-                {!searchTerm && (
+                {!searchTerm && activeTab === ALBUM_TABS.MY_ALBUMS && (
                   <>
                     <p className="text-sm text-gray-500">No albums found</p>
                     <p className="text-xs text-gray-400 mt-1">Create an album first to save media</p>
+                  </>
+                )}
+                {!searchTerm && activeTab === ALBUM_TABS.SHARED_ALBUMS && (
+                  <>
+                    <p className="text-sm text-gray-500">No shared albums</p>
+                    <p className="text-xs text-gray-400 mt-1">Albums shared with you will appear here</p>
                   </>
                 )}
               </div>
@@ -463,7 +499,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
                 onClose?.();
                 onModalOpen?.();
               }}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-md transition-colors duration-150"
+              className="w-full flex items-center justify-center space-x-2 !px-4 !py-2 !bg-gray-50 hover:!bg-blue-500 text-gray-700 hover:!text-white rounded-md transition-colors duration-300"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

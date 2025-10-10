@@ -6,12 +6,14 @@ import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import { EllipsisOutlined } from "@ant-design/icons/lib";
 import ModalComponent from "@/components/modal/ModalComponent";
 import { toast } from "react-toastify";
+import { useMedia } from "@/hooks/useMedia";
 
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;
   onSelectMedia: (media: Media) => void;
   drafts: Media[];
   loadingDrafts: boolean;
+  onDraftDeleted?: () => void;
 }
 
 const DraftMedia = ({
@@ -19,7 +21,9 @@ const DraftMedia = ({
   onSelectMedia,
   drafts,
   loadingDrafts,
+  onDraftDeleted,
 }: DraftMediaProps) => {
+  const { deleteMedia, deleteMediaLoading } = useMedia();
   const [isSelectedMedia, setIsSelectedMedia] = useState<Media | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [detailMedia, setDetailMedia] = useState<Media | null>(null);
@@ -43,15 +47,30 @@ const DraftMedia = ({
   };
 
   const deleteDraft = async () => {
-    try {
-      console.log("Deleting draft...");
+    if (!detailMedia?.id) {
+      toast.error("No draft selected to delete");
+      return;
+    }
 
+    try {
+      await deleteMedia([detailMedia.id]);
       setDeleteModalVisible(false);
-      toast.success("Draft deleted successfully!"); 
+      toast.success("Draft deleted successfully!");
+      
+      // Reset selected media if it was the deleted one
+      if (isSelectedMedia?.id === detailMedia.id) {
+        setIsSelectedMedia(null);
+        resetFormAndCloseDrawer();
+      }
+      
+      // Callback to refresh drafts list
+      if (onDraftDeleted) {
+        onDraftDeleted();
+      }
     } catch (error) {
-      console.error("Error deleting album:", error);
+      console.error("Error deleting draft:", error);
       toast.error(
-        "An error occurred while deleting the album. Please try again."
+        "An error occurred while deleting the draft. Please try again."
       );
     }
   };
@@ -113,9 +132,10 @@ const DraftMedia = ({
             onCancel={() => setDeleteModalVisible(false)}
             onConfirm={deleteDraft}
             buttonLabels={{
-              confirmLabel: "Delete",
+              confirmLabel: deleteMediaLoading ? "Deleting..." : "Delete",
               cancelLabel: "Cancel",
             }}
+            confirmLoading={deleteMediaLoading}
           >
             <div
               style={{
