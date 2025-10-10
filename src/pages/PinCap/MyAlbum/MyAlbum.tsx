@@ -13,9 +13,15 @@ import { useAlbum } from "@/hooks/useAlbum";
 
 const MyAlbum = () => {
   const navigate = useNavigate();
-  const { getAlbumList, createAlbum, createAlbumLoading } = useAlbum();
+  const { getAlbumList, getAlbumMemberList, createAlbum, createAlbumLoading } =
+    useAlbum();
 
   const { data: albumsData, isLoading, error, refetch } = getAlbumList();
+  const {
+    data: memberAlbumsData,
+    isLoading: isMemberLoading,
+    error: memberError,
+  } = getAlbumMemberList();
 
   // MODAL COMPONENTS
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,10 +49,7 @@ const MyAlbum = () => {
     }
   };
 
-  const renderAlbumSection = (
-    sectionTitle: string,
-    albumsList: Album[]
-  ) => (
+  const renderAlbumSection = (sectionTitle: string, albumsList: Album[]) => (
     <div className="album-section pt-2 pb-[40px] border-b-3 last:border-b-0 border-[#9eb8d9] px-[20px]">
       <h2 className="!pl-2 text-xl font-bold !mb-2 text-gray-800">
         {sectionTitle}
@@ -90,11 +93,17 @@ const MyAlbum = () => {
           />
         </div>
 
-        <Loading 
-          isLoading={isLoading} 
-          error={error ? "Failed to fetch albums. Please try again later." : null}
+        <Loading
+          isLoading={isLoading || isMemberLoading}
+          error={
+            error || memberError
+              ? "Failed to fetch albums. Please try again later."
+              : null
+          }
         >
           {albumsData?.data && renderAlbumSection("My Albums", albumsData.data)}
+          {memberAlbumsData?.data &&
+            renderAlbumSection("Albums Shared with Me", memberAlbumsData.data)}
         </Loading>
       </div>
 
