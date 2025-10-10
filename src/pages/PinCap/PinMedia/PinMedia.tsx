@@ -18,6 +18,7 @@ import "react-medium-image-zoom/dist/styles.css";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import AlbumDropdown from "@/components/albumDropdown";
+import clsx from "clsx";
 
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
@@ -96,7 +97,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
       const formValue = await form.validateFields();
 
       const updatedData: MediaFormValues = {
-        id: media?.id, // Sử dụng ID của media hiện tại
+        id: media?.id,
         mediaOwner_id: tokenPayload.id,
         media_name: formValue.media_name,
         description: formValue.description,
@@ -143,7 +144,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
   return (
     <>
       <motion.div
-        className="box"
+        className="box relative overflow-hidden"
         onClick={() => {
           // Block navigation when modal is open
           if (!modalOpen) {
@@ -154,15 +155,15 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 1 }}
-        style={{ position: "relative", overflow: "hidden" }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
       >
-        {data?.type === "VIDEO" ? (
+        {data?.type === "VIDEO" && (
           <video autoPlay loop muted>
             <source src={srcUrl} />
           </video>
-        ) : (
+        )}
+        {data?.type === "IMAGE" && (
           <LazyLoadImage
             src={srcUrl}
             alt="Media content"
@@ -170,21 +171,16 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             threshold={100}
           />
         )}
+       
         <motion.div
-          className="overlay"
+          className={clsx(
+            "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
+            {
+              "bottom-[5px]": data?.type === "IMAGE",
+              "bottom-0": data?.type === "VIDEO"
+            }
+          )}
           whileHover={{ opacity: 1 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 5,
-            backgroundColor: "rgba(0, 0, 0, 0.4)",
-            opacity: 0,
-            transition: "opacity 0.3s",
-            zIndex: 1,
-            borderRadius: "15px",
-          }}
         >
           {isEditMedia && (
             <div
@@ -294,7 +290,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         onConfirm={deleteMedia}
         buttonLabels={{ confirmLabel: "Delete", cancelLabel: "Cancel" }}
       >
-        <div style={{ marginBottom: 20, marginTop: 20 }}>
+        <div className="my-5">
           Are you sure you want to delete this Media? This action cannot be
           undone.
         </div>
