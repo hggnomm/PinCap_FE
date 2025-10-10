@@ -1,0 +1,153 @@
+// FilePond Grid Layout - Max height and image fit
+.filepond-grid-wrapper {
+  .filepond--item {
+    overflow: hidden;
+    border-radius: 10px !important;
+    max-height: 300px !important;
+    width: calc(50% - 0.5em) !important;
+    box-sizing: border-box;
+  }
+
+  // Hide file names
+  .filepond--file-info {
+    display: none !important;
+  }
+
+  .filepond--file-info-main {
+    display: none !important;
+  }
+
+  .filepond--file-info-sub {
+    display: none !important;
+  }
+
+  // Add hover effect to close button
+  .filepond--file-action-button {
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+  }
+
+  .filepond--file-action-button:hover {
+    transform: scale(1.1) !important;
+    background-color: rgba(255, 0, 0, 0.1) !important;
+    cursor: pointer !important;
+  }
+
+  .filepond--item-panel {
+    border-radius: 10px !important;
+    overflow: hidden;
+    max-height: 300px;
+  }
+
+  .filepond--file-wrapper {
+    border-radius: 10px !important;
+    overflow: hidden;
+    max-height: 300px;
+  }
+
+  .filepond--file {
+    border-radius: 10px !important;
+    overflow: hidden;
+    max-height: 300px;
+  }
+
+  .filepond--image-preview-wrapper {
+    border-radius: 10px !important;
+    overflow: hidden;
+    max-height: 300px;
+  }
+
+  .filepond--image-preview {
+    border-radius: 10px !important;
+    overflow: hidden;
+    object-fit: contain;
+    max-height: 300px;
+  }
+
+  .filepond--media-preview {
+    max-height: 300px;
+  }
+
+  .filepond--media-preview video {
+    border-radius: 10px !important;
+    overflow: hidden;
+    max-height: 300px;
+    object-fit: contain;
+  }
+
+  .filepond--root {
+    max-width: 100%;
+  }
+
+  .filepond--list {
+    max-width: 100%;
+  }
+}
+
+// General FilePond styles for single file upload
+.filepond--root {
+  .filepond--file-info {
+    display: none !important;
+  }
+
+  .filepond--file-info-main {
+    display: none !important;
+  }
+
+  .filepond--file-info-sub {
+    display: none !important;
+  }
+
+  // Add hover effect to close button for single file
+  .filepond--file-action-button {   
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+  }
+
+  .filepond--file-action-button:hover {
+    transform: scale(1.1) !important;
+    background-color: rgba(255, 0, 0, 0.1) !important;
+    cursor: pointer !important;
+  }
+}
+
+// Responsive max-height
+@media (min-width: 768px) {
+  .filepond-grid-wrapper {
+    .filepond--item {
+      max-height: 300px;
+      min-height: 400px;
+      width: calc(50% - 0.5em) !important;
+    }
+
+    .filepond--item-panel,
+    .filepond--file-wrapper,
+    .filepond--file,
+    .filepond--image-preview-wrapper,
+    .filepond--image-preview,
+    .filepond--media-preview,
+    .filepond--media-preview video {
+      max-height: 300px;
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  .filepond-grid-wrapper {
+    .filepond--item {
+      max-height: 300px;
+      min-height: 300px;
+      width: calc(33.33% - 0.5em) !important;
+    }
+
+    .filepond--item-panel,
+    .filepond--file-wrapper,
+    .filepond--file,
+    .filepond--image-preview-wrapper,
+    .filepond--image-preview,
+    .filepond--media-preview,
+    .filepond--media-preview video {
+      max-height: 300px;
+    }
+  }
+}
