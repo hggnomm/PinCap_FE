@@ -17,3 +17,8 @@ export const ALBUM_INVITATION_STATUS = {
   ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
 };
+
+export const ALBUM_TABS = {
+  MY_ALBUMS: "My Albums",
+  SHARED_ALBUMS: "Albums Shared with Me",
+};
