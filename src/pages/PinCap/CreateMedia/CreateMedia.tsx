@@ -479,6 +479,7 @@ const CreateMedia: React.FC = () => {
           onSelectMedia={handleSelectMedia}
           drafts={drafts}
           loadingDrafts={loadingDrafts}
+          onDraftDeleted={fetchDrafts}
         />
       </Drawer>
 
