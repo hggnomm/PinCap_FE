@@ -22,3 +22,8 @@ export const ALBUM_TABS = {
   MY_ALBUMS: "My Albums",
   SHARED_ALBUMS: "Albums Shared with Me",
 };
+
+export const PRIVACY = {
+  PRIVATE: "0",
+  PUBLIC: "1"
+};

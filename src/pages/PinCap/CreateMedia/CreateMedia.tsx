@@ -30,6 +30,7 @@ import { Media } from "@/types/type";
 import ImageEditor from "@/components/imageEditor";
 import { EditOutlined } from "@ant-design/icons";
 import { MediaResponse } from "@/types/Media/MediaResponse";
+import { PRIVACY } from "@/constants/constants";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -75,7 +76,7 @@ const CreateMedia: React.FC = () => {
 
   useEffect(() => {
     if (!form.getFieldValue("privacy")) {
-      form.setFieldsValue({ privacy: "0" });
+      form.setFieldsValue({ privacy: PRIVACY.PRIVATE });
     }
   }, [form]);
 
@@ -268,7 +269,7 @@ const CreateMedia: React.FC = () => {
     form.setFieldsValue({
       media_name: media.media_name,
       description: media.description,
-      privacy: media.privacy == "PUBLIC" ? "1" : "0",
+      privacy: media.privacy == "PUBLIC" ? PRIVACY.PUBLIC : PRIVACY.PRIVATE,
       tags_name: media.tags_name,
       id: media.id,
     });
@@ -398,7 +399,7 @@ const CreateMedia: React.FC = () => {
             {
               "set-opacity": isLoad,
               "!flex-col": fileList.length >= 2,
-              "!flex-row": fileList.length <= 1
+              // "!flex-row": fileList.length <= 1
             }
           )}
           onValuesChange={handleFormChange} // Gọi khi có thay đổi
@@ -438,11 +439,10 @@ const CreateMedia: React.FC = () => {
                       setFileList(fileItems.map((item): any => item.file))
                     }
                     allowMultiple={true}
-                    maxFiles={10}
+                    maxFiles={6}
                     maxFileSize="50MB"
                     acceptedFileTypes={["image/*", "video/*"]}
                     labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
-                    imagePreviewMaxHeight={350}
                     imagePreviewMarkupShow
                     itemInsertLocation="after"
                   />
@@ -477,10 +477,10 @@ const CreateMedia: React.FC = () => {
             </div>
             <div className="field-item-create">
               <span className="text-label">Privacy</span>
-              <Form.Item name="privacy" initialValue="0">
+              <Form.Item name="privacy" initialValue={PRIVACY.PRIVATE}>
                 <Select className="custom-select">
-                  <Select.Option value="0">Private</Select.Option>
-                  <Select.Option value="1">Public</Select.Option>
+                  <Select.Option value={PRIVACY.PRIVATE}>Private</Select.Option>
+                  <Select.Option value={PRIVACY.PUBLIC}>Public</Select.Option>
                 </Select>
               </Form.Item>
             </div>

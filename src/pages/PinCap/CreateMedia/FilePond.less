@@ -151,3 +151,16 @@
     }
   }
 }
+
+// Fix for layout breaking issue - only add this small fix
+.filepond-grid-wrapper {
+  .filepond--list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+  
+  .filepond--item {
+    flex-shrink: 0;
+  }
+}
