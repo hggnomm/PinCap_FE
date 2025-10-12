@@ -169,7 +169,7 @@ const CreateMedia: React.FC = () => {
     const mediaData: MediaFormValues = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
-      media: fileList[0],
+      media: fileList,
       tags_name: tags,
       is_created: false,
       is_comment: 1,
@@ -216,7 +216,7 @@ const CreateMedia: React.FC = () => {
     const mediaData: MediaFormValues = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
-      media: fileList[0],
+      media: fileList,
       tags_name: tags_name,
       is_created: true,
       is_comment: 1,
