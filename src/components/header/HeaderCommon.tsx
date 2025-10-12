@@ -16,6 +16,7 @@ import { LogoIcon, TextIcon } from "@/assets/img";
 import iconChatbot from "@/assets/img/PinCap/chatbot.png";
 import Chatbot from "../chatbot";
 import { useAuth } from "@/hooks/useAuth";
+import { useInitializeNotifications } from "@/hooks/useInitializeNotifications";
 import "./index.less";
 import { ROUTES } from "@/constants/routes";
 
@@ -23,6 +24,9 @@ const HeaderCommon = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  
+  // Initialize notifications when user is authenticated
+  useInitializeNotifications(isAuthenticated);
 
   // Toggle chatbot visibility
   const toggleChatbot = () => {
