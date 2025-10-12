@@ -34,6 +34,13 @@ const ImageEditorComponent: React.FC<ImageEditorProps> = ({
   const tuiEditorRef = useRef<ImageEditor | null>(null);
 
   useEffect(() => {
+    // Block body scroll when modal is open
+    if (isVisible) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
     // Inject custom CSS to hide download button
     if (isVisible) {
       const styleElement = document.createElement('style');
@@ -86,6 +93,8 @@ const ImageEditorComponent: React.FC<ImageEditorProps> = ({
     }
 
     return () => {
+      document.body.style.overflow = 'unset';
+      
       if (tuiEditorRef.current) {
         tuiEditorRef.current.destroy();
         tuiEditorRef.current = null;
@@ -148,7 +157,7 @@ const ImageEditorComponent: React.FC<ImageEditorProps> = ({
               onClick={handleSave}
               disabled={isProcessing}
               className={clsx(
-                'bg-rose-600 hover:bg-rose-700 border-rose-600',
+                '!bg-rose-600 hover:!bg-rose-700 !border-rose-600',
                 'disabled:bg-gray-400 disabled:border-gray-400'
               )}
             >
@@ -161,7 +170,7 @@ const ImageEditorComponent: React.FC<ImageEditorProps> = ({
               className={clsx(
                 'flex items-center justify-center',
                 'w-8 h-8 rounded-full',
-                'hover:bg-gray-100 transition-colors'
+                'hover:!bg-gray-100 transition-colors'
               )}
             />
           </div>
