@@ -213,7 +213,7 @@ const DetailMedia = () => {
 
               <div
                 className={clsx(
-                  "user_owner sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.1)]"
+                  "user_owner sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
                 )}
               >
                 <div className="user cursor-pointer hover:opacity-80 transition-opacity" onClick={handleNavigateToProfile}>

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 import { Edit, Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
+import BackButton from "@/components/backButton/BackButton";
 
 // Reusable StatCard component
 interface StatCardProps {
@@ -15,11 +16,16 @@ interface StatCardProps {
   textColor: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ value, label, icon, gradientColors, borderColor, textColor }) => (
+const StatCard: React.FC<StatCardProps> = ({
+  value,
+  label,
+  icon,
+  gradientColors,
+  borderColor,
+  textColor,
+}) => (
   <div className={`${gradientColors} p-4 rounded-2xl border ${borderColor}`}>
-    <div className={`text-2xl font-bold ${textColor}`}>
-      {value}
-    </div>
+    <div className={`text-2xl font-bold ${textColor}`}>{value}</div>
     <div className={`text-sm ${textColor}/70 flex items-center gap-1`}>
       {icon}
       {label}
@@ -36,12 +42,18 @@ interface InfoItemProps {
   iconColor: string;
 }
 
-const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, bgColor, iconColor }) => (
+const InfoItem: React.FC<InfoItemProps> = ({
+  icon,
+  label,
+  value,
+  bgColor,
+  iconColor,
+}) => (
   <div className="flex items-center gap-4 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
-    <div className={`w-10 h-10 ${bgColor} rounded-full flex items-center justify-center`}>
-      <div className={iconColor}>
-        {icon}
-      </div>
+    <div
+      className={`w-10 h-10 ${bgColor} rounded-full flex items-center justify-center`}
+    >
+      <div className={iconColor}>{icon}</div>
     </div>
     <div>
       <div className="text-sm text-muted-foreground">{label}</div>
@@ -61,14 +73,17 @@ const Profile = () => {
   return (
     <Loading isLoading={isLoadingUser} error={null}>
       <div className="min-h-screen p-4 md:p-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto relative">
+          <BackButton />
           {user && (
             <div className="bg-card rounded-3xl shadow-2xl overflow-hidden">
               {/* Cover Photo with improved gradient */}
               <div
                 className="h-56 md:h-64 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 relative"
                 style={{
-                  backgroundImage: user.background ? `url(${user.background})` : undefined,
+                  backgroundImage: user.background
+                    ? `url(${user.background})`
+                    : undefined,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
@@ -81,7 +96,11 @@ const Profile = () => {
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500">
                       {user.avatar ? (
-                        <img src={user.avatar || "/placeholder.svg"} alt="Profile" className="w-full h-full object-cover" />
+                        <img
+                          src={user.avatar || "/placeholder.svg"}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <User className="w-16 h-16 text-white" />
@@ -95,7 +114,7 @@ const Profile = () => {
 
                 {/* Edit Button - repositioned */}
                 <div className="absolute top-6 right-6">
-                  <button 
+                  <button
                     onClick={handleEditProfile}
                     className="!bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white !px-4 !py-2 !rounded-full flex items-center gap-2 transition-all duration-200 hover:scale-105"
                   >
@@ -124,32 +143,36 @@ const Profile = () => {
                     {
                       value: user.followers_count?.toLocaleString() || 0,
                       label: "Followers",
-                      gradientColors: "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
+                      gradientColors:
+                        "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
                       borderColor: "border-blue-200 dark:border-blue-800",
-                      textColor: "text-blue-600 dark:text-blue-400"
+                      textColor: "text-blue-600 dark:text-blue-400",
                     },
                     {
                       value: user.followees_count?.toLocaleString() || 0,
                       label: "Following",
-                      gradientColors: "bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20",
+                      gradientColors:
+                        "bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20",
                       borderColor: "border-purple-200 dark:border-purple-800",
-                      textColor: "text-purple-600 dark:text-purple-400"
+                      textColor: "text-purple-600 dark:text-purple-400",
                     },
                     {
                       value: "120",
                       label: "Reaction",
                       icon: <Star className="w-3 h-3 fill-current" />,
-                      gradientColors: "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
+                      gradientColors:
+                        "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
                       borderColor: "border-green-200 dark:border-green-800",
-                      textColor: "text-green-600 dark:text-green-400"
+                      textColor: "text-green-600 dark:text-green-400",
                     },
                     {
                       value: "156",
                       label: "Pin",
-                      gradientColors: "bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20",
+                      gradientColors:
+                        "bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20",
                       borderColor: "border-orange-200 dark:border-orange-800",
-                      textColor: "text-orange-600 dark:text-orange-400"
-                    }
+                      textColor: "text-orange-600 dark:text-orange-400",
+                    },
                   ].map((stat, index) => (
                     <StatCard key={index} {...stat} />
                   ))}
@@ -158,7 +181,9 @@ const Profile = () => {
                 {/* Contact Information */}
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-foreground mb-4">Contact Information</h3>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">
+                      Contact Information
+                    </h3>
 
                     <div className="space-y-4">
                       {[
@@ -167,22 +192,26 @@ const Profile = () => {
                           label: "Email",
                           value: user.email,
                           bgColor: "bg-blue-100 dark:bg-blue-900/30",
-                          iconColor: "text-blue-600 dark:text-blue-400"
+                          iconColor: "text-blue-600 dark:text-blue-400",
                         },
-                        ...(user.phone ? [{
-                          icon: <Phone className="w-5 h-5" />,
-                          label: "Phone",
-                          value: user.phone,
-                          bgColor: "bg-green-100 dark:bg-green-900/30",
-                          iconColor: "text-green-600 dark:text-green-400"
-                        }] : []),
+                        ...(user.phone
+                          ? [
+                              {
+                                icon: <Phone className="w-5 h-5" />,
+                                label: "Phone",
+                                value: user.phone,
+                                bgColor: "bg-green-100 dark:bg-green-900/30",
+                                iconColor: "text-green-600 dark:text-green-400",
+                              },
+                            ]
+                          : []),
                         {
                           icon: <User className="w-5 h-5" />,
                           label: "Role",
                           value: user.role?.toLowerCase() || "",
                           bgColor: "bg-purple-100 dark:bg-purple-900/30",
-                          iconColor: "text-purple-600 dark:text-purple-400"
-                        }
+                          iconColor: "text-purple-600 dark:text-purple-400",
+                        },
                       ].map((item, index) => (
                         <InfoItem key={index} {...item} />
                       ))}
@@ -190,7 +219,9 @@ const Profile = () => {
                   </div>
 
                   <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-foreground mb-4">Additional Info</h3>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">
+                      Additional Info
+                    </h3>
 
                     <div className="space-y-4">
                       {[
@@ -199,15 +230,15 @@ const Profile = () => {
                           label: "Location",
                           value: "San Francisco, CA",
                           bgColor: "bg-orange-100 dark:bg-orange-900/30",
-                          iconColor: "text-orange-600 dark:text-orange-400"
+                          iconColor: "text-orange-600 dark:text-orange-400",
                         },
                         {
                           icon: <Calendar className="w-5 h-5" />,
                           label: "Joined",
                           value: "March 2023",
                           bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
-                          iconColor: "text-indigo-600 dark:text-indigo-400"
-                        }
+                          iconColor: "text-indigo-600 dark:text-indigo-400",
+                        },
                       ].map((item, index) => (
                         <InfoItem key={index} {...item} />
                       ))}
@@ -215,9 +246,12 @@ const Profile = () => {
 
                     {/* Bio Section */}
                     <div className="mt-6">
-                      <h4 className="text-lg font-medium text-foreground mb-3">About</h4>
+                      <h4 className="text-lg font-medium text-foreground mb-3">
+                        About
+                      </h4>
                       <p className="text-muted-foreground leading-relaxed">
-                        Passionate developer and designer creating beautiful digital experiences. Love working with modern
+                        Passionate developer and designer creating beautiful
+                        digital experiences. Love working with modern
                         technologies and building user-friendly applications.
                       </p>
                     </div>
