@@ -50,6 +50,7 @@ const CreateMedia: React.FC = () => {
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
   const [isLoad, setIsLoad] = useState<boolean>(false);
   const [fileList, setFileList] = useState<File[]>([]);
+  const [isProcessingFiles, setIsProcessingFiles] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
   const [isSelectedDraft, setIsSelectedDraft] = useState<boolean>(false);
@@ -69,6 +70,9 @@ const CreateMedia: React.FC = () => {
   const [isImageEditorVisible, setIsImageEditorVisible] = useState<boolean>(false);
   const [editingImageSrc, setEditingImageSrc] = useState<string>("");
   const [editingImageIndex, setEditingImageIndex] = useState<number>(-1);
+  
+  // Ref for FilePond container
+  const filepondRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchDrafts();
@@ -330,7 +334,9 @@ const CreateMedia: React.FC = () => {
 
   useEffect(() => {
     const addEditButtons = () => {
-      const filepondItems = document.querySelectorAll('.filepond--item');
+      if (!filepondRef.current) return;
+      
+      const filepondItems = filepondRef.current.querySelectorAll('.filepond--item');
       filepondItems.forEach((item, index) => {
         if (item.querySelector('.edit-button')) {
           return;
@@ -351,6 +357,7 @@ const CreateMedia: React.FC = () => {
       });
     };
 
+    // Use setTimeout to wait for FilePond to render
     const timer = setTimeout(addEditButtons, 100);
     
     return () => clearTimeout(timer);
@@ -358,7 +365,7 @@ const CreateMedia: React.FC = () => {
 
   return (
     <div className="create-media-container">
-      <div className="field-create-media">
+      <div className={clsx("field-create-media", "sticky top-0 !z-20 bg-white")}>
         <div>
           <Title level={4} className="m-0">
             Create Media
@@ -429,15 +436,21 @@ const CreateMedia: React.FC = () => {
               </div>
             )}
             {!imageUrl && (
-              <div className={clsx("relative", {
-                "filepond-grid-wrapper": fileList.length >= 2
-              })}>
+              <div 
+                ref={filepondRef}
+                className={clsx("relative", {
+                  "filepond-grid-wrapper": fileList.length >= 2
+                })}
+              >
                 <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
                   <FilePond
                     files={fileList}
-                    onupdatefiles={(fileItems) =>
-                      setFileList(fileItems.map((item): any => item.file))
-                    }
+                    onupdatefiles={(fileItems) => {
+                      setFileList(fileItems.map((item): any => item.file));
+                      setIsProcessingFiles(false);
+                    }}
+                    onaddfilestart={() => setIsProcessingFiles(true)}
+                    onprocessfiles={() => setIsProcessingFiles(false)}
                     allowMultiple={true}
                     maxFiles={6}
                     maxFileSize="50MB"

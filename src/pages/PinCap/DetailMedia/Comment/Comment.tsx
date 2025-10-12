@@ -50,11 +50,6 @@ const Comment: React.FC<CommentProps> = ({ mediaId }) => {
       setInputValue("");
       setSelectedImage(null);
       setShowEmojiPicker(false);
-
-      notification.success({
-        message: "Comment posted successfully!",
-        duration: 2,
-      });
     } catch (error: any) {
       console.error("Error posting comment:", error);
       

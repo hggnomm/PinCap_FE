@@ -120,7 +120,7 @@ const Notification = () => {
 
   return (
     <>
-      <div className="relative flex cursor-pointer">
+      <div className="relative flex cursor-pointer" ref={ref}>
         <div onClick={onShowDropdown}>
           {unreadCount > 0 && (
             <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-auto min-w-[20px] px-1 flex justify-center items-center font-medium">
@@ -134,7 +134,6 @@ const Notification = () => {
           <div 
             id="scrollableDiv" 
             className="absolute z-50 top-10 right-0 max-h-96 w-96 border border-gray-200 rounded-lg bg-white shadow-xl overflow-auto"
-            ref={ref}
             onClick={(e) => e.stopPropagation()}
             style={{
               scrollbarWidth: 'thin',
