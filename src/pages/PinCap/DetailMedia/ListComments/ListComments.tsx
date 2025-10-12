@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { formatTime } from "@/utils/utils";
 import { useComment } from "@/hooks/useComment";
 import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { ROUTES } from "@/constants/routes";
 import "./ListComments.less";
 import Zoom from "react-medium-image-zoom";
 
@@ -13,6 +16,8 @@ interface ListCommentsProps {
 
 const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCount = 0 }) => {
   const { getInfiniteComments } = useComment();
+  const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
   const [allComments, setAllComments] = useState<any[]>([]);
   const { ref, inView } = useInView();
 
@@ -43,6 +48,16 @@ const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCoun
   const totalComments = data?.pages?.[0]?.total || initialCommentCount;
   const isLoading = status === "pending";
 
+  const handleNavigateToProfile = (userId: string) => {
+    if (!userId) return;
+    
+    if (currentUser && userId === currentUser.id) {
+      navigate(ROUTES.PROFILE);
+    } else {
+      navigate(ROUTES.USER_PROFILE.replace(':id', userId));
+    }
+  };
+
   return (
     <Collapse ghost expandIconPosition="end" className="user_comment">
       <Collapse.Panel key="1" header={`${totalComments} Comments`}>
@@ -63,7 +78,10 @@ const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCoun
                   className="comment !py-2"
                   ref={isLastComment ? ref : undefined}
                 >
-                  <div className="avatar">
+                  <div 
+                    className="avatar cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => handleNavigateToProfile(comment.user_id)}
+                  >
                     <img
                       src={comment.avatar || "/placeholder-user.jpg"}
                       alt="avatar"
@@ -71,7 +89,12 @@ const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCoun
                   </div>
                   <div className="content">
                     <div className="header_content">
-                      <strong>{comment.name || "Anonymous"}</strong>
+                      <strong 
+                        className="cursor-pointer hover:underline"
+                        onClick={() => handleNavigateToProfile(comment.user_id)}
+                      >
+                        {comment.name || "Anonymous"}
+                      </strong>
                       <span>{formatTime(comment.created_at ?? "")}</span>
                     </div>
 
