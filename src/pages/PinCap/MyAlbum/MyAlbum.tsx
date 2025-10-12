@@ -50,12 +50,12 @@ const MyAlbum = () => {
   };
 
   const renderAlbumSection = (sectionTitle: string, albumsList: Album[]) => (
-    <div className="album-section pt-2 pb-[40px] border-b-3 last:border-b-0 border-[#9eb8d9] px-[20px]">
+    <div className="album-section pt-2 border-b-3 last:border-b-0 border-[#9eb8d9] px-[20px]">
       <h2 className="!pl-2 text-xl font-bold !mb-2 text-gray-800">
         {sectionTitle}
       </h2>
       <div className="p-3">
-        <Row gutter={[24, 70]}>
+        <Row gutter={[24, 12]}>
           {albumsList?.map((album: Album) => (
             <Col key={album.id} xs={24} sm={12} md={8} lg={8} xl={6}>
               <AlbumCard album={album} fetchAlbums={refetch} />

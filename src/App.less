@@ -5,13 +5,24 @@
     margin: 0 auto;
     padding: 0 20px;
   }
+  
   .main-container {
-    margin-top: 70px;
-    min-height: calc(100vh - 70px);
-    background-image: linear-gradient(to bottom, #fff, #dfe9f7);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
-    .right-layout {
-      height: 100%;
+    .body-layout {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      margin-top: 70px;
+      background-image: linear-gradient(to bottom, #fff, #dfe9f7);
+
+      .right-layout {
+        flex: 1;
+        overflow-y: auto;
+      }
     }
   }
 }

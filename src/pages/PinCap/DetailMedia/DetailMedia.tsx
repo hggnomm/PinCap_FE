@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { getAllMedias } from "@/api/media";
 
 import { motion } from "framer-motion";
@@ -22,17 +22,21 @@ import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { useMedia } from "@/hooks/useMedia";
 import { useUser } from "@/hooks/useUser";
+import { ROUTES } from "@/constants/routes";
+import FollowButton from "@/components/FollowButton";
+import clsx from "clsx";
+
 interface TokenPayload {
   id: string;
 }
 
 const DetailMedia = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const id = location.state?.mediaId;
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
   
   const { mediaReaction, mediaReactionLoading } = useMedia();
-  const { followOrBlockUser: followUser, unfollowOrUnblockUser: unfollowUser } = useUser();
   
   const { data: mediaData, isLoading: loading, error: queryError } = useMedia().getMediaById(id);
   
@@ -54,63 +58,18 @@ const DetailMedia = () => {
     }
   }, [id]);
 
-  const handleWithOwnerUser = async () => {
-    const request = "FOLLOWING";
-
-    try {
-      if (media?.ownerUser?.isFollowing) {
-        if (!media?.ownerUser?.id) {
-          setError("User ID not found!");
-          return;
-        }
-
-        await unfollowUser({
-          followeeId: media.ownerUser.id,
-          status: request,
-        });
-
-        setMedia((prevState) => {
-          if (!prevState) return null;
-          return {
-            ...prevState,
-            numberUserFollowers: (media?.numberUserFollowers ?? 0) - 1,
-            ownerUser: {
-              ...prevState.ownerUser,
-              isFollowing: false,
-            },
-          };
-        });
-
-        return;
-      }
-
-      if (!media?.ownerUser?.id) {
-        setError("User ID not found!");
-        return;
-      }
-
-      const response = await followUser({
-        followeeId: media.ownerUser.id,
-        status: request,
-      });
-
-      if (response) {
-        setMedia((prevState) => {
-          if (!prevState) return null;
-          return {
-            ...prevState,
-            numberUserFollowers: (media?.numberUserFollowers ?? 0) + 1,
-            ownerUser: {
-              ...prevState.ownerUser,
-              isFollowing: true,
-            },
-          };
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      setError("Error when following or unfollowing a media!");
-    }
+  const handleFollowChange = (isFollowing: boolean, followersCount: number) => {
+    setMedia((prevState) => {
+      if (!prevState) return null;
+      return {
+        ...prevState,
+        numberUserFollowers: followersCount,
+        ownerUser: {
+          ...prevState.ownerUser,
+          isFollowing: isFollowing,
+        },
+      };
+    });
   };
 
   const handleReaction = async () => {
@@ -158,6 +117,16 @@ const DetailMedia = () => {
     }
   };
 
+  const handleNavigateToProfile = () => {
+    if (!media?.ownerUser?.id) return;
+    
+    if (media.ownerUser.id === tokenPayload.id) {
+      navigate(ROUTES.PROFILE);
+    } else {
+      navigate(ROUTES.USER_PROFILE.replace(':id', media.ownerUser.id));
+    }
+  };
+
   return (
     <Loading isLoading={loading} error={error}>
       <motion.div
@@ -186,20 +155,13 @@ const DetailMedia = () => {
             <div className="right-top-view">
               <div className="action">
                 <div className="action-left">
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
+                  <div className="flex justify-center items-center">
                     <button 
                       onClick={() => handleReaction()}
                       disabled={mediaReactionLoading}
-                      style={{
-                        opacity: mediaReactionLoading ? 0.6 : 1,
-                        cursor: mediaReactionLoading ? 'not-allowed' : 'pointer'
-                      }}
+                      className={clsx(
+                        mediaReactionLoading && "opacity-60 cursor-not-allowed"
+                      )}
                     >
                       <img
                         src={getImageReactionWithId(
@@ -249,13 +211,17 @@ const DetailMedia = () => {
                 </div>
               )}
 
-              <div className="user_owner">
-                <div className="user">
+              <div
+                className={clsx(
+                  "user_owner sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.1)]"
+                )}
+              >
+                <div className="user cursor-pointer hover:opacity-80 transition-opacity" onClick={handleNavigateToProfile}>
                   {media?.ownerUser && (
                     <>
                       <img src={media.ownerUser.avatar} alt="owner" />
                       <div className="info">
-                        <span style={{ fontWeight: "bold" }}>
+                        <span className="font-bold">
                           {media.ownerUser.first_name}{" "}
                           {media.ownerUser.last_name}
                         </span>
@@ -264,15 +230,14 @@ const DetailMedia = () => {
                     </>
                   )}
                 </div>
-                {media?.ownerUser.id !== tokenPayload.id && media?.ownerUser?.isFollowing && (
-                  <button onClick={handleWithOwnerUser} className="following">
-                    Following
-                  </button>
-                )}
-                {media?.ownerUser.id !== tokenPayload.id && !media?.ownerUser?.isFollowing && (
-                  <button onClick={handleWithOwnerUser} className="follow">
-                    Follow
-                  </button>
+                {media?.ownerUser.id !== tokenPayload.id && (
+                  <FollowButton
+                    userId={media?.ownerUser?.id || ""}
+                    initialIsFollowing={media?.ownerUser?.isFollowing}
+                    initialFollowersCount={media?.numberUserFollowers || 0}
+                    onFollowChange={handleFollowChange}
+                    variant="default"
+                  />
                 )}
               </div>
 
@@ -282,8 +247,11 @@ const DetailMedia = () => {
                 </div>
               )}
               <div className="comments">
-                {media?.is_comment && media?.userComments && (
-                  <ListComments media={media} />
+                {media?.is_comment && (
+                  <ListComments 
+                    mediaId={media.id || id} 
+                    initialCommentCount={media.commentCount || 0}
+                  />
                 )}
                 {!media?.is_comment && (
                   <p className="no_comment">

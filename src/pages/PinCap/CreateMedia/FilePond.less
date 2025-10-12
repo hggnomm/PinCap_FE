@@ -155,9 +155,9 @@
 // Fix for layout breaking issue - only add this small fix
 .filepond-grid-wrapper {
   .filepond--list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
   }
   
   .filepond--item {

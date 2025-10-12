@@ -10,7 +10,12 @@ export const NOTIFICATION_TYPES = {
   COMMENT: "COMMENT",
   COMMENT_REPLY: "COMMENT_REPLY",
   MEDIA_ADD_GROUP_ALBUM: "MEDIA_ADD_GROUP_ALBUM",
-};
+} as const;
+
+export const NOTIFICATION_STATUS = {
+  READ: 1,
+  UNREAD: 0,
+} as const;
 
 export const ALBUM_INVITATION_STATUS = {
   INVITED: "INVITED",

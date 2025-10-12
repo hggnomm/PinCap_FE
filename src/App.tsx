@@ -19,6 +19,7 @@ import MyMedia from "./pages/PinCap/MyMedia/MyMedia";
 import DetailAlbum from "./pages/PinCap/DetailAlbum/DetailAlbum";
 import Profile from "./pages/PinCap/Profile/Profile";
 import EditProfile from "./pages/PinCap/EditProfile/EditProfile";
+import UserProfile from "./pages/PinCap/UserProfile/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { ROUTES } from "./constants/routes";
 import { useAuth } from "./hooks";
@@ -71,32 +72,35 @@ const App = () => {
               <ProtectedRoute>
                 <Layout className="main-container">
                   <HeaderCommon />
-                  <SiderCommon />
-                  <Content className="right-layout">
-                    <Routes>
-                      <Route
-                        path={ROUTES.PINCAP_HOME}
-                        element={<PinCap />}
-                      />
-                      <Route
-                        path={ROUTES.CREATE_MEDIA}
-                        element={<CreateMedia />}
-                      />
-                      <Route path={ROUTES.AI_TOOLS} element={<ImageAi />} />
-                      <Route
-                        path={ROUTES.MEDIA_DETAIL}
-                        element={<DetailMedia />}
-                      />
-                      <Route path={ROUTES.MY_ALBUM} element={<MyAlbum />} />
-                      <Route
-                        path={ROUTES.ALBUM_DETAIL}
-                        element={<DetailAlbum />}
-                      />
-                      <Route path={ROUTES.MY_MEDIA} element={<MyMedia />} />
-                      <Route path={ROUTES.PROFILE} element={<Profile />} />
-                      <Route path={ROUTES.EDIT_PROFILE} element={<EditProfile />} />
-                    </Routes>
-                  </Content>
+                  <Layout className="body-layout">
+                    <SiderCommon />
+                    <Content className="right-layout">
+                      <Routes>
+                        <Route
+                          path={ROUTES.PINCAP_HOME}
+                          element={<PinCap />}
+                        />
+                        <Route
+                          path={ROUTES.CREATE_MEDIA}
+                          element={<CreateMedia />}
+                        />
+                        <Route path={ROUTES.AI_TOOLS} element={<ImageAi />} />
+                        <Route
+                          path={ROUTES.MEDIA_DETAIL}
+                          element={<DetailMedia />}
+                        />
+                        <Route path={ROUTES.MY_ALBUM} element={<MyAlbum />} />
+                        <Route
+                          path={ROUTES.ALBUM_DETAIL}
+                          element={<DetailAlbum />}
+                        />
+                        <Route path={ROUTES.MY_MEDIA} element={<MyMedia />} />
+                        <Route path={ROUTES.PROFILE} element={<Profile />} />
+                        <Route path={ROUTES.EDIT_PROFILE} element={<EditProfile />} />
+                        <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
+                      </Routes>
+                    </Content>
+                  </Layout>
                 </Layout>
               </ProtectedRoute>
             }

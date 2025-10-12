@@ -1,17 +1,17 @@
 import { Collapse } from "antd";
 import React, { useEffect, useState } from "react";
 import { formatTime } from "@/utils/utils";
-import { Media } from "@/types/type";
 import { useComment } from "@/hooks/useComment";
 import { useInView } from "react-intersection-observer";
 import "./ListComments.less";
 import Zoom from "react-medium-image-zoom";
 
 interface ListCommentsProps {
-  media: Media;
+  mediaId: string;
+  initialCommentCount?: number;
 }
 
-const ListComments: React.FC<ListCommentsProps> = ({ media }) => {
+const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCount = 0 }) => {
   const { getInfiniteComments } = useComment();
   const [allComments, setAllComments] = useState<any[]>([]);
   const { ref, inView } = useInView();
@@ -24,12 +24,12 @@ const ListComments: React.FC<ListCommentsProps> = ({ media }) => {
     isFetchingNextPage,
     isFetching,
     hasNextPage,
-  } = getInfiniteComments(media.id || "");
+  } = getInfiniteComments(mediaId);
 
   useEffect(() => {
     if (data?.pages) {
       const flattenedComments = data.pages.flatMap((page) => page?.data || []);
-      setAllComments(flattenedComments);
+      setAllComments(flattenedComments.reverse());
     }
   }, [data]);
 
@@ -39,13 +39,8 @@ const ListComments: React.FC<ListCommentsProps> = ({ media }) => {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const displayComments =
-    allComments.length > 0
-      ? allComments
-      : media?.userComments
-      ? [media.userComments]
-      : [];
-  const totalComments = data?.pages?.[0]?.total || media?.commentCount || 0;
+  const displayComments = allComments.length > 0 ? allComments : [];
+  const totalComments = data?.pages?.[0]?.total || initialCommentCount;
   const isLoading = status === "pending";
 
   return (
@@ -122,4 +117,4 @@ const ListComments: React.FC<ListCommentsProps> = ({ media }) => {
   );
 };
 
-export default ListComments;
+export default React.memo(ListComments);
