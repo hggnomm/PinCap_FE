@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getAllMedias } from "@/api/media";
 
 import { motion } from "framer-motion";
@@ -8,6 +8,7 @@ import more from "@/assets/img/PinCap/more.png";
 import { notification } from "antd";
 import Loading from "@/components/loading/Loading";
 import AlbumDropdown from "@/components/albumDropdown";
+import MediaViewer from "@/components/mediaViewer/MediaViewer";
 
 import "./index.less";
 import { Media } from "@/types/type";
@@ -18,8 +19,6 @@ import { saveAs } from "file-saver";
 import BackButton from "@/components/backButton/BackButton";
 import MediaList from "@/components/viewPin/ViewPinComponent";
 import ListComments from "./ListComments/ListComments";
-import Zoom from "react-medium-image-zoom";
-import "react-medium-image-zoom/dist/styles.css";
 import { useMedia } from "@/hooks/useMedia";
 import { useUser } from "@/hooks/useUser";
 import { ROUTES } from "@/constants/routes";
@@ -127,6 +126,8 @@ const DetailMedia = () => {
     }
   };
 
+
+
   return (
     <Loading isLoading={loading} error={error}>
       <motion.div
@@ -142,14 +143,7 @@ const DetailMedia = () => {
         <div className="detail-media">
           <BackButton />
           <div className="left-view">
-            {media && media.type === "IMAGE" && (
-              <Zoom>
-                <img src={media.media_url} alt={media.media_name} />
-              </Zoom>
-            )}
-            {media && media.type !== "IMAGE" && (
-              <video src={media.media_url} controls autoPlay muted />
-            )}
+            <MediaViewer media={media} />
           </div>
           <div className="right-view">
             <div className="right-top-view">

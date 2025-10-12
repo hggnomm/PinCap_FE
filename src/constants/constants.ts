@@ -28,7 +28,19 @@ export const ALBUM_TABS = {
   SHARED_ALBUMS: "Albums Shared with Me",
 };
 
+export const ALBUM_ROLES = {
+  OWNER: "OWNER",
+  EDIT: "EDIT",
+  VIEW: "VIEW",
+}
+
 export const PRIVACY = {
   PRIVATE: "0",
   PUBLIC: "1"
+};
+
+export const MEDIA_TYPES = {
+  VIDEO: "VIDEO",
+  IMAGE: "IMAGE",
+  FLEXIBLE: null,
 };
