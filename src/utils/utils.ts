@@ -7,6 +7,7 @@ import angry from "../assets/img/PinCap/angry.png";
 import heart from "../assets/img/PinCap/heart.png";
 import wow from "../assets/img/PinCap/wow.png";
 import black_heart from "../assets/img/PinCap/black-heart.png";
+import { MEDIA_TYPES } from "@/constants/constants";
 
 export enum FeelingType {
   HEART = "9bd68a9e-da0e-4889-8656-520818a8dadf",
@@ -112,4 +113,42 @@ export const formatTime = (dateString: string): string => {
   }
 
   return `${seconds}s`;
+};
+
+export interface ParsedMediaUrl {
+  url: string;
+  type: typeof MEDIA_TYPES.IMAGE | typeof MEDIA_TYPES.VIDEO;
+}
+
+export const parseMediaUrl = (mediaUrl: string | null | undefined): ParsedMediaUrl[] => {
+  if (!mediaUrl) {
+    return [];
+  }
+
+  let urls: string[] = [];
+
+  try {
+    const parsed = JSON.parse(mediaUrl);
+    if (Array.isArray(parsed)) {
+      urls = parsed;
+    } else {
+      urls = [String(parsed)];
+    }
+  } catch {
+    urls = mediaUrl
+      .split(",")
+      .map((url) => url.trim())
+      .filter((url) => url.length > 0);
+  }
+
+  return urls.reduce<ParsedMediaUrl[]>((acc, url) => {
+    const parts = url.split(".");
+    const extension = parts[parts.length - 1].toLowerCase();
+    
+    const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm", "flv"];
+    const type = videoExtensions.includes(extension) ? MEDIA_TYPES.VIDEO : MEDIA_TYPES.IMAGE;
+    
+    acc.push({ url, type });
+    return acc;
+  }, []);
 };

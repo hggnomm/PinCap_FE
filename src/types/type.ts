@@ -47,7 +47,7 @@ export type Media = {
   numberUserFollowers: number;
   ownerUser: User;
   reaction_user_count: number | null;
-  type: "IMAGE" | "VIDEO";
+  type: "IMAGE" | "VIDEO" | null;
   userComments: Comment | null;
   privacy: string;
   tags_name: string[];

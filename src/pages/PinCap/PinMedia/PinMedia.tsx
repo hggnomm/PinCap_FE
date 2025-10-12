@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./index.less";
@@ -19,6 +19,9 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import AlbumDropdown from "@/components/albumDropdown";
 import clsx from "clsx";
+import { MEDIA_TYPES } from "@/constants/constants";
+import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";
+import DotsPagination from "@/components/dotsPagination/DotsPagination";
 
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
@@ -53,6 +56,19 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
   const [isHovered, setIsHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+
+  const isFlexibleMedia = data?.type === MEDIA_TYPES.FLEXIBLE || data?.type === null || data?.type === "";
+  const flexibleMediaUrls: ParsedMediaUrl[] = isFlexibleMedia ? parseMediaUrl(data?.media_url) : [];
+  const currentFlexibleMedia = flexibleMediaUrls.length > 0 ? flexibleMediaUrls[currentMediaIndex] : null;
+  
+  const isFlexibleVideo = useMemo(() => {
+    return isFlexibleMedia && currentFlexibleMedia && currentFlexibleMedia.type === MEDIA_TYPES.VIDEO;
+  }, [isFlexibleMedia, currentFlexibleMedia]);
+
+  const isFlexibleImage = useMemo(() => {
+    return isFlexibleMedia && currentFlexibleMedia && currentFlexibleMedia.type === MEDIA_TYPES.IMAGE;
+  }, [isFlexibleMedia, currentFlexibleMedia]);
 
   useEffect(() => {
     if (modalVisible && isFirstOpen) {
@@ -158,14 +174,27 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
       >
-        {data?.type === "VIDEO" && (
+        {data?.type === MEDIA_TYPES.VIDEO && (
           <video autoPlay loop muted>
             <source src={srcUrl} />
           </video>
         )}
-        {data?.type === "IMAGE" && (
+        {data?.type === MEDIA_TYPES.IMAGE && (
           <LazyLoadImage
             src={srcUrl}
+            alt="Media content"
+            effect="blur"
+            threshold={100}
+          />
+        )}
+        {isFlexibleVideo && (
+          <video autoPlay loop muted>
+            <source src={currentFlexibleMedia!.url} />
+          </video>
+        )}
+        {isFlexibleImage && (
+          <LazyLoadImage
+            src={currentFlexibleMedia!.url}
             alt="Media content"
             effect="blur"
             threshold={100}
@@ -176,8 +205,8 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
           className={clsx(
             "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
             {
-              "bottom-[5px]": data?.type === "IMAGE",
-              "bottom-0": data?.type === "VIDEO"
+              "bottom-[5px]": data?.type === MEDIA_TYPES.IMAGE || isFlexibleImage,
+              "bottom-0": data?.type === MEDIA_TYPES.VIDEO || isFlexibleVideo
             }
           )}
           whileHover={{ opacity: 1 }}
@@ -211,6 +240,16 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
                 <p>Save</p>
               </div>
             }
+          />
+        )}
+
+        {/* DotsPagination for flexible media */}
+        {isFlexibleMedia && flexibleMediaUrls.length > 1 && (
+          <DotsPagination
+            total={flexibleMediaUrls.length}
+            current={currentMediaIndex}
+            onDotClick={setCurrentMediaIndex}
+            className="absolute bottom-2 left-1/2 -translate-x-1/2 [&>div]:w-1 [&>div]:h-1"
           />
         )}
       </motion.div>
@@ -267,7 +306,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             </div>
             <div className="media_detail">
               <Zoom>
-                {media?.type === "VIDEO" ? (
+                {media?.type === MEDIA_TYPES.VIDEO ? (
                   <video controls muted>
                     <source src={media?.media_url} type="video/mp4" />
                   </video>
