@@ -7,8 +7,8 @@ interface ModalComponentProps {
   titleDefault?: string;
   title?: string;
   visible: boolean; // Hoặc open nếu bạn dùng phiên bản Ant Design mới
-  onCancel: () => void;
-  onConfirm: () => void;
+  onCancel?: () => void;
+  onConfirm?: () => void;
   buttonLabels?: {
     confirmLabel?: string;
     cancelLabel?: string;
@@ -17,6 +17,7 @@ interface ModalComponentProps {
   className?: string;
   bodyClassName?: string;
   confirmLoading?: boolean;
+  showFooter?: boolean;
 }
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
@@ -30,6 +31,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   className,
   bodyClassName,
   confirmLoading = false,
+  showFooter = true,
 }) => {
   return (
     <Modal
@@ -40,24 +42,28 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       onCancel={onCancel}
       transitionName=""
       maskTransitionName=""
-      footer={[
-        <button 
-          className="cancel" 
-          key="cancel" 
-          onClick={onCancel}
-          disabled={confirmLoading}
-        >
-          {buttonLabels.cancelLabel}
-        </button>,
-        <button 
-          className={clsx("confirm", { "opacity-50 cursor-not-allowed": confirmLoading })}
-          key="confirm" 
-          onClick={onConfirm}
-          disabled={confirmLoading}
-        >
-          {buttonLabels.confirmLabel}
-        </button>,
-      ]}
+      footer={
+        showFooter && [
+          <button
+            className="cancel"
+            key="cancel"
+            onClick={onCancel}
+            disabled={confirmLoading}
+          >
+            {buttonLabels.cancelLabel}
+          </button>,
+          <button
+            className={clsx("confirm", {
+              "opacity-50 cursor-not-allowed": confirmLoading,
+            })}
+            key="confirm"
+            onClick={onConfirm}
+            disabled={confirmLoading}
+          >
+            {buttonLabels.confirmLabel}
+          </button>,
+        ]
+      }
       width="auto"
     >
       {title && (

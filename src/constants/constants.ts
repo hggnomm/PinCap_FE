@@ -19,9 +19,10 @@ export const NOTIFICATION_STATUS = {
 
 export const ALBUM_INVITATION_STATUS = {
   INVITED: "INVITED",
+  PENDING: "PENDING",
   ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
-};
+} as const;
 
 export const ALBUM_TABS = {
   MY_ALBUMS: "My Albums",

@@ -13,6 +13,7 @@ import type { UpdateAlbumRequest } from "@/types/Album/AlbumRequest";
 import { updateAlbumSchema, UpdateAlbumFormData } from "@/validation/album";
 import { useFormValidation } from "@/hooks";
 import { useAlbum } from "@/hooks/useAlbum";
+import { CollaboratorsListModal } from "@/components/modal/album";
 
 interface EditAlbumModalProps {
   visible: boolean;
@@ -38,6 +39,7 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
   const [selectedThumbnail, setSelectedThumbnail] = React.useState<string>("");
   const [showThumbnailSelector, setShowThumbnailSelector] =
     React.useState(false);
+  const [collaboratorsListModalVisible, setCollaboratorsListModalVisible] = React.useState(false);
   const { validate, validateField, getFieldError } =
     useFormValidation(updateAlbumSchema);
   const { getAlbumById } = useAlbum();
@@ -233,6 +235,7 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
         <CollaboratorsSection
           collaborators={detailAlbum?.allUser ?? []}
           onAddCollaborator={onInviteCollaborators}
+          onViewAllCollaborators={() => setCollaboratorsListModalVisible(true)}
           className="mt-6"
           showLearnMore={false}
         />
@@ -259,6 +262,12 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
         onCancel={() => setShowThumbnailSelector(false)}
         onConfirm={handleThumbnailSelect}
         title="Choose Album Thumbnail"
+      />
+
+      <CollaboratorsListModal
+        visible={collaboratorsListModalVisible}
+        onCancel={() => setCollaboratorsListModalVisible(false)}
+        collaborators={detailAlbum?.allUser || []}
       />
     </ModalComponent>
   );

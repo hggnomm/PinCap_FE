@@ -58,6 +58,15 @@ export const useAlbum = () => {
     },
   });
 
+  const removeMediasFromAlbumMutation = useMutation({
+    mutationFn: (data: { album_id: string; medias_id: string[] }) =>
+      album.removeMediasFromAlbum(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['album', variables.album_id] });
+      queryClient.invalidateQueries({ queryKey: ['albums'] });
+    },
+  });
+
   const inviteUserToAlbumMutation = useMutation({
     mutationFn: ({ albumId, userId }: { albumId: string; userId: string }) =>
       album.inviteUserToAlbum(albumId, userId),
@@ -99,6 +108,9 @@ export const useAlbum = () => {
     deleteAlbum: deleteAlbumMutation.mutateAsync,
     deleteAlbumLoading: deleteAlbumMutation.isPending,
     deleteAlbumError: deleteAlbumMutation.error,
+    removeMediasFromAlbum: removeMediasFromAlbumMutation.mutateAsync,
+    removeMediasFromAlbumLoading: removeMediasFromAlbumMutation.isPending,
+    removeMediasFromAlbumError: removeMediasFromAlbumMutation.error,
     inviteUserToAlbum: inviteUserToAlbumMutation.mutateAsync,
     acceptAlbumInvitation: acceptAlbumInvitationMutation.mutateAsync,
     acceptAlbumInvitationLoading: acceptAlbumInvitationMutation.isPending,

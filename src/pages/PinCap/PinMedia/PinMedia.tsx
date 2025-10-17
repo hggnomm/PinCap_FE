@@ -34,20 +34,26 @@ interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
     type: string;
   };
   isEditMedia?: boolean;
+  isSaveMedia?: boolean;
   onDelete?: () => void;
+  albumContext?: { inAlbum: boolean; albumId?: string; onRemoved?: () => void };
 }
 
 const PinMedia: React.FC<PinMediaProps> = (props) => {
-  const { srcUrl, data, isEditMedia, onDelete } = props;
-  const tokenPayload = useSelector((state: any) => state.auth);
+  const {
+    srcUrl,
+    data,
+    isEditMedia,
+    isSaveMedia = true,
+    onDelete,
+    albumContext,
+  } = props;
   const { updateMedia, deleteMedia } = useMedia();
   const [media, setMedia] = useState<Media>();
   const navigate = useNavigate();
-  const isMp4 = srcUrl?.endsWith(".mp4");
-  const [modalVisible, setModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  
+
   const [isFirstOpen, setIsFirstOpen] = useState(true);
   const [form] = Form.useForm<Media>();
   const [privacy, setPrivacy] = useState(false);
@@ -60,16 +66,30 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
-  const isFlexibleMedia = data?.type === MEDIA_TYPES.FLEXIBLE || data?.type === null || data?.type === "";
-  const flexibleMediaUrls: ParsedMediaUrl[] = isFlexibleMedia ? parseMediaUrl(data?.media_url) : [];
-  const currentFlexibleMedia = flexibleMediaUrls.length > 0 ? flexibleMediaUrls[currentMediaIndex] : null;
-  
+  const isFlexibleMedia =
+    data?.type === MEDIA_TYPES.FLEXIBLE ||
+    data?.type === null ||
+    data?.type === "";
+  const flexibleMediaUrls: ParsedMediaUrl[] = isFlexibleMedia
+    ? parseMediaUrl(data?.media_url)
+    : [];
+  const currentFlexibleMedia =
+    flexibleMediaUrls.length > 0 ? flexibleMediaUrls[currentMediaIndex] : null;
+
   const isFlexibleVideo = useMemo(() => {
-    return isFlexibleMedia && currentFlexibleMedia && currentFlexibleMedia.type === MEDIA_TYPES.VIDEO;
+    return (
+      isFlexibleMedia &&
+      currentFlexibleMedia &&
+      currentFlexibleMedia.type === MEDIA_TYPES.VIDEO
+    );
   }, [isFlexibleMedia, currentFlexibleMedia]);
 
   const isFlexibleImage = useMemo(() => {
-    return isFlexibleMedia && currentFlexibleMedia && currentFlexibleMedia.type === MEDIA_TYPES.IMAGE;
+    return (
+      isFlexibleMedia &&
+      currentFlexibleMedia &&
+      currentFlexibleMedia.type === MEDIA_TYPES.IMAGE
+    );
   }, [isFlexibleMedia, currentFlexibleMedia]);
 
   useEffect(() => {
@@ -100,43 +120,15 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     }
   };
 
-  const handleDeleteAction = () => {
-    setDeleteModalVisible(true);
-    setEditModalVisible(false);
-  };
-
   const handleCancel = () => {
     setEditModalVisible(false);
     setDeleteModalVisible(false);
   };
 
-  const handleConfirm = async () => {
-    try {
-      const formValue = await form.validateFields();
-
-      const updatedData = {
-        media_name: formValue.media_name,
-        description: formValue.description,
-        privacy: privacy ? PRIVACY.PRIVATE : PRIVACY.PUBLIC,
-        is_comment: isComment,
-      };
-
-      await updateMedia({ id: data.id, data: updatedData });
-      
-      setModalVisible(false);
-      toast.success("Media updated successfully!");
-    } catch (error) {
-      console.error("Validation failed:", error);
-      toast.error(
-        "Validation failed: Please check the form fields and try again."
-      );
-    }
-  };
-
   const handleDeleteMedia = async () => {
     try {
       await deleteMedia([data.id]);
-      
+
       handleCancel();
       toast.success("Media deleted successfully!");
 
@@ -150,7 +142,6 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
       );
     }
   };
-
 
   return (
     <>
@@ -195,13 +186,14 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             threshold={100}
           />
         )}
-       
+
         <motion.div
           className={clsx(
             "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
             {
-              "bottom-[5px]": data?.type === MEDIA_TYPES.IMAGE || isFlexibleImage,
-              "bottom-0": data?.type === MEDIA_TYPES.VIDEO || isFlexibleVideo
+              "bottom-[5px]":
+                data?.type === MEDIA_TYPES.IMAGE || isFlexibleImage,
+              "bottom-0": data?.type === MEDIA_TYPES.VIDEO || isFlexibleVideo,
             }
           )}
           whileHover={{ opacity: 1 }}
@@ -218,9 +210,9 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             </div>
           )}
         </motion.div>
-        
+
         {/* AlbumDropdown positioned outside overlay to avoid opacity issues */}
-        {(isHovered || dropdownOpen) && (
+        {isSaveMedia && (
           <AlbumDropdown
             mediaId={data.id}
             componentId={`pin-media-${data.id}`}
@@ -231,7 +223,10 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             onModalOpen={() => setModalOpen(true)}
             onModalClose={() => setModalOpen(false)}
             trigger={
-              <div className="save-button right-top">
+              <div className={clsx(
+                "save-button right-top transition-opacity duration-300",
+                isHovered || dropdownOpen ? "opacity-100" : "opacity-0"
+              )}>
                 <p>Save</p>
               </div>
             }
@@ -252,7 +247,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
       {/* Edit Media Modal */}
       <EditMediaModal
         visible={editModalVisible}
-        media={loading ? null : (media || null)}
+        media={loading ? null : media || null}
         onCancel={() => {
           setEditModalVisible(false);
           setIsFirstOpen(true); // Reset for next open
@@ -264,6 +259,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         onSuccess={() => {
           // Refetch media detail to update UI
           fetchMediaDetail(data.id);
+        }}
+        inAlbumContext={!!albumContext?.inAlbum}
+        albumId={albumContext?.albumId}
+        onRemovedFromAlbum={() => {
+          albumContext?.onRemoved?.();
         }}
       />
 

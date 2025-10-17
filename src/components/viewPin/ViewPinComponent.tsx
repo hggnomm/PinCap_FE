@@ -41,6 +41,8 @@ interface MediaListProps {
   queryFn?: (pageParam: number) => Promise<Media[]>;
   medias?: Media[];
   isEditMedia?: boolean;
+  isSaveMedia?: boolean;
+  albumContext?: { inAlbum: boolean; albumId?: string; onRemoved?: () => void };
   enabled?: boolean;
 }
 
@@ -49,6 +51,8 @@ const MediaList: React.FC<MediaListProps> = ({
   queryFn,
   medias: propMedias,
   isEditMedia = false,
+  isSaveMedia = true,
+  albumContext,
   enabled = true,
 }) => {
   const [medias, setMedias] = useState<Media[]>([]);
@@ -112,6 +116,8 @@ const MediaList: React.FC<MediaListProps> = ({
               type: media.type || "",
             }}
             isEditMedia={isEditMedia}
+            isSaveMedia={isSaveMedia}
+            albumContext={albumContext}
             onDelete={reloadData}
           />
         );
@@ -128,6 +134,8 @@ const MediaList: React.FC<MediaListProps> = ({
             type: media.type || "",
           }}
           isEditMedia={isEditMedia}
+          isSaveMedia={isSaveMedia}
+          albumContext={albumContext}
           onDelete={reloadData}
         />
       );
