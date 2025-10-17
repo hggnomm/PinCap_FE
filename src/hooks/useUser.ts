@@ -7,20 +7,18 @@ export const useUser = () => {
   const updateMyProfile = useMutation({
     mutationFn: (data: any) => users.updateMyProfile(data),
     onSuccess: (updatedData) => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      
-      queryClient.invalidateQueries({ queryKey: ['comments'] });
-      queryClient.invalidateQueries({ queryKey: ['replies'] });
-      
-      queryClient.invalidateQueries({ queryKey: ['medias'] });
-      
-      queryClient.invalidateQueries({ queryKey: ['albums'] });
-      queryClient.invalidateQueries({ queryKey: ['album'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      
+      // Update user cache immediately without refetching
       if (updatedData) {
         queryClient.setQueryData(['user'], updatedData);
       }
+      
+      // Invalidate other queries that depend on user data
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
+      queryClient.invalidateQueries({ queryKey: ['replies'] });
+      queryClient.invalidateQueries({ queryKey: ['medias'] });
+      queryClient.invalidateQueries({ queryKey: ['albums'] });
+      queryClient.invalidateQueries({ queryKey: ['album'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
     retry: false,
   });

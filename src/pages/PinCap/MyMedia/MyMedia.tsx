@@ -5,6 +5,7 @@ import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
 import MediaList from "@/components/viewPin/ViewPinComponent";
 import { getMyMedias } from "@/api/media";
 import { useNavigate } from "react-router";
+import { ROUTES } from "@/constants/routes";
 
 const MyMedia = () => {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const MyMedia = () => {
               key: "1",
               title: "Media",
               onClick: () => {
-                navigate("/create-media");
+                navigate(ROUTES.CREATE_MEDIA);
               },
             },
           ]}

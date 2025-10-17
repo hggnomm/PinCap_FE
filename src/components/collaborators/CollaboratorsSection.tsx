@@ -100,7 +100,7 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
           >
             <button
               onClick={onAddCollaborator}
-              className="group relative w-12 h-12 rounded-full border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-rose-50 hover:border-rose-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-opacity-50"
+              className="group relative w-12 h-12 !p-0 rounded-full !border-2 !border-dashed !border-gray-300 !bg-gray-50 hover:!bg-rose-50 hover:!border-rose-400 transition-all duration-300 hover:!scale-105"
             >
               <div className="flex items-center justify-center">
                 <svg
