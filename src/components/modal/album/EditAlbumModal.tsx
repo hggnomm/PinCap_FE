@@ -7,6 +7,7 @@ import FieldItem from "@/components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
 import MediaThumbnailSelector from "@/components/mediaThumbnailSelector/MediaThumbnailSelector";
+import Loading from "@/components/loading/Loading";
 import type { Album } from "type";
 import type { UpdateAlbumRequest } from "@/types/Album/AlbumRequest";
 import { updateAlbumSchema, UpdateAlbumFormData } from "@/validation/album";
@@ -41,9 +42,10 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
     useFormValidation(updateAlbumSchema);
   const { getAlbumById } = useAlbum();
 
-  // Fetch detail album using hook
+  // Fetch detail album using hook - only when modal is visible
   const { data: detailAlbum, isLoading: loadingDetail } = getAlbumById(
-    album?.id || ""
+    album?.id || "",
+    visible // Enable query only when modal is visible
   );
 
   // Initialize form when detail album is loaded
@@ -118,7 +120,8 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
       buttonLabels={{ confirmLabel: "Update", cancelLabel: "Cancel" }}
       className="!w-[700px]"
     >
-      <div className="create-album">
+      <Loading isLoading={loadingDetail && visible}>
+        <div className="create-album">
         <Form form={form} layout="vertical">
           <FieldItem
             label="Name"
@@ -245,7 +248,8 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
             permanently deleted.
           </p>
         </div>
-      </div>
+        </div>
+      </Loading>
 
       {/* Media Thumbnail Selector Modal */}
       <MediaThumbnailSelector

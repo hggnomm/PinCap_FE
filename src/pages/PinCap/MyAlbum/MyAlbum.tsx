@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import Loading from "@/components/loading/Loading";
 import AlbumCard from "./AlbumCard/AlbumCard";
 import { useAlbum } from "@/hooks/useAlbum";
+import { ROUTES } from "@/constants/routes";
 
 const MyAlbum = () => {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ const MyAlbum = () => {
               {
                 key: "1",
                 title: "Media",
-                onClick: () => navigate("/create-media"),
+                onClick: () => navigate(ROUTES.CREATE_MEDIA),
               },
               {
                 key: "2",

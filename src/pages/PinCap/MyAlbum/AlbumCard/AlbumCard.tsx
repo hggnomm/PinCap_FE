@@ -7,6 +7,7 @@ import { UpdateAlbumFormData } from "@/validation/album";
 import { useNavigate } from "react-router";
 import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";
 import { useAlbum } from "@/hooks/useAlbum";
+import { ROUTES } from "@/constants/routes";
 
 interface AlbumCardProps {
   album: Album;
@@ -56,7 +57,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
       <div
         className="album-card"
         onClick={() => {
-          navigate(`/album/${album.id}`, { state: { albumId: album.id } });
+          navigate(ROUTES.ALBUM_DETAIL.replace(':id', album.id), { state: { albumId: album.id } });
         }}
       >
         <div className="img-container">

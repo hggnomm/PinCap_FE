@@ -95,7 +95,7 @@ const MediaThumbnailSelector: React.FC<MediaThumbnailSelectorProps> = ({
             </div>
 
             <div
-              className="grid grid-cols-4 gap-4 max-h-96 overflow-y-auto pr-2"
+              className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scroll-bar"
               style={{
                 scrollbarWidth: "thin",
                 scrollbarColor: "hsl(var(--border)) transparent",

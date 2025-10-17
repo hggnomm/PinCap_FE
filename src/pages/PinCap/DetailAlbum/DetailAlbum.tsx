@@ -2,69 +2,44 @@ import React, { useEffect, useState } from "react";
 import "./DetailAlbum.less";
 import { useLocation, useNavigate } from "react-router";
 import MediaList from "@/components/viewPin/ViewPinComponent";
-import {
-  deleteMyAlbum,
-  getDetailAlbum,
-  updateMyAlbum,
-} from "@/api/album";
-import { Album } from "type";
 import { toast } from "react-toastify";
 import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import { LockFilled, MoreOutlined } from "@ant-design/icons/lib";
-import { UpdateAlbumRequest } from "@/types/Album/AlbumRequest";
+import { UpdateAlbumFormData } from "@/validation/album";
 import Loading from "@/components/loading/Loading";
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
 import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";
 import Empty, { NoMediaIcon } from "@/components/Empty";
+import { useAlbum } from "@/hooks/useAlbum";
+import { ROUTES } from "@/constants/routes";
 
 const DetailAlbum = () => {
   const location = useLocation();
   const albumId = location.state?.albumId;
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [albumData, setAlbumData] = useState<Album | null>(null);
-  const [isFetchData, setIsFetchData] = useState<boolean>(false);
+  const navigate = useNavigate();
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
-  const navigate = useNavigate();
+
+  // Use React Query hooks
+  const { getAlbumById, updateAlbum, deleteAlbum } = useAlbum();
+  const { data: albumData, isLoading: loading, error: queryError } = getAlbumById(albumId);
 
   useEffect(() => {
-    if (albumId) {
-      fetchDetailAlbums();
-    } else {
-      setError("Album ID is missing.");
+    if (!albumId) {
       toast.error("Album ID is missing.");
+      navigate(ROUTES.MY_ALBUM);
     }
-  }, []);
+  }, [albumId, navigate]);
 
-
-  const fetchDetailAlbums = async () => {
-    setLoading(true);
-    setError(null);
+  const handleEditAlbum = async (albumRequest: UpdateAlbumFormData) => {
     try {
-      const response = await getDetailAlbum(albumId);
-      console.log(response);
-      if (response) {
-        setAlbumData(response);
-        setIsFetchData(true);
-      }
-    } catch (err) {
-      setError("Failed to fetch albums. Please try again later.");
-      toast.error("Failed to fetch albums. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEditAlbum = async (albumRequest: UpdateAlbumRequest) => {
-    try {
-      const response = await updateMyAlbum(albumId, albumRequest);
-      if (response) {
-        setEditModalVisible(false);
-        fetchDetailAlbums();
-        toast.success("Album updated successfully!");
-      }
+      await updateAlbum({
+        id: albumId,
+        data: albumRequest
+      });
+      setEditModalVisible(false);
+      toast.success("Album updated successfully!");
     } catch (error) {
       console.error("Update failed:", error);
       toast.error("Failed to update album. Please try again.");
@@ -73,14 +48,10 @@ const DetailAlbum = () => {
 
   const handleDeleteAlbum = async () => {
     try {
-      const response = await deleteMyAlbum(albumId);
-      if (response) {
-        setDeleteModalVisible(false);
-        navigate("/album");
-        toast.success("Album deleted successfully!");
-      } else {
-        toast.error("Failed to delete the album. Please try again.");
-      }
+      await deleteAlbum(albumId);
+      setDeleteModalVisible(false);
+      navigate(ROUTES.MY_ALBUM);
+      toast.success("Album deleted successfully!");
     } catch (error) {
       console.error("Error deleting album:", error);
       toast.error("An error occurred while deleting the album. Please try again.");
@@ -91,6 +62,8 @@ const DetailAlbum = () => {
     setInviteModalVisible(false);
     toast.info("Invite functionality will be implemented later");
   };
+  const error = queryError ? "Failed to fetch album. Please try again later." : null;
+
   return (
     <Loading isLoading={loading} error={error}>
       <div className="album-detail-container">
@@ -147,7 +120,7 @@ const DetailAlbum = () => {
           />
         )}
 
-        {isFetchData && albumData?.medias && albumData.medias.length > 0 && (
+        {albumData?.medias && albumData.medias.length > 0 && (
           <MediaList medias={albumData?.medias} isEditMedia />
         )}
 

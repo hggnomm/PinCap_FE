@@ -6,6 +6,7 @@ export const getMyAlbumData = async (params?: {
   query?: string;
   order_key?: string;
   order_type?: string;
+  media_id?: string;
 }) => {
   try {
     const res = await apiClient.get("/api/albums/my-album", { params });
@@ -104,6 +105,7 @@ export const getMyAlbumMember = async (params?: {
   query?: string;
   order_key?: string;
   order_type?: string;
+  media_id?: string;
 }) => {
   try {
     const res = await apiClient.get("/api/albums/my-album-member", { params });

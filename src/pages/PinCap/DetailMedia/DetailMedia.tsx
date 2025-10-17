@@ -207,7 +207,14 @@ const DetailMedia = () => {
                     }
                   />
 
-                  <button className="save">Save</button>
+                  <AlbumDropdown
+                    mediaId={id}
+                    componentId={`detail-media-save-${id}`}
+                    position="click"
+                    trigger={
+                      <button className="save">Save</button>
+                    }
+                  />
                 </div>
               </div>
             </div>
