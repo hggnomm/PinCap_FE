@@ -157,7 +157,7 @@ const Profile = () => {
                       textColor: "text-purple-600 dark:text-purple-400",
                     },
                     {
-                      value: "120",
+                      value: user.reaction_media_count?.toLocaleString() || 0,
                       label: "Reaction",
                       icon: <Star className="w-3 h-3 fill-current" />,
                       gradientColors:
@@ -166,7 +166,7 @@ const Profile = () => {
                       textColor: "text-green-600 dark:text-green-400",
                     },
                     {
-                      value: "156",
+                      value: user.medias_count?.toLocaleString() || 0,
                       label: "Pin",
                       gradientColors:
                         "bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20",

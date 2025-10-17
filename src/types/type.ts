@@ -9,6 +9,8 @@ export type User = {
   role: string;
   followers_count: number;
   followees_count: number;
+  medias_count?: number;
+  reaction_media_count?: number;
   isFollowing?: boolean;
 };
 

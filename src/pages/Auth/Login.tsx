@@ -10,7 +10,7 @@ import Title from "antd/es/typography/Title";
 import { login, getGoogleOAuthUrl } from "@/api/auth";
 import { addToken } from "@/store/authSlice";
 import { motion } from "framer-motion";
-import { LoginRequest } from "Auth/LoginRequest";
+import { LoginRequest } from "@/types/Auth/LoginRequest";
 import { loginSchema } from "@/validation/auth";
 import { useFormValidation } from "@/hooks";
 import "./index.less";

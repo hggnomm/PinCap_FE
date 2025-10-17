@@ -1,6 +1,7 @@
 import apiClient from './apiClient';
+import type { User } from '@/types/type';
 
-export const getMyProfile = async () => {
+export const getMyProfile = async (): Promise<User> => {
   try {
     const response = await apiClient.get('/api/users/my-profile');
     return response.data;
@@ -52,7 +53,7 @@ export const unfollowOrUnblockUser = async (data: { followeeId: string; status: 
   }
 };
 
-export const getUserProfile = async (id: string) => {
+export const getUserProfile = async (id: string): Promise<User> => {
   try {
     const response = await apiClient.get(`/api/users/profiles/${id}`);
     return response.data;

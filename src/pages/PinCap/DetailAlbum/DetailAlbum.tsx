@@ -11,7 +11,7 @@ import { Album } from "type";
 import { toast } from "react-toastify";
 import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import { LockFilled, MoreOutlined } from "@ant-design/icons/lib";
-import { UpdateAlbumRequest } from "Album/AlbumRequest";
+import { UpdateAlbumRequest } from "@/types/Album/AlbumRequest";
 import Loading from "@/components/loading/Loading";
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
 import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";

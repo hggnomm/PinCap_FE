@@ -5,13 +5,12 @@ import "./index.less";
 import { EditFilled } from "@ant-design/icons/lib";
 import ModalComponent from "@/components/modal/ModalComponent";
 import { toast } from "react-toastify";
-import { deleteMedias, getDetailMedia, updatedMedia } from "@/api/media";
+import { getDetailMedia } from "@/api/media";
 import { Media } from "type";
 import { Form, Input } from "antd";
 import FieldItem from "@/components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
 import Loading from "@/components/loading/Loading";
-import { MediaFormValues } from "Media/MediaRequest";
 import { useSelector } from "react-redux";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
@@ -19,9 +18,10 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import AlbumDropdown from "@/components/albumDropdown";
 import clsx from "clsx";
-import { MEDIA_TYPES } from "@/constants/constants";
+import { MEDIA_TYPES, PRIVACY } from "@/constants/constants";
 import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";
 import DotsPagination from "@/components/dotsPagination/DotsPagination";
+import { useMedia } from "@/hooks/useMedia";
 
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
@@ -39,6 +39,7 @@ interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
 const PinMedia: React.FC<PinMediaProps> = (props) => {
   const { srcUrl, data, isEditMedia, onDelete } = props;
   const tokenPayload = useSelector((state: any) => state.auth);
+  const { updateMedia, deleteMedia } = useMedia();
   const [media, setMedia] = useState<Media>();
   const navigate = useNavigate();
   const isMp4 = srcUrl?.endsWith(".mp4");
@@ -112,20 +113,17 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     try {
       const formValue = await form.validateFields();
 
-      const updatedData: MediaFormValues = {
-        id: media?.id,
-        mediaOwner_id: tokenPayload.id,
+      const updatedData = {
         media_name: formValue.media_name,
         description: formValue.description,
-        privacy: privacy ? "0" : "1",
-        is_comment: isComment ? 1 : 0,
+        privacy: privacy ? PRIVACY.PRIVATE : PRIVACY.PUBLIC,
+        is_comment: isComment,
       };
 
-      const response = await updatedMedia(data.id, updatedData);
-
-      if (response) {
-        setModalVisible(false);
-      }
+      await updateMedia({ id: data.id, data: updatedData });
+      
+      setModalVisible(false);
+      toast.success("Media updated successfully!");
     } catch (error) {
       console.error("Validation failed:", error);
       toast.error(
@@ -134,19 +132,15 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     }
   };
 
-  const deleteMedia = async () => {
+  const handleDeleteMedia = async () => {
     try {
-      const response = await deleteMedias([data.id]);
+      await deleteMedia([data.id]);
+      
+      handleCancel();
+      toast.success("Media deleted successfully!");
 
-      if (response) {
-        handleCancel();
-        toast.success("Media deleted successfully!");
-
-        if (onDelete) {
-          onDelete();
-        }
-      } else {
-        toast.error("Failed to delete the Media. Please try again.");
+      if (onDelete) {
+        onDelete();
       }
     } catch (error) {
       console.error("Error deleting media:", error);
@@ -326,7 +320,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
           setDeleteModalVisible(false);
           setModalVisible(true);
         }}
-        onConfirm={deleteMedia}
+        onConfirm={handleDeleteMedia}
         buttonLabels={{ confirmLabel: "Delete", cancelLabel: "Cancel" }}
       >
         <div className="my-5">

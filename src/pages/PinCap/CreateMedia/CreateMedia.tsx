@@ -4,15 +4,14 @@ import "./FilePond.less";
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 import Title from "antd/es/typography/Title";
 import {
-  createMedia,
   getDetailMedia,
   getMyMedias,
-  updatedMedia,
 } from "@/api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import clsx from "clsx";
+import { useMedia } from "@/hooks/useMedia";
 
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -48,6 +47,7 @@ interface TokenPayload {
 const CreateMedia: React.FC = () => {
   const [form] = Form.useForm();
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
+  const { createMedia, updateMedia } = useMedia();
   const [isLoad, setIsLoad] = useState<boolean>(false);
   const [fileList, setFileList] = useState<File[]>([]);
   const [isProcessingFiles, setIsProcessingFiles] = useState<boolean>(false);
@@ -166,7 +166,7 @@ const CreateMedia: React.FC = () => {
 
   const onChangeToCreateDraft = async () => {
     const formValue = form.getFieldsValue(true);
-    const mediaData: MediaFormValues = {
+    const mediaData: any = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList,
@@ -179,12 +179,17 @@ const CreateMedia: React.FC = () => {
     setTextCreateDraft(true);
 
     try {
-      const response: MediaResponse = formValue.id
-        ? await updatedMedia(formValue.id, { ...mediaData})
-        : await createMedia(mediaData);
+      let response: any;
+      if (formValue.id) {
+        delete mediaData.media;
+        response = await updateMedia({ id: formValue.id, data: mediaData });
+      } else {
+        response = await createMedia(mediaData);
+      }
 
       if (response?.media?.id) {
         setDraftId(response.media.id);
+        form.setFieldValue('id', response.media.id);
       } else {
         toast.error("An unexpected error occurred.");
       }
@@ -213,7 +218,7 @@ const CreateMedia: React.FC = () => {
 
     const tags_name = tags;
 
-    const mediaData: MediaFormValues = {
+    const mediaData: any = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList,
@@ -227,33 +232,22 @@ const CreateMedia: React.FC = () => {
 
       if (formValue.id) {
         delete mediaData.media;
-        const response = await updatedMedia(formValue.id, mediaData);
-        if (response) {
-          setIsLoad(false);
-          toast.success("Media updated successfully!");
-        } else {
-          toast.error("Error: Failed to update media.");
-        }
+        await updateMedia({ id: formValue.id, data: mediaData });
+        toast.success("Media updated successfully!");
       } else {
-        const response = await createMedia(mediaData);
-        if (response) {
-          setIsLoad(false);
-          toast.success("Media created successfully!");
-        } else {
-          toast.error(
-            "Error: Occurred while creating media, please send report to admin"
-          );
-        }
+        await createMedia(mediaData);
+        toast.success("Media created successfully!");
       }
+      
+      setDraftId("");
+      fetchDrafts();
+      resetForm();
     } catch (error: any) {
       toast.error(
         `Error: ${error?.message || "An unexpected error occurred."}`
       );
     } finally {
       setIsLoad(false);
-      setDraftId("");
-      fetchDrafts();
-      resetForm();
     }
   };
 

@@ -8,6 +8,7 @@ import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponen
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
 import MediaThumbnailSelector from "@/components/mediaThumbnailSelector/MediaThumbnailSelector";
 import type { Album } from "type";
+import type { UpdateAlbumRequest } from "@/types/Album/AlbumRequest";
 import { updateAlbumSchema, UpdateAlbumFormData } from "@/validation/album";
 import { useFormValidation } from "@/hooks";
 import { useAlbum } from "@/hooks/useAlbum";
@@ -16,7 +17,7 @@ interface EditAlbumModalProps {
   visible: boolean;
   album: Album | null;
   onCancel: () => void;
-  onConfirm: (albumRequest: UpdateAlbumFormData) => Promise<void>;
+  onConfirm: (albumRequest: UpdateAlbumRequest) => Promise<void>;
   onDeleteClick: () => void;
   onInviteCollaborators: () => void;
   loading?: boolean;

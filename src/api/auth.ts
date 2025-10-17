@@ -1,5 +1,6 @@
 import axios from "axios";
 import apiClient from "./apiClient";
+import type { User } from "@/types/type";
 const baseUrl = (import.meta as any).env.VITE_BASE_API as string;
 
 export const login = async (data: any) => {
@@ -52,7 +53,7 @@ export const register = async (data: any) => {
   }
 };
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = async (): Promise<User> => {
   try {
     const response = await apiClient.get('/api/users/my-profile');
     return response.data;

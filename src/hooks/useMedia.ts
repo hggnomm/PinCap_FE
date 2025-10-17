@@ -7,7 +7,7 @@ export const useMedia = () => {
 
   const getMediaList = (page = 1) => {
     return useQuery({
-      queryKey: ['media', page],
+      queryKey: ['medias', 'all', page],
       queryFn: () => media.getAllMedias({ pageParam: page }),
       staleTime: 5 * 60 * 1000, // 5 minutes
     });
@@ -24,7 +24,7 @@ export const useMedia = () => {
 
   const getMyMedia = (page = 1, isCreated = true) => {
     return useQuery({
-      queryKey: ['my-media', page, isCreated],
+      queryKey: ['medias', 'my-media', isCreated ? 'created' : 'saved', page],
       queryFn: () => media.getMyMedias({ pageParam: page, is_created: isCreated }),
       staleTime: 5 * 60 * 1000,
     });
@@ -33,8 +33,7 @@ export const useMedia = () => {
   const createMediaMutation = useMutation({
     mutationFn: (data: CreateMediaFormData) => media.createMedia(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] });
-      queryClient.invalidateQueries({ queryKey: ['my-media'] });
+      queryClient.invalidateQueries({ queryKey: ['medias'] });
     },
   });
 
@@ -42,17 +41,15 @@ export const useMedia = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateMediaFormData }) =>
       media.updatedMedia(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: ['medias'] });
       queryClient.invalidateQueries({ queryKey: ['media', id] });
-      queryClient.invalidateQueries({ queryKey: ['my-media'] });
     },
   });
 
   const deleteMediaMutation = useMutation({
     mutationFn: (ids: string[]) => media.deleteMedias(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] });
-      queryClient.invalidateQueries({ queryKey: ['my-media'] });
+      queryClient.invalidateQueries({ queryKey: ['medias'] });
     },
   });
 

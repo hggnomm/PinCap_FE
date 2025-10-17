@@ -12,8 +12,7 @@ export const useUser = () => {
       queryClient.invalidateQueries({ queryKey: ['comments'] });
       queryClient.invalidateQueries({ queryKey: ['replies'] });
       
-      queryClient.invalidateQueries({ queryKey: ['media'] });
-      queryClient.invalidateQueries({ queryKey: ['my-media'] });
+      queryClient.invalidateQueries({ queryKey: ['medias'] });
       
       queryClient.invalidateQueries({ queryKey: ['albums'] });
       queryClient.invalidateQueries({ queryKey: ['album'] });
