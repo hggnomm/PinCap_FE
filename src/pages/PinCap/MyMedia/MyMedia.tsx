@@ -12,7 +12,7 @@ const MyMedia = () => {
 
   return (
     <div className="media-container">
-      <div className="fixed-topbar">
+      <div className="fixed-topbar !sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]">
         <div className="text-head">
           <span>All Medias</span>
         </div>

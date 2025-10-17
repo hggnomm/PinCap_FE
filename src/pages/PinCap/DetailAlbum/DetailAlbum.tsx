@@ -15,6 +15,7 @@ import { UpdateAlbumRequest } from "@/types/Album/AlbumRequest";
 import Loading from "@/components/loading/Loading";
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
 import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";
+import Empty, { NoMediaIcon } from "@/components/Empty";
 
 const DetailAlbum = () => {
   const location = useLocation();
@@ -139,12 +140,16 @@ const DetailAlbum = () => {
           </div>
         </div>
         {albumData?.medias && albumData.medias.length === 0 && (
-          <div className="no-medias">
-            <p>There aren’t any Medias on this album yet</p>
-          </div>
+          <Empty
+            icon={<NoMediaIcon />}
+            title="No Media Yet"
+            description="There aren't any medias on this album yet. Start adding some!"
+          />
         )}
 
-        {isFetchData && <MediaList medias={albumData?.medias} isEditMedia />}
+        {isFetchData && albumData?.medias && albumData.medias.length > 0 && (
+          <MediaList medias={albumData?.medias} isEditMedia />
+        )}
 
         {/* Edit Album Modal */}
         <EditAlbumModal
