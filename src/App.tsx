@@ -20,6 +20,8 @@ import DetailAlbum from "./pages/PinCap/DetailAlbum/DetailAlbum";
 import Profile from "./pages/PinCap/Profile/Profile";
 import EditProfile from "./pages/PinCap/EditProfile/EditProfile";
 import UserProfile from "./pages/PinCap/UserProfile/UserProfile";
+import NotFound from "./pages/NotFound";
+import Forbidden from "./pages/Forbidden";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { ROUTES } from "./constants/routes";
 import { useAuth } from "./hooks";
@@ -61,11 +63,15 @@ const App = () => {
       />
       <div className="App">
         <Routes>
+          {/* Public Routes */}
           <Route path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.REGISTER} element={<Register />} />
+          <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
+          <Route path={ROUTES.FORBIDDEN} element={<Forbidden />} />
 
           <Route path={ROUTES.HOME} element={<HomeRouteHandler />} />
 
+          {/* Protected Routes */}
           <Route
             path="*"
             element={
@@ -98,6 +104,9 @@ const App = () => {
                         <Route path={ROUTES.PROFILE} element={<Profile />} />
                         <Route path={ROUTES.EDIT_PROFILE} element={<EditProfile />} />
                         <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
+                        
+                        {/* Catch all - redirect to 404 */}
+                        <Route path="*" element={<Navigate to={ROUTES.NOT_FOUND} replace />} />
                       </Routes>
                     </Content>
                   </Layout>
