@@ -33,7 +33,7 @@ export const useAuth = () => {
     onSuccess: (response: any) => {
       localStorage.setItem('token', response.token);
       queryClient.setQueryData(['user'], response.user);
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      // No need to invalidate - we just set the data
       navigate(ROUTES.PINCAP_HOME);
     },
   });

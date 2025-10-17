@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import clsx from "clsx";
 
@@ -59,6 +59,14 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    setIsFollowing(initialIsFollowing);
+  }, [initialIsFollowing]);
+
+  useEffect(() => {
+    setFollowersCount(initialFollowersCount);
+  }, [initialFollowersCount]);
 
   // Variant styles
   const baseClasses = "border-none outline-none cursor-pointer font-medium transition-all";

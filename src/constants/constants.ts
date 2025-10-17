@@ -37,7 +37,7 @@ export const ALBUM_ROLES = {
 export const PRIVACY = {
   PRIVATE: "0",
   PUBLIC: "1"
-};
+} as const;
 
 export const MEDIA_TYPES = {
   VIDEO: "VIDEO",

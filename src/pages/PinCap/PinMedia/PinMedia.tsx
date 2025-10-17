@@ -5,13 +5,12 @@ import "./index.less";
 import { EditFilled } from "@ant-design/icons/lib";
 import ModalComponent from "@/components/modal/ModalComponent";
 import { toast } from "react-toastify";
-import { deleteMedias, getDetailMedia, updatedMedia } from "@/api/media";
+import { getDetailMedia } from "@/api/media";
 import { Media } from "type";
 import { Form, Input } from "antd";
 import FieldItem from "@/components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
 import Loading from "@/components/loading/Loading";
-import { MediaFormValues } from "Media/MediaRequest";
 import { useSelector } from "react-redux";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
@@ -19,9 +18,11 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import AlbumDropdown from "@/components/albumDropdown";
 import clsx from "clsx";
-import { MEDIA_TYPES } from "@/constants/constants";
+import { MEDIA_TYPES, PRIVACY } from "@/constants/constants";
 import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";
 import DotsPagination from "@/components/dotsPagination/DotsPagination";
+import { useMedia } from "@/hooks/useMedia";
+import { EditMediaModal, DeleteMediaModal } from "@/components/modal/media";
 
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
@@ -39,13 +40,14 @@ interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
 const PinMedia: React.FC<PinMediaProps> = (props) => {
   const { srcUrl, data, isEditMedia, onDelete } = props;
   const tokenPayload = useSelector((state: any) => state.auth);
+  const { updateMedia, deleteMedia } = useMedia();
   const [media, setMedia] = useState<Media>();
   const navigate = useNavigate();
   const isMp4 = srcUrl?.endsWith(".mp4");
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalNotMyMediaVisible, setModalNotMyMediaVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-
+  
   const [isFirstOpen, setIsFirstOpen] = useState(true);
   const [form] = Form.useForm<Media>();
   const [privacy, setPrivacy] = useState(false);
@@ -71,11 +73,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
   }, [isFlexibleMedia, currentFlexibleMedia]);
 
   useEffect(() => {
-    if (modalVisible && isFirstOpen) {
+    if (editModalVisible && isFirstOpen) {
       fetchMediaDetail(data.id);
       setIsFirstOpen(false); // After fetch media, set false
     }
-  }, [modalVisible, isFirstOpen]);
+  }, [editModalVisible, isFirstOpen]);
 
   const fetchMediaDetail = async (idMedia: string) => {
     setLoading(true);
@@ -100,11 +102,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
 
   const handleDeleteAction = () => {
     setDeleteModalVisible(true);
-    setModalVisible(false);
+    setEditModalVisible(false);
   };
 
   const handleCancel = () => {
-    setModalVisible(false);
+    setEditModalVisible(false);
     setDeleteModalVisible(false);
   };
 
@@ -112,20 +114,17 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     try {
       const formValue = await form.validateFields();
 
-      const updatedData: MediaFormValues = {
-        id: media?.id,
-        mediaOwner_id: tokenPayload.id,
+      const updatedData = {
         media_name: formValue.media_name,
         description: formValue.description,
-        privacy: privacy ? "0" : "1",
-        is_comment: isComment ? 1 : 0,
+        privacy: privacy ? PRIVACY.PRIVATE : PRIVACY.PUBLIC,
+        is_comment: isComment,
       };
 
-      const response = await updatedMedia(data.id, updatedData);
-
-      if (response) {
-        setModalVisible(false);
-      }
+      await updateMedia({ id: data.id, data: updatedData });
+      
+      setModalVisible(false);
+      toast.success("Media updated successfully!");
     } catch (error) {
       console.error("Validation failed:", error);
       toast.error(
@@ -134,19 +133,15 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     }
   };
 
-  const deleteMedia = async () => {
+  const handleDeleteMedia = async () => {
     try {
-      const response = await deleteMedias([data.id]);
+      await deleteMedia([data.id]);
+      
+      handleCancel();
+      toast.success("Media deleted successfully!");
 
-      if (response) {
-        handleCancel();
-        toast.success("Media deleted successfully!");
-
-        if (onDelete) {
-          onDelete();
-        }
-      } else {
-        toast.error("Failed to delete the Media. Please try again.");
+      if (onDelete) {
+        onDelete();
       }
     } catch (error) {
       console.error("Error deleting media:", error);
@@ -215,8 +210,8 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             <div
               className="right-bottom circle-button"
               onClick={(e) => {
-                setModalVisible(true);
-                e.stopPropagation(); // Prevent event propagation when the button is clicked
+                setEditModalVisible(true);
+                e.stopPropagation();
               }}
             >
               <EditFilled />
@@ -249,91 +244,39 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             total={flexibleMediaUrls.length}
             current={currentMediaIndex}
             onDotClick={setCurrentMediaIndex}
-            className="absolute bottom-2 left-1/2 -translate-x-1/2 [&>div]:w-1 [&>div]:h-1"
+            className="absolute bottom-[0.83vw] left-1/2 -translate-x-1/2 [&>div]:w-1 [&>div]:h-1"
           />
         )}
       </motion.div>
 
-      {/* MODAL */}
-      <ModalComponent
-        title="Edit Your Media"
-        visible={modalVisible}
-        onCancel={handleCancel}
-        onConfirm={handleConfirm}
-        buttonLabels={{ confirmLabel: "Update", cancelLabel: "Cancel" }}
-      >
-        <Loading isLoading={loading} error={error}>
-          <div className="detail_container">
-            <div className="form_det">
-              <Form form={form} layout="vertical">
-                <FieldItem
-                  label="Name"
-                  name="media_name"
-                  placeholder="Like 'Places to Go' or 'Recipes to Make'"
-                >
-                  <Input />
-                </FieldItem>
+      {/* Edit Media Modal */}
+      <EditMediaModal
+        visible={editModalVisible}
+        media={loading ? null : (media || null)}
+        onCancel={() => {
+          setEditModalVisible(false);
+          setIsFirstOpen(true); // Reset for next open
+        }}
+        onDeleteClick={() => {
+          setEditModalVisible(false);
+          setDeleteModalVisible(true);
+        }}
+        onSuccess={() => {
+          // Refetch media detail to update UI
+          fetchMediaDetail(data.id);
+        }}
+      />
 
-                <FieldItem
-                  label="Description"
-                  name="description"
-                  placeholder="Write a detailed description for your Media here."
-                >
-                  <Input />
-                </FieldItem>
-
-                <CheckboxWithDescription
-                  title="Keep this media private"
-                  description="So only you and collaborators can see it."
-                  value={privacy}
-                  onChange={(e) => setPrivacy(e.target.checked)}
-                  name="privacy"
-                />
-                <CheckboxWithDescription
-                  title="Allow people to comment"
-                  value={isComment}
-                  onChange={(e) => setIsComment(e.target.checked)}
-                  name="is_comment"
-                />
-              </Form>
-              <div className="delete-action" onClick={handleDeleteAction}>
-                <p className="title-delele">Delete Media</p>
-                <p className="des-delete">
-                  You have 7 days to restore a deleted Media. After that, it
-                  will be permanently deleted.
-                </p>
-              </div>
-            </div>
-            <div className="media_detail">
-              <Zoom>
-                {media?.type === MEDIA_TYPES.VIDEO ? (
-                  <video controls muted>
-                    <source src={media?.media_url} type="video/mp4" />
-                  </video>
-                ) : (
-                  <img src={media?.media_url} alt={media?.media_name} />
-                )}
-              </Zoom>
-            </div>
-          </div>
-        </Loading>
-      </ModalComponent>
-
-      <ModalComponent
-        titleDefault="Delete this media?"
+      {/* Delete Media Modal */}
+      <DeleteMediaModal
         visible={deleteModalVisible}
+        media={media || null}
         onCancel={() => {
           setDeleteModalVisible(false);
-          setModalVisible(true);
+          setEditModalVisible(true);
         }}
-        onConfirm={deleteMedia}
-        buttonLabels={{ confirmLabel: "Delete", cancelLabel: "Cancel" }}
-      >
-        <div className="my-5">
-          Are you sure you want to delete this Media? This action cannot be
-          undone.
-        </div>
-      </ModalComponent>
+        onConfirm={handleDeleteMedia}
+      />
     </>
   );
 };

@@ -10,9 +10,9 @@ import Title from "antd/es/typography/Title";
 import { login, getGoogleOAuthUrl } from "@/api/auth";
 import { addToken } from "@/store/authSlice";
 import { motion } from "framer-motion";
-import { LoginRequest } from "Auth/LoginRequest";
+import { LoginRequest } from "@/types/Auth/LoginRequest";
 import { loginSchema } from "@/validation/auth";
-import { useFormValidation } from "@/hooks";
+import { useFormValidation, useAuth } from "@/hooks";
 import "./index.less";
 import { ROUTES } from "@/constants/routes";
 interface LoginFormValues {
@@ -31,11 +31,18 @@ const Login: React.FC = () => {
   const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
   const { validate, validateField, getFieldError } =
     useFormValidation(loginSchema);
+  const { user } = useAuth();
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const verifiedToken = params.get("verified-token");
   const googleToken = params.get("google-token");
+
+  useEffect(() => {
+    if (user && !verifiedToken && !googleToken) {
+      navigate(ROUTES.PINCAP_HOME, { replace: true });
+    }
+  }, [user, navigate, verifiedToken, googleToken]);
 
   useEffect(() => {
     if (verifiedToken) {

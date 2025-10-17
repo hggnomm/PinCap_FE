@@ -73,7 +73,6 @@ const UserProfile = () => {
   const [followersCount, setFollowersCount] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // Nếu id là của current user, redirect về /profile
   if (id && currentUser && id === currentUser.id) {
     return <Navigate to={ROUTES.PROFILE} replace />;
   }
@@ -84,8 +83,8 @@ const UserProfile = () => {
   // Update local state when profile data changes
   useEffect(() => {
     if (userProfile) {
-      setFollowersCount(userProfile.followers_count || 0);
-      setIsFollowing(userProfile.isFollowing || false);
+      setFollowersCount(userProfile.followers_count ?? 0);
+      setIsFollowing(userProfile.isFollowing ?? false);
     }
   }, [userProfile]);
 
@@ -184,7 +183,7 @@ const UserProfile = () => {
                       textColor: "text-purple-600 dark:text-purple-400",
                     },
                     {
-                      value: "120",
+                      value: userProfile.reaction_media_count?.toLocaleString() || 0,
                       label: "Reaction",
                       icon: <Star className="w-3 h-3 fill-current" />,
                       gradientColors:
@@ -193,7 +192,7 @@ const UserProfile = () => {
                       textColor: "text-green-600 dark:text-green-400",
                     },
                     {
-                      value: "156",
+                      value: userProfile.medias_count?.toLocaleString() || 0,
                       label: "Pin",
                       gradientColors:
                         "bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20",

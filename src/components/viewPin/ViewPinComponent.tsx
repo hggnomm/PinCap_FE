@@ -105,7 +105,12 @@ const MediaList: React.FC<MediaListProps> = ({
             innerRef={ref}
             key={media.id}
             srcUrl={media.media_url}
-            data={media}
+            data={{
+              id: media.id,
+              media_name: media.media_name,
+              media_url: media.media_url,
+              type: media.type || "",
+            }}
             isEditMedia={isEditMedia}
             onDelete={reloadData}
           />
@@ -116,7 +121,12 @@ const MediaList: React.FC<MediaListProps> = ({
         <PinMedia
           key={media.id}
           srcUrl={media.media_url}
-          data={media}
+          data={{
+            id: media.id,
+            media_name: media.media_name,
+            media_url: media.media_url,
+            type: media.type || "",
+          }}
           isEditMedia={isEditMedia}
           onDelete={reloadData}
         />

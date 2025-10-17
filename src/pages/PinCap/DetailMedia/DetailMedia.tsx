@@ -42,6 +42,20 @@ const DetailMedia = () => {
   const [media, setMedia] = useState<Media | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Redirect to 404 if no media ID provided
+  useEffect(() => {
+    if (!id) {
+      navigate(ROUTES.NOT_FOUND, { replace: true });
+    }
+  }, [id, navigate]);
+
+  // Redirect to 404 if media not found
+  useEffect(() => {
+    if (!loading && !mediaData && queryError) {
+      navigate(ROUTES.NOT_FOUND, { replace: true });
+    }
+  }, [loading, mediaData, queryError, navigate]);
+
   useEffect(() => {
     if (mediaData) {
       setMedia(mediaData);
@@ -193,7 +207,14 @@ const DetailMedia = () => {
                     }
                   />
 
-                  <button className="save">Save</button>
+                  <AlbumDropdown
+                    mediaId={id}
+                    componentId={`detail-media-save-${id}`}
+                    position="click"
+                    trigger={
+                      <button className="save">Save</button>
+                    }
+                  />
                 </div>
               </div>
             </div>

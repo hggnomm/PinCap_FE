@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import Loading from "@/components/loading/Loading";
 import AlbumCard from "./AlbumCard/AlbumCard";
 import { useAlbum } from "@/hooks/useAlbum";
+import { ROUTES } from "@/constants/routes";
 
 const MyAlbum = () => {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ const MyAlbum = () => {
   return (
     <div className="album-container">
       <div className="my-list-media">
-        <div className="action">
+        <div className="action sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]">
           <ButtonCircle
             paddingClass="padding-0-8"
             icon={<FilterOutlined style={{ fontSize: "26px" }} />}
@@ -82,7 +83,7 @@ const MyAlbum = () => {
               {
                 key: "1",
                 title: "Media",
-                onClick: () => navigate("/create-media"),
+                onClick: () => navigate(ROUTES.CREATE_MEDIA),
               },
               {
                 key: "2",

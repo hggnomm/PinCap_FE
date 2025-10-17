@@ -1,20 +1,22 @@
 import { Button, Col, Form, Input, notification, Row, Progress } from "antd";
 import { register, resendVerifyEmail } from "@/api/auth";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Title from "antd/es/typography/Title";
 import RegisterImage from "@/assets/img/PinCap/register_page_image.jpg";
 import { LogoIcon } from "@/assets/img";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MailOutlined, CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
-import { ROUTES } from "@/constants/routes"
-import "./index.less"
+import { ROUTES } from "@/constants/routes";
+import { useAuth } from "@/hooks";
+import "./index.less";
 // List of common passwords to disallow
 const commonPasswords = ["123456", "password", "admin", "qwerty", "welcome", "123456789", "12345678", "111111", "abc123"];
 
 const Register = () => {
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [passwordValue, setPasswordValue] = useState("");
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
@@ -24,6 +26,12 @@ const Register = () => {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [isResending, setIsResending] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      navigate(ROUTES.PINCAP_HOME, { replace: true });
+    }
+  }, [user, navigate]);
 
   const onSwitchLogin = () => {
     navigate(ROUTES.LOGIN);

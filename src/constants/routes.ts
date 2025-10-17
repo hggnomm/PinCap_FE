@@ -3,6 +3,8 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
+  NOT_FOUND: '/404',
+  FORBIDDEN: '/403',
   
   // Protected routes
   PINCAP_HOME: '/home',
@@ -21,6 +23,8 @@ export const PUBLIC_ROUTES = [
   ROUTES.HOME,
   ROUTES.LOGIN,
   ROUTES.REGISTER,
+  ROUTES.NOT_FOUND,
+  ROUTES.FORBIDDEN,
 ] as const;
 
 export const PROTECTED_ROUTES = [

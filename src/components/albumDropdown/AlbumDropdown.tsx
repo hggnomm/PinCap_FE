@@ -8,6 +8,7 @@ import { useAlbum } from "@/hooks/useAlbum";
 import { CreateAlbumFormData } from "@/validation";
 import { BaseTabs } from "@/components/baseTabs";
 import { ALBUM_TABS } from "@/constants/constants";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Global state to track which dropdown is open
 let currentOpenDropdown: string | null = null;
@@ -19,6 +20,7 @@ interface Album {
   thumbnail_url?: string;
   image_cover?: string;
   media_count?: number;
+  is_media_in_album?: boolean; 
 }
 
 interface AlbumDropdownProps {
@@ -55,10 +57,11 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
   // Create album modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   
-  // Use React Query for albums
+  // Use React Query for albums - only fetch when dropdown is open
+  const queryClient = useQueryClient();
   const { getAlbumList, getAlbumMemberList, createAlbum, createAlbumLoading } = useAlbum();
-  const { data: myAlbumsResponse, isLoading: myAlbumsLoading } = getAlbumList();
-  const { data: sharedAlbumsResponse, isLoading: sharedAlbumsLoading } = getAlbumMemberList();
+  const { data: myAlbumsResponse, isLoading: myAlbumsLoading } = getAlbumList(mediaId, showDropdown);
+  const { data: sharedAlbumsResponse, isLoading: sharedAlbumsLoading } = getAlbumMemberList(mediaId, showDropdown);
   
   const myAlbums = myAlbumsResponse?.data ?? [];
   const sharedAlbums = sharedAlbumsResponse?.data ?? [];
@@ -197,12 +200,11 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
       
       if (response) {
         toast.success(`Media saved to "${albumName}" successfully!`);
-        setShowDropdown(false);
-        setSearchTerm("");
-        setOriginalClickPosition(null);
-        setInitialScrollPosition({ x: 0, y: 0 });
-        currentOpenDropdown = null;
-        onClose?.();
+        
+        queryClient.invalidateQueries({ queryKey: ['albums', mediaId] });
+        queryClient.invalidateQueries({ queryKey: ['album-members', mediaId] });
+        queryClient.invalidateQueries({ queryKey: ['album', albumId] });
+        
         onSuccess?.();
       } else {
         toast.error("Failed to save media to album");
@@ -409,7 +411,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto custom-scroll-bar">
             {currentLoading && (
               <div className="p-4 text-center">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-rose-600 mx-auto"></div>
@@ -422,10 +424,17 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
                 {currentAlbums.map((album: Album) => (
                   <div
                     key={album.id}
-                    className="px-3 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 flex items-center justify-between"
+                    className={clsx(
+                      "px-3 py-3 transition-colors duration-150 flex items-center justify-between",
+                      album.is_media_in_album 
+                        ? "bg-gray-50 cursor-default" 
+                        : "hover:bg-gray-50 cursor-pointer"
+                    )}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleSaveToAlbum(album.id, album.album_name);
+                      if (!album.is_media_in_album) {
+                        handleSaveToAlbum(album.id, album.album_name);
+                      }
                     }}
                   >
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -447,15 +456,23 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
                         </p>
                       </div>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSaveToAlbum(album.id, album.album_name);
-                      }}
-                      className="px-3 py-1.5 bg-rose-600 text-white text-sm rounded-md hover:bg-rose-700 transition-colors duration-150 flex-shrink-0"
-                    >
-                      Save
-                    </button>
+                    {album.is_media_in_album ? (
+                      <div className="flex items-center space-x-1 text-green-600 flex-shrink-0">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveToAlbum(album.id, album.album_name);
+                        }}
+                        className="px-3 py-1.5 bg-rose-600 text-white text-sm rounded-md hover:bg-rose-700 transition-colors duration-150 flex-shrink-0"
+                      >
+                        Save
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -523,3 +540,4 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
 };
 
 export default AlbumDropdown;
+

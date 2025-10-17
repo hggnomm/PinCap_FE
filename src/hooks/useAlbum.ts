@@ -5,27 +5,29 @@ import { CreateAlbumFormData, UpdateAlbumFormData } from '@/validation';
 export const useAlbum = () => {
   const queryClient = useQueryClient();
 
-  const getAlbumList = () => {
+  const getAlbumList = (mediaId?: string, enabled: boolean = true) => {
     return useQuery({
-      queryKey: ['albums'],
-      queryFn: () => album.getMyAlbumData(),
+      queryKey: mediaId ? ['albums', mediaId] : ['albums'],
+      queryFn: () => album.getMyAlbumData(mediaId ? { media_id: mediaId } : undefined),
       staleTime: 5 * 60 * 1000,
+      enabled: enabled,
     });
   };
 
-  const getAlbumMemberList = () => {
+  const getAlbumMemberList = (mediaId?: string, enabled: boolean = true) => {
     return useQuery({
-      queryKey: ['album-members'],
-      queryFn: () => album.getMyAlbumMember(),
+      queryKey: mediaId ? ['album-members', mediaId] : ['album-members'],
+      queryFn: () => album.getMyAlbumMember(mediaId ? { media_id: mediaId } : undefined),
       staleTime: 5 * 60 * 1000,
+      enabled: enabled,
     });
   };
 
-  const getAlbumById = (id: string) => {
+  const getAlbumById = (id: string, enabled: boolean = true) => {
     return useQuery({
       queryKey: ['album', id],
       queryFn: () => album.getDetailAlbum(id),
-      enabled: !!id,
+      enabled: !!id && enabled,
       staleTime: 5 * 60 * 1000,
     });
   };

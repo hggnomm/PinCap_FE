@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PRIVACY } from '@/constants/constants';
 
 export const createMediaSchema = z.object({
   media: z.any(), // File upload
@@ -10,7 +11,7 @@ export const createMediaSchema = z.object({
     .string()
     .max(500, 'Description must be less than 500 characters')
     .optional(),
-  privacy: z.enum(['PUBLIC', 'PRIVATE']),
+  privacy: z.enum([PRIVACY.PUBLIC, PRIVACY.PRIVATE]),
   is_comment: z.boolean().optional(),
   is_created: z.boolean().optional(),
   tags_name: z.string().optional(), // Array as string
@@ -27,7 +28,7 @@ export const updateMediaSchema = z.object({
     .string()
     .max(500, 'Description must be less than 500 characters')
     .optional(),
-  privacy: z.enum(['public', 'private']).optional(),
+  privacy: z.enum([PRIVACY.PRIVATE, PRIVACY.PUBLIC]).optional(),
   is_comment: z.boolean().optional(),
   tags_name: z.array(z.string()).optional(),
   album_id: z.string().optional(),
