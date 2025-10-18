@@ -52,7 +52,7 @@ const MyAlbum = () => {
 
   const renderAlbumSection = (sectionTitle: string, albumsList: Album[]) => (
     <div className="album-section pt-2 border-b-3 last:border-b-0 border-[#9eb8d9] px-[20px]">
-      <h2 className="!pl-2 text-xl font-bold !mb-2 text-gray-800">
+      <h2 className="pl-2 text-xl font-bold !my-2 text-gray-800">
         {sectionTitle}
       </h2>
       <div className="p-3">
@@ -68,53 +68,59 @@ const MyAlbum = () => {
   );
 
   return (
-    <div className="album-container">
-      <div className="my-list-media">
-        <div className="action sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]">
-          <ButtonCircle
-            paddingClass="padding-0-8"
-            icon={<FilterOutlined style={{ fontSize: "26px" }} />}
-          />
-          <ButtonCircle
-            text="Create"
-            paddingClass="padding-0-8"
-            icon={<PlusOutlined style={{ fontSize: "26px" }} />}
-            dropdownMenu={[
-              {
-                key: "1",
-                title: "Media",
-                onClick: () => navigate(ROUTES.CREATE_MEDIA),
-              },
-              {
-                key: "2",
-                title: "Album",
-                onClick: () => setModalVisible(true),
-              },
-            ]}
-          />
+    <Loading
+      isLoading={isLoading || isMemberLoading}
+      error={
+        error || memberError
+          ? "Failed to fetch albums. Please try again later."
+          : null
+      }
+    >
+      <div className="album-container">
+        <div className="my-list-media">
+          <div className="action sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]">
+            <ButtonCircle
+              paddingClass="padding-0-8"
+              icon={<FilterOutlined style={{ fontSize: "26px" }} />}
+            />
+            <ButtonCircle
+              text="Create"
+              paddingClass="padding-0-8"
+              icon={<PlusOutlined style={{ fontSize: "26px" }} />}
+              dropdownMenu={[
+                {
+                  key: "1",
+                  title: "Media",
+                  onClick: () => navigate(ROUTES.CREATE_MEDIA),
+                },
+                {
+                  key: "2",
+                  title: "Album",
+                  onClick: () => setModalVisible(true),
+                },
+              ]}
+            />
+          </div>
+
+          <div className="flex-1">
+            {albumsData?.data &&
+              renderAlbumSection("My Albums", albumsData.data)}
+            {memberAlbumsData?.data &&
+              renderAlbumSection(
+                "Albums Shared with Me",
+                memberAlbumsData.data
+              )}
+          </div>
         </div>
 
-        <Loading
-          isLoading={isLoading || isMemberLoading}
-          error={
-            error || memberError
-              ? "Failed to fetch albums. Please try again later."
-              : null
-          }
-        >
-          {albumsData?.data && renderAlbumSection("My Albums", albumsData.data)}
-          {memberAlbumsData?.data &&
-            renderAlbumSection("Albums Shared with Me", memberAlbumsData.data)}
-        </Loading>
+        <CreateAlbumModal
+          visible={modalVisible}
+          onCancel={handleCancel}
+          onConfirm={handleConfirm}
+          loading={createAlbumLoading}
+        />
       </div>
-
-      <CreateAlbumModal
-        visible={modalVisible}
-        onCancel={handleCancel}
-        onConfirm={handleConfirm}
-        loading={createAlbumLoading}
-      />
-    </div>
+    </Loading>
   );
 };
 

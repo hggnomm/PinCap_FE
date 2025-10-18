@@ -2,6 +2,7 @@ import React, { useEffect, ReactNode } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import styles
+import clsx from "clsx";
 
 interface LoadingSpinnerProps {
   isLoading: boolean;
@@ -21,37 +22,20 @@ const Loading: React.FC<LoadingSpinnerProps> = ({
   }, [error]);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="relative h-full w-full">
       {isLoading && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            maxWidth: "100%",
-            height: "100%",
-            backgroundColor: "rgba(255, 255, 255, 0.7)",
-            backdropFilter: "blur(5px)",
-            zIndex: 9998,
-          }}
-        />
+        <div className="absolute top-0 left-0 w-full h-full bg-transparent backdrop-blur-sm z-50" />
       )}
 
       {isLoading && (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 9999,
-          }}
-        >
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <ClipLoader size={40} color={"#A64D79"} loading={isLoading} />
         </div>
       )}
 
-      <div style={{ filter: isLoading ? "blur(5px)" : "none" }}>{children}</div>
+      <div className={clsx(isLoading ? "blur-sm" : "blur-none")}>
+        {children}
+      </div>
     </div>
   );
 };

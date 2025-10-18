@@ -3,10 +3,7 @@ import "./index.less";
 import "./FilePond.less";
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 import Title from "antd/es/typography/Title";
-import {
-  getDetailMedia,
-  getMyMedias,
-} from "@/api/media";
+import { getDetailMedia, getMyMedias } from "@/api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -65,12 +62,13 @@ const CreateMedia: React.FC = () => {
   const [drafts, setDrafts] = useState<any[]>([]);
   const [loadingDrafts, setLoadingDrafts] = useState<boolean>(false);
   const [draftId, setDraftId] = useState<string>("");
-  
+
   // Image Editor states
-  const [isImageEditorVisible, setIsImageEditorVisible] = useState<boolean>(false);
+  const [isImageEditorVisible, setIsImageEditorVisible] =
+    useState<boolean>(false);
   const [editingImageSrc, setEditingImageSrc] = useState<string>("");
   const [editingImageIndex, setEditingImageIndex] = useState<number>(-1);
-  
+
   // Ref for FilePond container
   const filepondRef = React.useRef<HTMLDivElement>(null);
 
@@ -106,7 +104,7 @@ const CreateMedia: React.FC = () => {
     try {
       const draftList = await getMyMedias({
         pageParam: 1,
-        is_created: false, 
+        is_created: false,
       });
 
       if (draftList) {
@@ -189,7 +187,7 @@ const CreateMedia: React.FC = () => {
 
       if (response?.media?.id) {
         setDraftId(response.media.id);
-        form.setFieldValue('id', response.media.id);
+        form.setFieldValue("id", response.media.id);
       } else {
         toast.error("An unexpected error occurred.");
       }
@@ -238,7 +236,7 @@ const CreateMedia: React.FC = () => {
         await createMedia(mediaData);
         toast.success("Media created successfully!");
       }
-      
+
       setDraftId("");
       fetchDrafts();
       resetForm();
@@ -280,7 +278,7 @@ const CreateMedia: React.FC = () => {
 
   const handleOpenImageEditor = (index: number = 0) => {
     let imageSrc = "";
-    
+
     if (imageUrl && index === 0) {
       // For draft images, use the existing imageUrl (only for first image)
       imageSrc = imageUrl;
@@ -288,7 +286,7 @@ const CreateMedia: React.FC = () => {
       // For newly uploaded files, create object URL for specific index
       imageSrc = URL.createObjectURL(fileList[index]);
     }
-    
+
     if (imageSrc) {
       setEditingImageSrc(imageSrc);
       setEditingImageIndex(index);
@@ -301,7 +299,7 @@ const CreateMedia: React.FC = () => {
     const editedFile = new File([editedBlob], "edited-image.jpg", {
       type: "image/jpeg",
     });
-    
+
     if (editingImageIndex === 0 && imageUrl) {
       // If editing the first image and it's a draft image
       setFileList([editedFile]);
@@ -313,7 +311,7 @@ const CreateMedia: React.FC = () => {
       newFileList[editingImageIndex] = editedFile;
       setFileList(newFileList);
     }
-    
+
     // Close editor
     setIsImageEditorVisible(false);
     setEditingImageSrc("");
@@ -329,37 +327,62 @@ const CreateMedia: React.FC = () => {
   useEffect(() => {
     const addEditButtons = () => {
       if (!filepondRef.current) return;
-      
-      const filepondItems = filepondRef.current.querySelectorAll('.filepond--item');
+
+      const filepondItems =
+        filepondRef.current.querySelectorAll(".filepond--item");
       filepondItems.forEach((item, index) => {
-        if (item.querySelector('.edit-button')) {
+        if (item.querySelector(".edit-button")) {
           return;
         }
-        
-        const imagePreview = item.querySelector('.filepond--image-preview');
+
+        const imagePreview = item.querySelector(".filepond--image-preview");
         if (imagePreview) {
-          const editButton = document.createElement('button');
-          editButton.className = 'edit-button absolute top-2 right-2 !bg-rose-600 hover:!bg-rose-700 !border-rose-600 hover:!border-rose-700 shadow-lg z-10 !p-2 rounded-full flex items-center justify-center border-0 cursor-pointer transition-all duration-200';
-          editButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="16" height="16"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+          const editButton = document.createElement("button");
+          editButton.className =
+            "edit-button absolute top-2 right-2 !bg-rose-600 hover:!bg-rose-700 !border-rose-600 hover:!border-rose-700 shadow-lg z-10 !p-2 rounded-full flex items-center justify-center border-0 cursor-pointer transition-all duration-200";
+          editButton.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="16" height="16"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
           editButton.onclick = (e) => {
             e.stopPropagation();
             handleOpenImageEditor(index);
           };
-          (item as HTMLElement).style.position = 'relative';
+          (item as HTMLElement).style.position = "relative";
           item.appendChild(editButton);
         }
       });
     };
 
-    // Use setTimeout to wait for FilePond to render
-    const timer = setTimeout(addEditButtons, 100);
-    
-    return () => clearTimeout(timer);
+    if (!filepondRef.current) return;
+
+    // Initial add with multiple retries to handle FilePond rendering delays
+    const timers: NodeJS.Timeout[] = [];
+    [100, 300, 500].forEach((delay) => {
+      timers.push(setTimeout(addEditButtons, delay));
+    });
+
+    // Set up MutationObserver to watch for DOM changes in FilePond
+    const observer = new MutationObserver(() => {
+      addEditButtons();
+    });
+
+    observer.observe(filepondRef.current, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      observer.disconnect();
+    };
   }, [fileList]);
 
   return (
     <div className="create-media-container">
-      <div className={clsx("field-create-media", "sticky top-0 !z-20 bg-white")}>
+      <div
+        className={clsx("field-create-media", "sticky top-0 !z-20 bg-white")}
+      >
         <div>
           <Title level={4} className="m-0">
             Create Media
@@ -395,19 +418,16 @@ const CreateMedia: React.FC = () => {
         <Form
           form={form}
           disabled={isFormDisabled} // Disable form khi isFormDisabled = true
-          className={clsx(
-            "form-create-media",
-            {
-              "set-opacity": isLoad,
-              "!flex-col": fileList.length >= 2,
-              // "!flex-row": fileList.length <= 1
-            }
-          )}
+          className={clsx("form-create-media", {
+            "set-opacity": isLoad,
+            "!flex-col": fileList.length >= 2,
+            // "!flex-row": fileList.length <= 1
+          })}
           onValuesChange={handleFormChange} // Gọi khi có thay đổi
         >
-          <Col 
-            md={24} 
-            xl={fileList.length >= 2 ? 24 : 10} 
+          <Col
+            md={24}
+            xl={fileList.length >= 2 ? 24 : 10}
             className={clsx("upload-image", {
               "!w-full !px-8": fileList.length >= 2,
             })}
@@ -430,10 +450,10 @@ const CreateMedia: React.FC = () => {
               </div>
             )}
             {!imageUrl && (
-              <div 
+              <div
                 ref={filepondRef}
                 className={clsx("relative", {
-                  "filepond-grid-wrapper": fileList.length >= 2
+                  "filepond-grid-wrapper": fileList.length >= 2,
                 })}
               >
                 <Form.Item name="medias" getValueFromEvent={(e) => e?.fileList}>
@@ -454,16 +474,15 @@ const CreateMedia: React.FC = () => {
                     itemInsertLocation="after"
                   />
                 </Form.Item>
-               
               </div>
             )}
           </Col>
 
-          <Col 
-            md={24} 
-            xl={fileList.length >= 2 ? 24 : 14} 
+          <Col
+            md={24}
+            xl={fileList.length >= 2 ? 24 : 14}
             className={clsx("field-input", {
-              "!w-full !px-8": fileList.length >= 2
+              "!w-full !px-8": fileList.length >= 2,
             })}
           >
             <div className="field-item-create">
@@ -501,7 +520,9 @@ const CreateMedia: React.FC = () => {
                       ? "Maximum 10 cards, no more can be added"
                       : "Search for tags or create new ones"
                   }
-                  disabled={tags.length >= 10 || (!fileList.length && !isSelectedDraft)}
+                  disabled={
+                    tags.length >= 10 || (!fileList.length && !isSelectedDraft)
+                  }
                 />
               </Form.Item>
               <div className="tags-display">
@@ -514,9 +535,9 @@ const CreateMedia: React.FC = () => {
                   >
                     {tag}
                   </Tag>
-                  ))}
-                </div>
+                ))}
               </div>
+            </div>
           </Col>
         </Form>
       </Row>

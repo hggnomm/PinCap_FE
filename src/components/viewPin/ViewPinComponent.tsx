@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import "./ViewPinComponent.less";
 import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
 import Loading from "@/components/loading/Loading";
@@ -9,26 +9,26 @@ import { useInView } from "react-intersection-observer";
 
 /**
  * MediaList Component - Hiển thị danh sách media với infinite scroll
- * 
+ *
  * Cách sử dụng:
  * 1. Với API call (khuyến nghị):
- *    <MediaList 
+ *    <MediaList
  *      queryKey={["medias", "all"]}
  *      queryFn={(pageParam) => getAllMedias({ pageParam })}
  *      isEditMedia={false}
  *    />
- * 
+ *
  * 2. Với data có sẵn:
- *    <MediaList 
+ *    <MediaList
  *      medias={myMediaData}
  *      isEditMedia={true}
  *    />
- * 
+ *
  * Ví dụ cụ thể:
  * - Trong PinCap.tsx: Hiển thị tất cả media
  * - Trong MyMedia.tsx: Hiển thị media của user với infinite scroll
  * - Trong DetailAlbum.tsx: Hiển thị media trong album (data có sẵn)
- * 
+ *
  * Props:
  * - queryKey: Array chứa key cho React Query cache
  * - queryFn: Function để fetch data (nhận pageParam và trả về Promise<Media[]>)
@@ -36,6 +36,13 @@ import { useInView } from "react-intersection-observer";
  * - isEditMedia: Boolean cho phép edit media
  * - enabled: Boolean để enable/disable query (default: true)
  */
+
+// Animation variants - extract ra ngoài để tránh tạo mới mỗi lần render
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
 interface MediaListProps {
   queryKey?: string[];
   queryFn?: (pageParam: number) => Promise<Media[]>;
@@ -44,6 +51,7 @@ interface MediaListProps {
   isSaveMedia?: boolean;
   albumContext?: { inAlbum: boolean; albumId?: string; onRemoved?: () => void };
   enabled?: boolean;
+  withoutLoadingWrapper?: boolean;
 }
 
 const MediaList: React.FC<MediaListProps> = ({
@@ -54,8 +62,8 @@ const MediaList: React.FC<MediaListProps> = ({
   isSaveMedia = true,
   albumContext,
   enabled = true,
+  withoutLoadingWrapper = false,
 }) => {
-  const [medias, setMedias] = useState<Media[]>([]);
   const { ref, inView } = useInView();
 
   const {
@@ -84,21 +92,21 @@ const MediaList: React.FC<MediaListProps> = ({
     }
   }, [fetchNextPage, inView, hasNextPage]);
 
-  useEffect(() => {
+  // Optimize: Dùng useMemo thay vì useState + useEffect
+  const medias = useMemo(() => {
     if (propMedias) {
-      setMedias(propMedias);
-    } else {
-      const allMedias = data?.pages.flat() || [];
-      setMedias(allMedias);
+      return propMedias;
     }
+    return data?.pages.flat() || [];
   }, [propMedias, data]);
 
-  const reloadData = () => {
+  // Optimize: Memoize reloadData function để tránh re-create mỗi lần render
+  const reloadData = useCallback(() => {
     if (propMedias) {
       return;
     }
     refetch();
-  };
+  }, [propMedias, refetch]);
 
   let content;
   if (status === "success" || propMedias) {
@@ -142,22 +150,27 @@ const MediaList: React.FC<MediaListProps> = ({
     });
   }
 
+  const contentWrapper = (
+    <div className="pincap-container">
+      <motion.div
+        className="media-list-container"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        {content}
+        {!propMedias && <div ref={ref} style={{ height: 10 }} />}
+      </motion.div>
+    </div>
+  );
+
+  if (withoutLoadingWrapper) {
+    return contentWrapper;
+  }
+
   return (
     <Loading isLoading={isFetching || isFetchingNextPage} error={error}>
-      <div className="pincap-container">
-        <motion.div
-          className="media-list-container"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-          }}
-        >
-          {content}
-          {!propMedias && <div ref={ref} style={{ height: 10 }} />}
-        </motion.div>
-      </div>
+      {contentWrapper}
     </Loading>
   );
 };

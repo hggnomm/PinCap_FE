@@ -20,6 +20,7 @@ import DetailAlbum from "./pages/PinCap/DetailAlbum/DetailAlbum";
 import Profile from "./pages/PinCap/Profile/Profile";
 import EditProfile from "./pages/PinCap/EditProfile/EditProfile";
 import UserProfile from "./pages/PinCap/UserProfile/UserProfile";
+import Search from "./pages/PinCap/Search/Search";
 import NotFound from "./pages/NotFound";
 import Forbidden from "./pages/Forbidden";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
@@ -30,11 +31,11 @@ import { Navigate } from "react-router-dom";
 
 const HomeRouteHandler = () => {
   const { user } = useAuth();
-  
+
   if (user) {
     return <Navigate to={ROUTES.PINCAP_HOME} replace />;
   }
-  
+
   return (
     <>
       <HeaderCommon />
@@ -84,10 +85,7 @@ const App = () => {
                     <SiderCommon />
                     <Content className="right-layout">
                       <Routes>
-                        <Route
-                          path={ROUTES.PINCAP_HOME}
-                          element={<PinCap />}
-                        />
+                        <Route path={ROUTES.PINCAP_HOME} element={<PinCap />} />
                         <Route
                           path={ROUTES.CREATE_MEDIA}
                           element={<CreateMedia />}
@@ -104,11 +102,21 @@ const App = () => {
                         />
                         <Route path={ROUTES.MY_MEDIA} element={<MyMedia />} />
                         <Route path={ROUTES.PROFILE} element={<Profile />} />
-                        <Route path={ROUTES.EDIT_PROFILE} element={<EditProfile />} />
-                        <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
-                        
+                        <Route
+                          path={ROUTES.EDIT_PROFILE}
+                          element={<EditProfile />}
+                        />
+                        <Route
+                          path={ROUTES.USER_PROFILE}
+                          element={<UserProfile />}
+                        />
+                        <Route path={ROUTES.SEARCH} element={<Search />} />
+
                         {/* Catch all - redirect to 404 */}
-                        <Route path="*" element={<Navigate to={ROUTES.NOT_FOUND} replace />} />
+                        <Route
+                          path="*"
+                          element={<Navigate to={ROUTES.NOT_FOUND} replace />}
+                        />
                       </Routes>
                     </Content>
                   </Layout>

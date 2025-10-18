@@ -1,5 +1,6 @@
 import React from "react";
 import "./Empty.less";
+import clsx from "clsx";
 
 interface EmptyProps {
   title?: string;
@@ -15,7 +16,12 @@ export default function Empty({
   className = "",
 }: EmptyProps) {
   return (
-    <div className={`flex flex-col items-center justify-center !py-12 !px-4 ${className}`}>
+    <div
+      className={clsx(
+        "flex flex-col items-center justify-center py-12 px-4",
+        className
+      )}
+    >
       {/* Icon/Illustration */}
       <div className="!mb-4 empty-state-icon">
         {icon ? (
@@ -58,4 +64,3 @@ export default function Empty({
     </div>
   );
 }
-

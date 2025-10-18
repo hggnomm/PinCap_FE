@@ -6,7 +6,7 @@ const PinCap = () => {
   window.scrollTo(0, 0);
 
   return (
-    <MediaList 
+    <MediaList
       queryKey={["medias", "all"]}
       queryFn={(pageParam) => getAllMedias({ pageParam })}
     />
