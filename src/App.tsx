@@ -25,7 +25,7 @@ import Forbidden from "./pages/Forbidden";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import ChatbotProvider from "./components/chatbot/ChatbotProvider";
 import { ROUTES } from "./constants/routes";
-import { useAuth } from "./hooks";
+import { useAuth } from "./react-query";
 import { Navigate } from "react-router-dom";
 
 const HomeRouteHandler = () => {

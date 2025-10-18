@@ -12,7 +12,8 @@ import { addToken } from "@/store/authSlice";
 import { motion } from "framer-motion";
 import { LoginRequest } from "@/types/Auth/LoginRequest";
 import { loginSchema } from "@/validation/auth";
-import { useFormValidation, useAuth } from "@/hooks";
+import { useFormValidation } from "@/hooks";
+import { useAuth } from "@/react-query";
 import "./index.less";
 import { ROUTES } from "@/constants/routes";
 interface LoginFormValues {

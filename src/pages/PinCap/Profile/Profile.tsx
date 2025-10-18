@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/react-query/useAuth";
 import { useNavigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 import { Edit, Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";

@@ -6,7 +6,7 @@ import { AlbumUser } from "@/types/type";
 import { ALBUM_ROLES, ALBUM_INVITATION_STATUS } from "@/constants/constants";
 import { Dropdown } from "@/components/dropdown";
 import Empty from "@/components/Empty";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 import { toast } from "react-toastify";
 import type { MenuProps } from "antd";
 

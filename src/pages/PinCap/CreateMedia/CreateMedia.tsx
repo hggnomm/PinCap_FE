@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import clsx from "clsx";
-import { useMedia } from "@/hooks/useMedia";
+import { useMedia } from "@/react-query/useMedia";
 
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";

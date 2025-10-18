@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MailOutlined, CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import { ROUTES } from "@/constants/routes";
-import { useAuth } from "@/hooks";
+import { useAuth } from "@/react-query";
 import "./index.less";
 // List of common passwords to disallow
 const commonPasswords = ["123456", "password", "admin", "qwerty", "welcome", "123456789", "12345678", "111111", "abc123"];

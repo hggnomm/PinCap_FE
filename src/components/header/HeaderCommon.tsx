@@ -15,7 +15,7 @@ import { useDispatch } from "react-redux";
 import Notification from "../notification";
 import { LogoIcon, TextIcon } from "@/assets/img";
 import iconChatbot from "@/assets/img/PinCap/chatbot.png";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/react-query/useAuth";
 import { useInitializeNotifications } from "@/hooks/useInitializeNotifications";
 import { toggleChatbot } from "@/store/chatSlice";
 import "./index.less";

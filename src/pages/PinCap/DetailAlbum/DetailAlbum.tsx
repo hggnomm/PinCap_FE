@@ -10,7 +10,7 @@ import Loading from "@/components/loading/Loading";
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
 import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal, CollaboratorsListModal } from "@/components/modal/album";
 import Empty, { NoMediaIcon } from "@/components/Empty";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 import { ROUTES } from "@/constants/routes";
 
 const DetailAlbum = () => {
