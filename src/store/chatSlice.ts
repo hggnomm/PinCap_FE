@@ -9,6 +9,7 @@ interface Message {
 interface ChatState {
   messages: Message[];
   isTyping: boolean;
+  isOpen: boolean;
 }
 
 const initialState: ChatState = {
@@ -23,6 +24,7 @@ const initialState: ChatState = {
     },
   ],
   isTyping: false,
+  isOpen: false,
 };
 
 const chatSlice = createSlice({
@@ -35,9 +37,18 @@ const chatSlice = createSlice({
     setTyping: (state, action: PayloadAction<boolean>) => {
       state.isTyping = action.payload;
     },
+    toggleChatbot: (state) => {
+      state.isOpen = !state.isOpen;
+    },
+    openChatbot: (state) => {
+      state.isOpen = true;
+    },
+    closeChatbot: (state) => {
+      state.isOpen = false;
+    },
   },
 });
 
-export const { addMessage, setTyping } = chatSlice.actions;
+export const { addMessage, setTyping, toggleChatbot, openChatbot, closeChatbot } = chatSlice.actions;
 
 export default chatSlice.reducer;

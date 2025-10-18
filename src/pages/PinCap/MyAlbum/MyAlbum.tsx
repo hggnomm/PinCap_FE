@@ -9,7 +9,7 @@ import { Col, Row } from "antd";
 import { toast } from "react-toastify";
 import Loading from "@/components/loading/Loading";
 import AlbumCard from "./AlbumCard/AlbumCard";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 import { ROUTES } from "@/constants/routes";
 
 const MyAlbum = () => {

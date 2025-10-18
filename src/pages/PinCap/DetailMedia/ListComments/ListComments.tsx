@@ -1,10 +1,10 @@
 import { Collapse } from "antd";
 import React, { useEffect, useState } from "react";
 import { formatTime } from "@/utils/utils";
-import { useComment } from "@/hooks/useComment";
+import { useComment } from "@/react-query/useComment";
 import { useInView } from "react-intersection-observer";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/react-query/useAuth";
 import { ROUTES } from "@/constants/routes";
 import "./ListComments.less";
 import Zoom from "react-medium-image-zoom";

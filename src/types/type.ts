@@ -1,3 +1,5 @@
+import { ALBUM_ROLES, ALBUM_INVITATION_STATUS } from "@/constants/constants";
+
 export type User = {
   id: string;
   first_name: string;
@@ -12,6 +14,12 @@ export type User = {
   medias_count?: number;
   reaction_media_count?: number;
   isFollowing?: boolean;
+};
+
+export type AlbumUser = User & {
+  album_role: keyof typeof ALBUM_ROLES;
+  status: keyof typeof ALBUM_INVITATION_STATUS;
+  name: string;
 };
 
 export type Feeling = {
@@ -69,7 +77,7 @@ export type Album = {
   updated_at: string;
   users: User[];
   medias: Media[];
-  allUser?: User[];
+  allUser?: AlbumUser[];
 };
 
 export type Tag = {

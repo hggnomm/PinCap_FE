@@ -8,9 +8,9 @@ import { LockFilled, MoreOutlined } from "@ant-design/icons/lib";
 import { UpdateAlbumFormData } from "@/validation/album";
 import Loading from "@/components/loading/Loading";
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
-import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";
+import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal, CollaboratorsListModal } from "@/components/modal/album";
 import Empty, { NoMediaIcon } from "@/components/Empty";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 import { ROUTES } from "@/constants/routes";
 
 const DetailAlbum = () => {
@@ -20,6 +20,7 @@ const DetailAlbum = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
+  const [collaboratorsListModalVisible, setCollaboratorsListModalVisible] = useState(false);
 
   // Use React Query hooks
   const { getAlbumById, updateAlbum, deleteAlbum } = useAlbum();
@@ -85,6 +86,7 @@ const DetailAlbum = () => {
             <CollaboratorsSection
               collaborators={albumData?.allUser || []}
               onAddCollaborator={() => setInviteModalVisible(true)}
+              onViewAllCollaborators={() => setCollaboratorsListModalVisible(true)}
             />
           </div>
           <div>
@@ -121,7 +123,12 @@ const DetailAlbum = () => {
         )}
 
         {albumData?.medias && albumData.medias.length > 0 && (
-          <MediaList medias={albumData?.medias} isEditMedia />
+          <MediaList 
+            medias={albumData?.medias} 
+            isEditMedia 
+            isSaveMedia={false}
+            albumContext={{ inAlbum: true, albumId: albumId, onRemoved: () => { /* refetch handled by useAlbum invalidate */ } }}
+          />
         )}
 
         {/* Edit Album Modal */}
@@ -156,6 +163,13 @@ const DetailAlbum = () => {
           visible={inviteModalVisible}
           onCancel={() => setInviteModalVisible(false)}
           onConfirm={handleInviteCollaborators}
+          albumId={albumId}
+        />
+
+        {/* Collaborators List Modal */}
+        <CollaboratorsListModal
+          visible={collaboratorsListModalVisible}
+          onCancel={() => setCollaboratorsListModalVisible(false)}
           albumId={albumId}
         />
       </div>

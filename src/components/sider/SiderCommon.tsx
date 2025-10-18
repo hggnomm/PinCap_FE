@@ -8,10 +8,11 @@ import { Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import "./index.less";
 import iconAI from "@/assets/img/PinCap/ai-technology-img.png";
 import styled from "styled-components";
+import { toggleChatbot } from "@/store/chatSlice";
 
 const CreateMediaBtn = styled(Menu.Item)`
   background-color: #a25772;
@@ -54,6 +55,7 @@ const AIToolBtn = styled(Menu.Item)`
 `;
 
 const SiderCommon = () => {
+  const dispatch = useDispatch();
   const tokenPayload = useSelector((state: any) => state.auth);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [collapsed, setCollapsed] = useState<boolean>(true);
@@ -90,6 +92,10 @@ const SiderCommon = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const handleToggleChatbot = () => {
+    dispatch(toggleChatbot());
+  };
 
   return (
     <Sider
@@ -153,6 +159,20 @@ const SiderCommon = () => {
           }
         >
           <Link to="/ai">AI Tool</Link>
+        </AIToolBtn>
+
+        <AIToolBtn
+          key="PinBot"
+          icon={
+            <img
+              src={iconAI}
+              alt="PinBot"
+              style={{ width: "16px", height: "16px" }}
+            />
+          }
+          onClick={handleToggleChatbot}
+        >
+          <span style={{ cursor: "pointer" }}>PinBot</span>
         </AIToolBtn>
       </Menu>
       <Outlet />

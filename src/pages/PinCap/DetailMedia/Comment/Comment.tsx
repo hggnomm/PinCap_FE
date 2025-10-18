@@ -7,7 +7,7 @@ import {
   SendOutlined,
   FileImageOutlined,
 } from "@ant-design/icons";
-import { useComment } from "@/hooks/useComment";
+import { useComment } from "@/react-query/useComment";
 import { notification } from "antd";
 
 interface CommentProps {

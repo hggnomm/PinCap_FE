@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { addMediasToAlbum } from "@/api/album";
 import clsx from "clsx";
 import { CreateAlbumModal } from "@/components/modal/album";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 import { CreateAlbumFormData } from "@/validation";
 import { BaseTabs } from "@/components/baseTabs";
 import { ALBUM_TABS } from "@/constants/constants";
@@ -121,6 +121,10 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         
         // Only close if click is outside both trigger, dropdown, and modals
         if (!isInsideTrigger && !isInsideDropdown && !isInsideModal) {
+          // Prevent event from bubbling to other elements
+          event.stopPropagation();
+          event.preventDefault();
+          
           setShowDropdown(false);
           setSearchTerm("");
           setOriginalClickPosition(null);
@@ -366,7 +370,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
 
       {showDropdown && createPortal(
         <div 
-          className="album-dropdown-menu absolute w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] max-h-96 flex flex-col"
+          className="album-dropdown-menu min-h-[430px] absolute w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] max-h-96 flex flex-col"
           style={{
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
@@ -516,7 +520,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
                 onClose?.();
                 onModalOpen?.();
               }}
-              className="w-full flex items-center justify-center space-x-2 !px-4 !py-2 !bg-gray-50 hover:!bg-blue-500 text-gray-700 hover:!text-white rounded-md transition-colors duration-300"
+              className="w-full flex items-center justify-center space-x-2 !px-4 !py-3 !bg-gray-50 hover:!bg-blue-500 text-gray-700 hover:!text-white rounded-md transition-colors duration-300"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -528,7 +532,6 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         document.body
       )}
       
-      {/* Create Album Modal */}
       <CreateAlbumModal
         visible={showCreateModal}
         onCancel={handleCreateModalCancel}

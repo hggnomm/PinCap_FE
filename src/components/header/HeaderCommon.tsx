@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Avatar,
   Button,
@@ -11,26 +11,27 @@ import {
 } from "antd";
 import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import Notification from "../notification";
 import { LogoIcon, TextIcon } from "@/assets/img";
 import iconChatbot from "@/assets/img/PinCap/chatbot.png";
-import Chatbot from "../chatbot";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/react-query/useAuth";
 import { useInitializeNotifications } from "@/hooks/useInitializeNotifications";
+import { toggleChatbot } from "@/store/chatSlice";
 import "./index.less";
 import { ROUTES } from "@/constants/routes";
 
 const HeaderCommon = () => {
-  const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
+  const dispatch = useDispatch();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   
   // Initialize notifications when user is authenticated
   useInitializeNotifications(isAuthenticated);
 
-  // Toggle chatbot visibility
-  const toggleChatbot = () => {
-    setIsChatbotOpen((prevState) => !prevState);
+  // Toggle chatbot visibility using Redux
+  const handleToggleChatbot = () => {
+    dispatch(toggleChatbot());
   };
 
   // Handle user logout
@@ -100,7 +101,7 @@ const HeaderCommon = () => {
         {isAuthenticated && (
           <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
             <Tooltip title="Pinbot: Virtual Assistant" placement="bottom">
-              <div className="chatbot-btn" onClick={toggleChatbot}>
+              <div className="chatbot-btn" onClick={handleToggleChatbot}>
                 <img
                   src={iconChatbot}
                   alt="Chatbot"
@@ -108,10 +109,6 @@ const HeaderCommon = () => {
                 />
               </div>
             </Tooltip>
-
-            {isChatbotOpen && (
-              <Chatbot toggleChatbot={toggleChatbot} isOpen={isChatbotOpen} />
-            )}
 
             <Col className="menu-notification">
               <Notification />

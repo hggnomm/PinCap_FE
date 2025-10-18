@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { UpdateAlbumFormData } from "@/validation/album";
 import { useNavigate } from "react-router";
 import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 import { ROUTES } from "@/constants/routes";
 
 interface AlbumCardProps {

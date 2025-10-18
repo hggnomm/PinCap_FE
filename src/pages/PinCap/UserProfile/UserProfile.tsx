@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useUser } from "@/hooks/useUser";
+import { useAuth } from "@/react-query/useAuth";
+import { useUser } from "@/react-query/useUser";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 import { Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";
