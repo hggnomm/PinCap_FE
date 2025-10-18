@@ -352,10 +352,30 @@ const CreateMedia: React.FC = () => {
       });
     };
 
-    // Use setTimeout to wait for FilePond to render
-    const timer = setTimeout(addEditButtons, 100);
+    if (!filepondRef.current) return;
 
-    return () => clearTimeout(timer);
+    // Initial add with multiple retries to handle FilePond rendering delays
+    const timers: NodeJS.Timeout[] = [];
+    [100, 300, 500].forEach((delay) => {
+      timers.push(setTimeout(addEditButtons, delay));
+    });
+
+    // Set up MutationObserver to watch for DOM changes in FilePond
+    const observer = new MutationObserver(() => {
+      addEditButtons();
+    });
+
+    observer.observe(filepondRef.current, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      observer.disconnect();
+    };
   }, [fileList]);
 
   return (
