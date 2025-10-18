@@ -1,4 +1,9 @@
-import React from "react";
+import { useState } from "react";
+
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 import {
   Avatar,
   Button,
@@ -9,23 +14,26 @@ import {
   Space,
   Tooltip,
 } from "antd";
-import { DownOutlined, SearchOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import Notification from "../notification";
+
 import { LogoIcon, TextIcon } from "@/assets/img";
 import iconChatbot from "@/assets/img/PinCap/chatbot.png";
-import { useAuth } from "@/react-query/useAuth";
-import { useInitializeNotifications } from "@/hooks/useInitializeNotifications";
-import { toggleChatbot } from "@/store/chatSlice";
-import "./index.less";
 import { ROUTES } from "@/constants/routes";
+import { useInitializeNotifications } from "@/hooks/useInitializeNotifications";
+import { useAuth } from "@/react-query/useAuth";
+import { toggleChatbot } from "@/store/chatSlice";
+
+import Notification from "../notification";
+
+import SearchDrawer from "./SearchDrawer";
+import "./index.less";
 
 const HeaderCommon = () => {
   const dispatch = useDispatch();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  
+  const [isSearchDrawerOpen, setIsSearchDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   // Initialize notifications when user is authenticated
   useInitializeNotifications(isAuthenticated);
 
@@ -39,25 +47,52 @@ const HeaderCommon = () => {
     logout();
   };
 
+  // Handle search drawer
+  const handleSearchClick = () => {
+    setIsSearchDrawerOpen(true);
+  };
+
+  const handleCloseSearchDrawer = () => {
+    setIsSearchDrawerOpen(false);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleHeaderSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchEnter = () => {
+    if (searchQuery.trim()) {
+      navigate(
+        `${ROUTES.SEARCH}?search=${encodeURIComponent(searchQuery.trim())}`
+      );
+      setIsSearchDrawerOpen(false);
+    }
+  };
+
   const menuItems = [
     {
       key: "1",
       label: (
-        <div 
+        <div
           className="p-2 min-w-48 cursor-pointer hover:bg-gray-50 rounded-md transition-colors"
           onClick={() => navigate(ROUTES.PROFILE)}
         >
           <div className="font-bold text-gray-900">
-            {user?.first_name && user?.last_name 
+            {user?.first_name && user?.last_name
               ? `${user.first_name} ${user.last_name}`
-              : user?.first_name || user?.last_name
-            }
+              : user?.first_name || user?.last_name}
           </div>
-          <div className="text-gray-600">{user?.email || 'user@example.com'}</div>
+          <div className="text-gray-600">
+            {user?.email || "user@example.com"}
+          </div>
         </div>
       ),
     },
-    { type: "divider" },
+    { type: "divider" as const },
     {
       key: "3",
       label: (
@@ -78,7 +113,9 @@ const HeaderCommon = () => {
     <Row className="main-header !z-50">
       <Col
         className="left-header"
-        onClick={() => navigate(isAuthenticated ? ROUTES.PINCAP_HOME : ROUTES.LOGIN)}
+        onClick={() =>
+          navigate(isAuthenticated ? ROUTES.PINCAP_HOME : ROUTES.LOGIN)
+        }
       >
         <img className="logo-icon" src={LogoIcon} alt="Logo" />
         {isAuthenticated && (
@@ -89,25 +126,38 @@ const HeaderCommon = () => {
       {/* Middle Search Bar */}
       {isAuthenticated && (
         <Col className="middle-header">
-          <Input
-            className="search-bar"
-            placeholder="Search..."
-            suffix={<SearchOutlined />}
-          />
+          <div className="search-bar">
+            <Input
+              placeholder="Search..."
+              suffix={<SearchOutlined />}
+              value={searchQuery}
+              onChange={handleHeaderSearchChange}
+              onFocus={handleSearchClick}
+              onPressEnter={handleSearchEnter}
+              className="cursor-pointer"
+            />
+          </div>
         </Col>
       )}
 
       <Col className="right-header">
         {isAuthenticated && (
-          <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
+          <Col
+            className="action-header !gap-3"
+            xs={{ span: 16 }}
+            lg={{ span: 9 }}
+          >
             <Tooltip title="Pinbot: Virtual Assistant" placement="bottom">
-              <div className="chatbot-btn" onClick={handleToggleChatbot}>
-                <img
-                  src={iconChatbot}
-                  alt="Chatbot"
-                  className="w-4 object-contain block"
-                />
-              </div>
+              <div
+                className="chatbot-btn"
+                onClick={handleToggleChatbot}
+                style={{
+                  backgroundImage: `url(${iconChatbot})`,
+                  backgroundSize: "24px 24px",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                }}
+              />
             </Tooltip>
 
             <Col className="menu-notification">
@@ -116,7 +166,7 @@ const HeaderCommon = () => {
 
             <Space direction="vertical" className="logo-avatar">
               <Dropdown
-                menu={{ items: menuItems as any }}
+                menu={{ items: menuItems }}
                 placement="bottomRight"
                 trigger={["click"]}
                 className="dropdown_item"
@@ -124,7 +174,10 @@ const HeaderCommon = () => {
                 <Space>
                   <Avatar
                     className="avatar"
-                    src={user?.avatar || "https://imagedelivery.net/LBWXYQ-XnKSYxbZ-NuYGqQ/543c6373-55ce-4fb2-b282-dbb0e43c1500/avatarhd"}
+                    src={
+                      user?.avatar ||
+                      "https://imagedelivery.net/LBWXYQ-XnKSYxbZ-NuYGqQ/543c6373-55ce-4fb2-b282-dbb0e43c1500/avatarhd"
+                    }
                   />
                   <DownOutlined className="text-xs" />
                 </Space>
@@ -132,7 +185,7 @@ const HeaderCommon = () => {
             </Space>
           </Col>
         )}
-        
+
         {!isAuthenticated && (
           <Col className="action-header" xs={{ span: 16 }} lg={{ span: 9 }}>
             <Button
@@ -150,6 +203,14 @@ const HeaderCommon = () => {
           </Col>
         )}
       </Col>
+
+      {/* Search Drawer */}
+      <SearchDrawer
+        isOpen={isSearchDrawerOpen}
+        onClose={handleCloseSearchDrawer}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+      />
     </Row>
   );
 };

@@ -7,7 +7,7 @@
   justify-content: space-between;
   align-items: center;
   background-color: white;
-  z-index: 10;
+  z-index: 60;
   width: -webkit-fill-available;
   top: 0;
 
@@ -52,15 +52,21 @@
       gap: 4px;
 
       .chatbot-btn {
+        display: flex;
         align-items: center;
-        width: 25px;
         justify-content: center;
         background: linear-gradient(#fff, #fff) padding-box,
           linear-gradient(60deg, #00f, #00e8ff, #ff00ff) border-box;
         border-radius: 100px !important;
         border: 2px solid transparent;
-        transition: background 0.3s ease;
+        transition: all 0.3s ease;
         padding: 0.625rem;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        position: relative;
+
         &:hover {
           background: linear-gradient(#fff, #fff) padding-box,
             linear-gradient(60deg, #ff00ff, #00c0ff) border-box;

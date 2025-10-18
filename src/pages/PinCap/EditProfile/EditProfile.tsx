@@ -8,7 +8,6 @@ import { ArrowLeft, Save, Upload, X } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-s;
 
 const { TextArea } = Input;
 

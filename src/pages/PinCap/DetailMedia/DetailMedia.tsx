@@ -33,11 +33,15 @@ const DetailMedia = () => {
   const navigate = useNavigate();
   const id = location.state?.mediaId;
   const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
-  
+
   const { mediaReaction, mediaReactionLoading } = useMedia();
-  
-  const { data: mediaData, isLoading: loading, error: queryError } = useMedia().getMediaById(id);
-  
+
+  const {
+    data: mediaData,
+    isLoading: loading,
+    error: queryError,
+  } = useMedia().getMediaById(id);
+
   const [media, setMedia] = useState<Media | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -131,160 +135,167 @@ const DetailMedia = () => {
 
   const handleNavigateToProfile = () => {
     if (!media?.ownerUser?.id) return;
-    
+
     if (media.ownerUser.id === tokenPayload.id) {
       navigate(ROUTES.PROFILE);
     } else {
-      navigate(ROUTES.USER_PROFILE.replace(':id', media.ownerUser.id));
+      navigate(ROUTES.USER_PROFILE.replace(":id", media.ownerUser.id));
     }
   };
 
-
-
   return (
-    <Loading isLoading={loading} error={error}>
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0 },
-          visible: { opacity: 1 },
-        }}
-        transition={{ duration: 0.5 }}
-        className="detail-media-container"
-      >
-        <div className="detail-media">
-          <BackButton />
-          <div className="left-view">
-            <MediaViewer media={media} />
-          </div>
-          <div className="right-view">
-            <div className="right-top-view">
-              <div className="action">
-                <div className="action-left">
-                  <div className="flex justify-center items-center">
-                    <button 
-                      onClick={() => handleReaction()}
-                      disabled={mediaReactionLoading}
-                      className={clsx(
-                        mediaReactionLoading && "opacity-60 cursor-not-allowed"
-                      )}
-                    >
-                      <img
-                        src={getImageReactionWithId(
-                          media?.reaction?.feeling_id
+    <div className="min-h-screen">
+      <Loading isLoading={loading} error={error}>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1 },
+          }}
+          transition={{ duration: 0.5 }}
+          className="detail-media-container"
+        >
+          <div className="detail-media">
+            <BackButton />
+            <div className="left-view">
+              <MediaViewer media={media} />
+            </div>
+            <div className="right-view">
+              <div className="right-top-view">
+                <div className="action">
+                  <div className="action-left">
+                    <div className="flex justify-center items-center">
+                      <button
+                        onClick={() => handleReaction()}
+                        disabled={mediaReactionLoading}
+                        className={clsx(
+                          mediaReactionLoading &&
+                            "opacity-60 cursor-not-allowed"
                         )}
-                        alt="heart"
-                      />
-                    </button>
-                    <span>{media?.reaction_user_count}</span>
-                  </div>
-
-                  <button onClick={handleDownload}>
-                    <img src={download} alt="download" />
-                  </button>
-                  <button>
-                    <img src={more} alt="more" />
-                  </button>
-                </div>
-                <div className="action-right flex">
-                  <AlbumDropdown
-                    mediaId={id}
-                    componentId={`detail-media-${id}`}
-                    position="click"
-                    trigger={
-                      <button className="album">
-                        Album
-                        <svg 
-                          className="inline-block ml-1 w-4 h-4" 
-                          fill="currentColor" 
-                          viewBox="0 0 20 20"
-                        >
-                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
+                      >
+                        <img
+                          src={getImageReactionWithId(
+                            media?.reaction?.feeling_id
+                          )}
+                          alt="heart"
+                        />
                       </button>
-                    }
-                  />
+                      <span>{media?.reaction_user_count}</span>
+                    </div>
 
-                  <AlbumDropdown
-                    mediaId={id}
-                    componentId={`detail-media-save-${id}`}
-                    position="click"
-                    trigger={
-                      <button className="save">Save</button>
-                    }
-                  />
+                    <button onClick={handleDownload}>
+                      <img src={download} alt="download" />
+                    </button>
+                    <button>
+                      <img src={more} alt="more" />
+                    </button>
+                  </div>
+                  <div className="action-right flex">
+                    <AlbumDropdown
+                      mediaId={id}
+                      componentId={`detail-media-${id}`}
+                      position="click"
+                      trigger={
+                        <button className="album">
+                          Album
+                          <svg
+                            className="inline-block ml-1 w-4 h-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      }
+                    />
+
+                    <AlbumDropdown
+                      mediaId={id}
+                      componentId={`detail-media-save-${id}`}
+                      position="click"
+                      trigger={<button className="save">Save</button>}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="main-view custom-scroll-bar">
-              {media?.media_name && (
-                <div className="media_name">
-                  <span>{media.media_name}</span>
-                </div>
-              )}
-
-              <div
-                className={clsx(
-                  "user_owner sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
+              <div className="main-view custom-scroll-bar">
+                {media?.media_name && (
+                  <div className="media_name">
+                    <span>{media.media_name}</span>
+                  </div>
                 )}
-              >
-                <div className="user cursor-pointer hover:opacity-80 transition-opacity" onClick={handleNavigateToProfile}>
-                  {media?.ownerUser && (
-                    <>
-                      <img src={media.ownerUser.avatar} alt="owner" />
-                      <div className="info">
-                        <span className="font-bold">
-                          {media.ownerUser.first_name}{" "}
-                          {media.ownerUser.last_name}
-                        </span>
-                        <span>{media.numberUserFollowers} follower</span>
-                      </div>
-                    </>
+
+                <div
+                  className={clsx(
+                    "user_owner sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
+                  )}
+                >
+                  <div
+                    className="user cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={handleNavigateToProfile}
+                  >
+                    {media?.ownerUser && (
+                      <>
+                        <img src={media.ownerUser.avatar} alt="owner" />
+                        <div className="info">
+                          <span className="font-bold">
+                            {media.ownerUser.first_name}{" "}
+                            {media.ownerUser.last_name}
+                          </span>
+                          <span>{media.numberUserFollowers} follower</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {media?.ownerUser.id !== tokenPayload.id && (
+                    <FollowButton
+                      userId={media?.ownerUser?.id || ""}
+                      initialIsFollowing={media?.ownerUser?.isFollowing}
+                      initialFollowersCount={media?.numberUserFollowers || 0}
+                      onFollowChange={handleFollowChange}
+                      variant="default"
+                    />
                   )}
                 </div>
-                {media?.ownerUser.id !== tokenPayload.id && (
-                  <FollowButton
-                    userId={media?.ownerUser?.id || ""}
-                    initialIsFollowing={media?.ownerUser?.isFollowing}
-                    initialFollowersCount={media?.numberUserFollowers || 0}
-                    onFollowChange={handleFollowChange}
-                    variant="default"
-                  />
-                )}
-              </div>
 
-              {media?.description && (
-                <div className="description">
-                  <span>{media.description}</span>
+                {media?.description && (
+                  <div className="description">
+                    <span>{media.description}</span>
+                  </div>
+                )}
+                <div className="comments">
+                  {media?.is_comment && (
+                    <ListComments
+                      mediaId={media.id || id}
+                      initialCommentCount={media.commentCount || 0}
+                    />
+                  )}
+                  {!media?.is_comment && (
+                    <p className="no_comment">
+                      Comments are turned off for this Media
+                    </p>
+                  )}
                 </div>
-              )}
-              <div className="comments">
-                {media?.is_comment && (
-                  <ListComments 
-                    mediaId={media.id || id} 
-                    initialCommentCount={media.commentCount || 0}
-                  />
-                )}
-                {!media?.is_comment && (
-                  <p className="no_comment">
-                    Comments are turned off for this Media
-                  </p>
-                )}
               </div>
-            </div>
-            <div className="right-bottom-view">
-              {media?.is_comment && <Comment mediaId={id} />}
+              <div className="right-bottom-view">
+                {media?.is_comment && <Comment mediaId={id} />}
+              </div>
             </div>
           </div>
-        </div>
-      </motion.div>
-      <MediaList 
+        </motion.div>
+      </Loading>
+
+      <MediaList
         queryKey={["medias", "detail-page"]}
         queryFn={(pageParam) => getAllMedias({ pageParam })}
       />
-    </Loading>
+    </div>
   );
 };
 
