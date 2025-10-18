@@ -3,16 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./index.less";
 import { EditFilled } from "@ant-design/icons/lib";
-import ModalComponent from "@/components/modal/ModalComponent";
 import { toast } from "react-toastify";
 import { getDetailMedia } from "@/api/media";
 import { Media } from "type";
 import { Form, Input } from "antd";
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
-import Loading from "@/components/loading/Loading";
-import { useSelector } from "react-redux";
-import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
@@ -21,7 +15,7 @@ import clsx from "clsx";
 import { MEDIA_TYPES, PRIVACY } from "@/constants/constants";
 import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";
 import DotsPagination from "@/components/dotsPagination/DotsPagination";
-import { useMedia } from "@/hooks/useMedia";
+import { useMedia } from "@/react-query/useMedia";
 import { EditMediaModal, DeleteMediaModal } from "@/components/modal/media";
 
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {

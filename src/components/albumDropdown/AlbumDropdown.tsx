@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { addMediasToAlbum } from "@/api/album";
 import clsx from "clsx";
 import { CreateAlbumModal } from "@/components/modal/album";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 import { CreateAlbumFormData } from "@/validation";
 import { BaseTabs } from "@/components/baseTabs";
 import { ALBUM_TABS } from "@/constants/constants";

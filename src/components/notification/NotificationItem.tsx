@@ -1,7 +1,7 @@
 import React from 'react';
 import { DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { NOTIFICATION_TYPES } from '@/constants/constants';
-import { useNotificationActions } from '@/hooks/useNotificationActions';
+import { useNotificationActions } from '@/react-query/useNotificationActions';
 import clsx from 'clsx';
 import { Button } from 'antd/es';
 

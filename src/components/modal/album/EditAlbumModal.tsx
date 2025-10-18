@@ -12,7 +12,7 @@ import type { Album } from "type";
 import type { UpdateAlbumRequest } from "@/types/Album/AlbumRequest";
 import { updateAlbumSchema, UpdateAlbumFormData } from "@/validation/album";
 import { useFormValidation } from "@/hooks";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 import { CollaboratorsListModal } from "@/components/modal/album";
 
 interface EditAlbumModalProps {
@@ -267,7 +267,7 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
       <CollaboratorsListModal
         visible={collaboratorsListModalVisible}
         onCancel={() => setCollaboratorsListModalVisible(false)}
-        collaborators={detailAlbum?.allUser || []}
+        albumId={album?.id || ""}
       />
     </ModalComponent>
   );

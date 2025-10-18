@@ -5,11 +5,11 @@ import ModalComponent from "@/components/modal/ModalComponent";
 import FieldItem from "@/components/form/fieldItem/FieldItem";
 import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
 import { Media } from "@/types/type";
-import { useMedia } from "@/hooks/useMedia";
+import { useMedia } from "@/react-query/useMedia";
 import { PRIVACY } from "@/constants/constants";
 import MediaViewer from "@/components/mediaViewer/MediaViewer";
 import Loading from "@/components/loading/Loading";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useAlbum } from "@/react-query/useAlbum";
 
 interface EditMediaModalProps {
   visible: boolean;

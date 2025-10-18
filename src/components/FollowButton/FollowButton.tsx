@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/react-query/useUser";
 import clsx from "clsx";
 
 interface FollowButtonProps {

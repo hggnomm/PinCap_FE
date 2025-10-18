@@ -1,8 +1,8 @@
 
 import type React from "react";
 import { useState, useRef } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useUser } from "@/hooks/useUser";
+import { useAuth } from "@/react-query/useAuth";
+import { useUser } from "@/react-query/useUser";
 import { useNavigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 import FieldItem from "@/components/form/fieldItem/FieldItem";

@@ -6,7 +6,7 @@ import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import { EllipsisOutlined } from "@ant-design/icons/lib";
 import ModalComponent from "@/components/modal/ModalComponent";
 import { toast } from "react-toastify";
-import { useMedia } from "@/hooks/useMedia";
+import { useMedia } from "@/react-query/useMedia";
 
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;

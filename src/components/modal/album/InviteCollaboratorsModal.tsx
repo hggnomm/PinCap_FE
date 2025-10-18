@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Search, User, Loader2 } from "lucide-react";
 import clsx from "clsx";
 import ModalComponent from "@/components/modal/ModalComponent";
-import { useUser } from "@/hooks/useUser";
-import { useAlbum } from "@/hooks/useAlbum";
+import { useUser } from "@/react-query/useUser";
+import { useAlbum } from "@/react-query/useAlbum";
 import { ALBUM_INVITATION_STATUS } from "@/constants/constants";
 
 const useDebounce = (value: string, delay: number) => {
