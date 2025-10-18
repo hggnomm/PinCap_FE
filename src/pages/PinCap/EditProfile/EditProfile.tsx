@@ -1,25 +1,20 @@
-
-import type React from "react";
-import { useState, useRef } from "react";
+import FieldItem from "@/components/form/fieldItem/FieldItem";
+import Loading from "@/components/loading/Loading";
+import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query/useAuth";
 import { useUser } from "@/react-query/useUser";
-import { useNavigate } from "react-router-dom";
-import Loading from "@/components/loading/Loading";
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import { ArrowLeft, Save, Upload, X } from "lucide-react";
-import { ROUTES } from "@/constants/routes";
 import { Form, Input } from "antd";
+import { ArrowLeft, Save, Upload, X } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+s;
 
 const { TextArea } = Input;
 
 const EditProfile = () => {
   const { user, isLoadingUser } = useAuth();
-  const {
-    updateMyProfile,
-    updateMyProfileLoading,
-    updateMyProfileError,
-  } = useUser();
+  const { updateMyProfile, updateMyProfileLoading } = useUser();
   const navigate = useNavigate();
   const [form] = Form.useForm();
 

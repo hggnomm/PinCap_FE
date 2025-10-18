@@ -1,22 +1,22 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import "./index.less";
-import { EditFilled } from "@ant-design/icons/lib";
-import { toast } from "react-toastify";
 import { getDetailMedia } from "@/api/media";
-import { Media } from "type";
-import { Form, Input } from "antd";
-import "react-medium-image-zoom/dist/styles.css";
+import AlbumDropdown from "@/components/albumDropdown";
+import DotsPagination from "@/components/dotsPagination/DotsPagination";
+import { DeleteMediaModal, EditMediaModal } from "@/components/modal/media";
+import { MEDIA_TYPES } from "@/constants/constants";
+import { useMedia } from "@/react-query/useMedia";
+import { ParsedMediaUrl, parseMediaUrl } from "@/utils/utils";
+import { EditFilled } from "@ant-design/icons/lib";
+import { Form } from "antd";
+import clsx from "clsx";
+import { motion } from "framer-motion";
+import React, { useEffect, useMemo, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
-import AlbumDropdown from "@/components/albumDropdown";
-import clsx from "clsx";
-import { MEDIA_TYPES, PRIVACY } from "@/constants/constants";
-import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";
-import DotsPagination from "@/components/dotsPagination/DotsPagination";
-import { useMedia } from "@/react-query/useMedia";
-import { EditMediaModal, DeleteMediaModal } from "@/components/modal/media";
+import "react-medium-image-zoom/dist/styles.css";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Media } from "type";
+import "./index.less";
 
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
@@ -217,10 +217,12 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             onModalOpen={() => setModalOpen(true)}
             onModalClose={() => setModalOpen(false)}
             trigger={
-              <div className={clsx(
-                "save-button right-top transition-opacity duration-300",
-                isHovered || dropdownOpen ? "opacity-100" : "opacity-0"
-              )}>
+              <div
+                className={clsx(
+                  "save-button right-top transition-opacity duration-300",
+                  isHovered || dropdownOpen ? "opacity-100" : "opacity-0"
+                )}
+              >
                 <p>Save</p>
               </div>
             }

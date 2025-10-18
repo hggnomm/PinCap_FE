@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import "./MyMedia.less";
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
-import MediaList from "@/components/viewPin/ViewPinComponent";
 import { getMyMedias } from "@/api/media";
-import { useNavigate } from "react-router";
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
+import MediaList from "@/components/viewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
+import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
+import { useNavigate } from "react-router";
+import "./MyMedia.less";
 
 const MyMedia = () => {
   const navigate = useNavigate();
@@ -55,10 +54,12 @@ const MyMedia = () => {
       <div className="my-list-media">
         <div className="action"></div>
         <div className="list">
-          <MediaList 
+          <MediaList
             queryKey={["medias", "my-media", "created"]}
-            queryFn={(pageParam) => getMyMedias({ pageParam, is_created: true })}
-            isEditMedia 
+            queryFn={(pageParam) =>
+              getMyMedias({ pageParam, is_created: true })
+            }
+            isEditMedia
           />
         </div>
       </div>
