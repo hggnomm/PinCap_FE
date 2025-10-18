@@ -170,7 +170,7 @@ const DetailAlbum = () => {
         <CollaboratorsListModal
           visible={collaboratorsListModalVisible}
           onCancel={() => setCollaboratorsListModalVisible(false)}
-          collaborators={albumData?.allUser || []}
+          albumId={albumId}
         />
       </div>
     </Loading>

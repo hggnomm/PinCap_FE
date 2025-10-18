@@ -46,7 +46,7 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
 
   return (
     <div className={clsx("my-8", className)}>
-      <div className="flex items-center justify-between mb-6 gap-2 w-fit">
+      <div className="flex items-center justify-between mb-3 gap-2 w-fit">
         <div className="flex items-center gap-3">
           <h3 className="text-xl font-semibold text-gray-900 tracking-tight">
             Collaborators

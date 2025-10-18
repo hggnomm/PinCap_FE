@@ -23,6 +23,7 @@ import UserProfile from "./pages/PinCap/UserProfile/UserProfile";
 import NotFound from "./pages/NotFound";
 import Forbidden from "./pages/Forbidden";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import ChatbotProvider from "./components/chatbot/ChatbotProvider";
 import { ROUTES } from "./constants/routes";
 import { useAuth } from "./hooks";
 import { Navigate } from "react-router-dom";
@@ -38,6 +39,7 @@ const HomeRouteHandler = () => {
     <>
       <HeaderCommon />
       <Home />
+      <ChatbotProvider />
     </>
   );
 };
@@ -110,6 +112,7 @@ const App = () => {
                       </Routes>
                     </Content>
                   </Layout>
+                  <ChatbotProvider />
                 </Layout>
               </ProtectedRoute>
             }

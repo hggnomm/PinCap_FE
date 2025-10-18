@@ -95,6 +95,42 @@ export const useAlbum = () => {
     },
   });
 
+  const getUsersInAlbumMutation = (albumId: string, params?: {
+    query?: string;
+    order_key?: string;
+    order_type?: string;
+    per_page?: number;
+    page?: number;
+  }) => {
+    return useQuery({
+      queryKey: ['album-users', albumId, params],
+      queryFn: () => album.getUsersInAlbum(albumId, params),
+      enabled: !!albumId,
+      staleTime: 5 * 60 * 1000,
+    });
+  };
+
+  const updateMemberRoleMutation = useMutation({
+    mutationFn: ({ albumId, userId, data }: { 
+      albumId: string; 
+      userId: string; 
+      data: { role: "VIEW" | "EDIT" } 
+    }) => album.updateMemberRole(albumId, userId, data),
+    onSuccess: (_, { albumId }) => {
+      queryClient.invalidateQueries({ queryKey: ['album-users', albumId] });
+      queryClient.invalidateQueries({ queryKey: ['album', albumId] });
+    },
+  });
+
+  const removeMemberFromAlbumMutation = useMutation({
+    mutationFn: ({ albumId, userId }: { albumId: string; userId: string }) =>
+      album.removeMemberFromAlbum(albumId, userId),
+    onSuccess: (_, { albumId }) => {
+      queryClient.invalidateQueries({ queryKey: ['album-users', albumId] });
+      queryClient.invalidateQueries({ queryKey: ['album', albumId] });
+    },
+  });
+
   return {
     getAlbumList,
     getAlbumMemberList,
@@ -116,5 +152,10 @@ export const useAlbum = () => {
     acceptAlbumInvitationLoading: acceptAlbumInvitationMutation.isPending,
     rejectAlbumInvitation: rejectAlbumInvitationMutation.mutateAsync,
     rejectAlbumInvitationLoading: rejectAlbumInvitationMutation.isPending,
+    getUsersInAlbum: getUsersInAlbumMutation,
+    updateMemberRole: updateMemberRoleMutation.mutateAsync,
+    updateMemberRoleLoading: updateMemberRoleMutation.isPending,
+    removeMemberFromAlbum: removeMemberFromAlbumMutation.mutateAsync,
+    removeMemberFromAlbumLoading: removeMemberFromAlbumMutation.isPending,
   };
 };

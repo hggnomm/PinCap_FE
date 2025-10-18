@@ -6,30 +6,38 @@ import { AlbumUser } from "@/types/type";
 import { ALBUM_ROLES, ALBUM_INVITATION_STATUS } from "@/constants/constants";
 import { Dropdown } from "@/components/dropdown";
 import Empty from "@/components/Empty";
+import { useAlbum } from "@/hooks/useAlbum";
+import { toast } from "react-toastify";
 import type { MenuProps } from "antd";
 
 interface CollaboratorsListModalProps {
   visible: boolean;
   onCancel: () => void;
-  collaborators: AlbumUser[];
-  loading?: boolean;
+  albumId: string;
 }
 
 const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
   visible,
   onCancel,
-  collaborators,
-  loading = false,
+  albumId,
 }) => {
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [selectedCollaborator, setSelectedCollaborator] =
     useState<AlbumUser | null>(null);
+
+  // Use React Query hooks
+  const { getUsersInAlbum, updateMemberRole, removeMemberFromAlbum } = useAlbum();
+  const { data: collaboratorsData, isLoading: loading, error } = getUsersInAlbum(albumId, {
+    per_page: 50, // Get more collaborators
+    page: 1,
+  });
+
   // Filter only accepted collaborators and sort with Owner first
-  const acceptedCollaborators = collaborators
+  const acceptedCollaborators = (collaboratorsData?.data || [])
     .filter(
-      (collaborator) => collaborator.status === ALBUM_INVITATION_STATUS.ACCEPTED
+      (collaborator: AlbumUser) => collaborator.status === ALBUM_INVITATION_STATUS.ACCEPTED
     )
-    .sort((a, b) => {
+    .sort((a: AlbumUser, b: AlbumUser) => {
       // Owner always comes first
       if (a.album_role === ALBUM_ROLES.OWNER) return -1;
       if (b.album_role === ALBUM_ROLES.OWNER) return 1;
@@ -74,13 +82,20 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
   };
 
   const handleRoleChange = useCallback(
-    (collaboratorId: string, newRole: string) => {
-      // TODO: Implement role change API call
-      console.log(
-        `Change role for collaborator ${collaboratorId} to ${newRole}`
-      );
+    async (collaboratorId: string, newRole: string) => {
+      try {
+        await updateMemberRole({
+          albumId,
+          userId: collaboratorId,
+          data: { role: newRole as "VIEW" | "EDIT" }
+        });
+        toast.success("Role updated successfully!");
+      } catch (error) {
+        console.error("Failed to update role:", error);
+        toast.error("Failed to update role. Please try again.");
+      }
     },
-    []
+    [albumId, updateMemberRole]
   );
 
   const handleRemoveCollaborator = useCallback((collaborator: AlbumUser) => {
@@ -88,14 +103,22 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
     setRemoveModalVisible(true);
   }, []);
 
-  const handleRemoveConfirm = useCallback(() => {
+  const handleRemoveConfirm = useCallback(async () => {
     if (selectedCollaborator) {
-      // TODO: Implement remove collaborator API call
-      console.log(`Remove collaborator ${selectedCollaborator.id}`);
-      setRemoveModalVisible(false);
-      setSelectedCollaborator(null);
+      try {
+        await removeMemberFromAlbum({
+          albumId,
+          userId: selectedCollaborator.id
+        });
+        toast.success("Member removed successfully!");
+        setRemoveModalVisible(false);
+        setSelectedCollaborator(null);
+      } catch (error) {
+        console.error("Failed to remove member:", error);
+        toast.error("Failed to remove member. Please try again.");
+      }
     }
-  }, [selectedCollaborator]);
+  }, [selectedCollaborator, albumId, removeMemberFromAlbum]);
 
   const handleRemoveCancel = useCallback(() => {
     setRemoveModalVisible(false);
@@ -369,7 +392,7 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
 
             {!loading && acceptedCollaborators.length > 0 && (
               <div className="space-y-3">
-                {acceptedCollaborators.map((collaborator) =>
+                {acceptedCollaborators.map((collaborator: AlbumUser) =>
                   renderCollaboratorItem(collaborator)
                 )}
               </div>
