@@ -1,18 +1,25 @@
+import { useEffect, useState } from "react";
+
+import { useSelector, useDispatch } from "react-redux";
+import { Link, Outlet, useLocation } from "react-router-dom";
+
+import { styled } from "styled-components";
+
 import {
   DashboardOutlined,
   PlusOutlined,
   ProductOutlined,
   SignatureOutlined,
 } from "@ant-design/icons";
-import { Menu } from "antd";
+
 import Sider from "antd/es/layout/Sider";
-import React, { useEffect, useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+
+import { Menu } from "antd";
+
 import "./index.less";
 import iconAI from "@/assets/img/PinCap/ai-technology-img.png";
-import styled from "styled-components";
 import { toggleChatbot } from "@/store/chatSlice";
+import { TokenPayload } from "@/types/Auth";
 
 const CreateMediaBtn = styled(Menu.Item)`
   background-color: #a25772;
@@ -53,10 +60,11 @@ const AIToolBtn = styled(Menu.Item)`
     cursor: pointer;
   }
 `;
-
 const SiderCommon = () => {
   const dispatch = useDispatch();
-  const tokenPayload = useSelector((state: any) => state.auth);
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [collapsed, setCollapsed] = useState<boolean>(true);
   const location = useLocation();
@@ -128,7 +136,7 @@ const SiderCommon = () => {
         </Menu.Item>
 
         {/* Dashboard Submenu */}
-        {tokenPayload.role == "ADMIN" && (
+        {tokenPayload.role === "ADMIN" && (
           <Menu.SubMenu
             key="dashboard"
             icon={<DashboardOutlined />}

@@ -1,6 +1,10 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "./store";
+import { createSlice } from "@reduxjs/toolkit";
+
+import { TokenPayload } from "@/types/Auth";
+
 import { decodedToken } from "../utils/utils";
+
+import { RootState } from "./store";
 
 interface IAuth {
   id: string;
@@ -9,12 +13,12 @@ interface IAuth {
   role: string;
   isAuthenticated: boolean,
 }
-const tokenInfo: any =  decodedToken(localStorage.getItem('token')); 
+const tokenInfo: TokenPayload | null = decodedToken(localStorage.getItem('token')); 
 
 const initialState: IAuth = {
   id: tokenInfo?.id || "",
   name: tokenInfo?.name || "",
-  email: tokenInfo?.email || "",
+  email: tokenInfo?.mail || "",
   role: tokenInfo?.role || "",
   isAuthenticated: false,
 
@@ -24,12 +28,12 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    addToken: (state, action) => {
-      const tokenInfo: any =  decodedToken(localStorage.getItem('token')); 
-      state.id = tokenInfo?.id;
-      state.email = tokenInfo?.email;
-      state.name = tokenInfo?.name;
-      state.role = tokenInfo?.role;
+    addToken: (state, _action) => {
+      const tokenInfo: TokenPayload | null = decodedToken(localStorage.getItem('token')); 
+      state.id = tokenInfo?.id || "";
+      state.email = tokenInfo?.mail || "";
+      state.name = tokenInfo?.name || "";
+      state.role = tokenInfo?.role || "";
       state.isAuthenticated = true;
     },
     logout: (state) => {

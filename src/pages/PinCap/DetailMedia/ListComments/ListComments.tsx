@@ -1,24 +1,35 @@
-import { Collapse } from "antd";
 import React, { useEffect, useState } from "react";
-import { formatTime } from "@/utils/utils";
-import { useComment } from "@/react-query/useComment";
+
 import { useInView } from "react-intersection-observer";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/react-query/useAuth";
-import { ROUTES } from "@/constants/routes";
-import "./ListComments.less";
 import Zoom from "react-medium-image-zoom";
+import { useNavigate } from "react-router-dom";
+
+import { Collapse } from "antd";
+
+import { ROUTES } from "@/constants/routes";
+import { useAuth } from "@/react-query/useAuth";
+import { useComment } from "@/react-query/useComment";
+import { Comment } from "@/types/type";
+import { formatTime } from "@/utils/utils";
+
+import "./ListComments.less";
 
 interface ListCommentsProps {
   mediaId: string;
   initialCommentCount?: number;
+  defaultOpen?: boolean;
 }
 
-const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCount = 0 }) => {
+const ListComments: React.FC<ListCommentsProps> = ({
+  mediaId,
+  initialCommentCount = 0,
+  defaultOpen = false,
+}) => {
   const { getInfiniteComments } = useComment();
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
-  const [allComments, setAllComments] = useState<any[]>([]);
+  const [allComments, setAllComments] = useState<Comment[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
   const { ref, inView } = useInView();
 
   const {
@@ -27,7 +38,6 @@ const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCoun
     error,
     fetchNextPage,
     isFetchingNextPage,
-    isFetching,
     hasNextPage,
   } = getInfiniteComments(mediaId);
 
@@ -46,20 +56,35 @@ const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCoun
 
   const displayComments = allComments.length > 0 ? allComments : [];
   const totalComments = data?.pages?.[0]?.total || initialCommentCount;
-  const isLoading = status === "pending";
+  const isLoading = status === "pending" || isFetchingNextPage;
+
+  // Handle defaultOpen prop
+  useEffect(() => {
+    if (defaultOpen) {
+      setIsOpen(true);
+    }
+  }, [defaultOpen]);
 
   const handleNavigateToProfile = (userId: string) => {
     if (!userId) return;
-    
+
     if (currentUser && userId === currentUser.id) {
       navigate(ROUTES.PROFILE);
     } else {
-      navigate(ROUTES.USER_PROFILE.replace(':id', userId));
+      navigate(ROUTES.USER_PROFILE.replace(":id", userId));
     }
   };
 
   return (
-    <Collapse ghost expandIconPosition="end" className="user_comment">
+    <Collapse
+      ghost
+      expandIconPosition="end"
+      className="user_comment"
+      activeKey={totalComments === 0 ? [] : isOpen ? ["1"] : []}
+      onChange={(keys) => {
+        setIsOpen(keys.includes("1"));
+      }}
+    >
       <Collapse.Panel key="1" header={`${totalComments} Comments`}>
         {isLoading && (
           <div className="text-center p-5">
@@ -69,37 +94,41 @@ const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCoun
 
         {!isLoading && displayComments.length > 0 && (
           <div>
-            {displayComments.map((comment: any, index: number) => {
+            {displayComments?.map((comment: Comment, index: number) => {
               const isLastComment = index === displayComments.length - 1;
 
               return (
                 <div
-                  key={comment.id || index}
+                  key={comment?.id ?? index}
                   className="comment !py-2"
                   ref={isLastComment ? ref : undefined}
                 >
-                  <div 
+                  <div
                     className="avatar cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => handleNavigateToProfile(comment.user_id)}
+                    onClick={() =>
+                      handleNavigateToProfile(comment?.user_id ?? "")
+                    }
                   >
                     <img
-                      src={comment.avatar || "/placeholder-user.jpg"}
+                      src={comment?.avatar ?? "/placeholder-user.jpg"}
                       alt="avatar"
                     />
                   </div>
                   <div className="content">
                     <div className="header_content">
-                      <strong 
+                      <strong
                         className="cursor-pointer hover:underline"
-                        onClick={() => handleNavigateToProfile(comment.user_id)}
+                        onClick={() =>
+                          handleNavigateToProfile(comment?.user_id || "")
+                        }
                       >
-                        {comment.name || "Anonymous"}
+                        {comment?.name || "Anonymous"}
                       </strong>
-                      <span>{formatTime(comment.created_at ?? "")}</span>
+                      <span>{formatTime(comment?.created_at || "")}</span>
                     </div>
 
-                    <p>{comment.content}</p>
-                    {comment.image_url && (
+                    <p>{comment?.content}</p>
+                    {comment?.image_url && (
                       <div className="comment_img">
                         <Zoom>
                           <img
@@ -126,10 +155,6 @@ const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCoun
           </div>
         )}
 
-        {!isLoading && displayComments.length === 0 && (
-          <div className="text-center text-gray-500 p-5">No comments yet</div>
-        )}
-
         {error && (
           <div className="text-center text-red-500 p-5">
             Error loading comments. Please try again.
@@ -140,4 +165,4 @@ const ListComments: React.FC<ListCommentsProps> = ({ mediaId, initialCommentCoun
   );
 };
 
-export default React.memo(ListComments);
+export default ListComments;

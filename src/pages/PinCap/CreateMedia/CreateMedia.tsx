@@ -1,32 +1,36 @@
 import React, { useState, useEffect } from "react";
+
 import "./index.less";
 import "./FilePond.less";
-import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
-import Title from "antd/es/typography/Title";
-import { getDetailMedia, getMyMedias } from "@/api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import clsx from "clsx";
-import { useMedia } from "@/react-query/useMedia";
+import { FilePond, FileItem, registerPlugin } from "react-filepond";
 
-import { FilePond, registerPlugin } from "react-filepond";
+import { clsx } from "clsx";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "filepond-plugin-media-preview/dist/filepond-plugin-media-preview.min.css";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import FilePondPluginImageEdit from "filepond-plugin-image-edit";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginImageEdit from "filepond-plugin-image-edit";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
-// @ts-ignore
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
-import DraftMedia from "./DraftMedia";
-import { MediaFormValues } from "@/types/Media/MediaRequest";
-import { Media } from "@/types/type";
+
+import Title from "antd/es/typography/Title";
+
+import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
+
+import { getDetailMedia, getMyMedias } from "@/api/media";
 import ImageEditor from "@/components/imageEditor";
-import { EditOutlined } from "@ant-design/icons";
-import { MediaResponse } from "@/types/Media/MediaResponse";
 import { PRIVACY } from "@/constants/constants";
+import { useMediaToast } from "@/contexts/MediaToastContext";
+import { useMedia } from "@/react-query/useMedia";
+import { TokenPayload } from "@/types/Auth";
+import { Media } from "@/types/type";
+import { CreateMediaFormData, UpdateMediaFormData } from "@/validation/media";
+
+import DraftMedia from "./DraftMedia";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -36,18 +40,15 @@ registerPlugin(
   FilePondPluginMediaPreview
 );
 
-// Types
-interface TokenPayload {
-  id: string;
-}
-
 const CreateMedia: React.FC = () => {
   const [form] = Form.useForm();
-  const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
   const { createMedia, updateMedia } = useMedia();
+  const { showToast } = useMediaToast();
   const [isLoad, setIsLoad] = useState<boolean>(false);
   const [fileList, setFileList] = useState<File[]>([]);
-  const [isProcessingFiles, setIsProcessingFiles] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
   const [isSelectedDraft, setIsSelectedDraft] = useState<boolean>(false);
@@ -59,7 +60,7 @@ const CreateMedia: React.FC = () => {
   const [textCreateDraft, setTextCreateDraft] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
 
-  const [drafts, setDrafts] = useState<any[]>([]);
+  const [drafts, setDrafts] = useState<Media[]>([]);
   const [loadingDrafts, setLoadingDrafts] = useState<boolean>(false);
   const [draftId, setDraftId] = useState<string>("");
 
@@ -164,7 +165,7 @@ const CreateMedia: React.FC = () => {
 
   const onChangeToCreateDraft = async () => {
     const formValue = form.getFieldsValue(true);
-    const mediaData: any = {
+    const mediaData: CreateMediaFormData = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList,
@@ -177,12 +178,15 @@ const CreateMedia: React.FC = () => {
     setTextCreateDraft(true);
 
     try {
-      let response: any;
+      let response;
       if (formValue.id) {
         delete mediaData.media;
-        response = await updateMedia({ id: formValue.id, data: mediaData });
+        response = await updateMedia({
+          id: formValue.id,
+          data: mediaData as UpdateMediaFormData,
+        });
       } else {
-        response = await createMedia(mediaData);
+        response = await createMedia(mediaData as CreateMediaFormData);
       }
 
       if (response?.media?.id) {
@@ -216,7 +220,7 @@ const CreateMedia: React.FC = () => {
 
     const tags_name = tags;
 
-    const mediaData: any = {
+    const mediaData: CreateMediaFormData = {
       ...formValue,
       mediaOwner_id: tokenPayload.id,
       media: fileList,
@@ -228,21 +232,35 @@ const CreateMedia: React.FC = () => {
     try {
       setIsLoad(true);
 
+      let response;
       if (formValue.id) {
         delete mediaData.media;
-        await updateMedia({ id: formValue.id, data: mediaData });
-        toast.success("Media updated successfully!");
+        response = await updateMedia({
+          id: formValue.id,
+          data: mediaData as UpdateMediaFormData,
+        });
+
+        if (response?.media) {
+          showToast(response.media, "update");
+        }
       } else {
-        await createMedia(mediaData);
-        toast.success("Media created successfully!");
+        response = await createMedia(mediaData as CreateMediaFormData);
+
+        if (response?.media) {
+          showToast(response.media, "create");
+        }
       }
 
       setDraftId("");
       fetchDrafts();
       resetForm();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
-        `Error: ${error?.message || "An unexpected error occurred."}`
+        `Error: ${
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred."
+        }`
       );
     } finally {
       setIsLoad(false);
@@ -460,11 +478,8 @@ const CreateMedia: React.FC = () => {
                   <FilePond
                     files={fileList}
                     onupdatefiles={(fileItems) => {
-                      setFileList(fileItems.map((item): any => item.file));
-                      setIsProcessingFiles(false);
+                      setFileList(fileItems.map((item: FileItem) => item.file));
                     }}
-                    onaddfilestart={() => setIsProcessingFiles(true)}
-                    onprocessfiles={() => setIsProcessingFiles(false)}
                     allowMultiple={true}
                     maxFiles={6}
                     maxFileSize="50MB"

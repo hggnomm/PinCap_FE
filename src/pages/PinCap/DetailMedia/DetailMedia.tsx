@@ -1,38 +1,40 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getAllMedias } from "@/api/media";
+import { useEffect, useState } from "react";
 
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
+import { clsx } from "clsx";
+import { saveAs } from "file-saver";
 import { motion } from "framer-motion";
+
+import { getAllMedias } from "@/api/media";
 import download from "@/assets/img/PinCap/download.png";
 import more from "@/assets/img/PinCap/more.png";
-import { notification } from "antd";
-import Loading from "@/components/loading/Loading";
 import AlbumDropdown from "@/components/albumDropdown";
+import BackButton from "@/components/backButton/BackButton";
+import FollowButton from "@/components/FollowButton";
+import Loading from "@/components/loading/Loading";
 import MediaViewer from "@/components/mediaViewer/MediaViewer";
-
-import "./index.less";
+import MediaList from "@/components/viewPin/ViewPinComponent";
+import { ROUTES } from "@/constants/routes";
+import { useMedia } from "@/react-query/useMedia";
+import { TokenPayload } from "@/types/Auth";
 import { Media } from "@/types/type";
 import { FeelingType, getImageReactionWithId } from "@/utils/utils";
-import Comment from "./Comment/Comment";
-import { useSelector } from "react-redux";
-import { saveAs } from "file-saver";
-import BackButton from "@/components/backButton/BackButton";
-import MediaList from "@/components/viewPin/ViewPinComponent";
-import ListComments from "./ListComments/ListComments";
-import { useMedia } from "@/react-query/useMedia";
-import { ROUTES } from "@/constants/routes";
-import FollowButton from "@/components/FollowButton";
-import clsx from "clsx";
 
-interface TokenPayload {
-  id: string;
-}
+import Comment from "./Comment/Comment";
+import ListComments from "./ListComments/ListComments";
+
+import "./index.less";
 
 const DetailMedia = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const id = location.state?.mediaId;
-  const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
+  const params = useParams();
+  const id = params.id || location.state?.mediaId;
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
 
   const { mediaReaction, mediaReactionLoading } = useMedia();
 
@@ -44,6 +46,7 @@ const DetailMedia = () => {
 
   const [media, setMedia] = useState<Media | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [shouldOpenComments, setShouldOpenComments] = useState(false);
 
   // Redirect to 404 if no media ID provided
   useEffect(() => {
@@ -51,6 +54,15 @@ const DetailMedia = () => {
       navigate(ROUTES.NOT_FOUND, { replace: true });
     }
   }, [id, navigate]);
+
+  useEffect(() => {
+    const rightLayout = document.querySelector(".right-layout");
+    if (rightLayout) {
+      rightLayout.scrollTo({ top: 0, left: 0 });
+    } else {
+      window.scrollTo({ top: 0, left: 0 });
+    }
+  }, [location.pathname]);
 
   // Redirect to 404 if media not found
   useEffect(() => {
@@ -68,12 +80,6 @@ const DetailMedia = () => {
     }
   }, [mediaData, queryError]);
 
-  useEffect(() => {
-    if (id) {
-      window.scrollTo(0, 0);
-    }
-  }, [id]);
-
   const handleFollowChange = (isFollowing: boolean, followersCount: number) => {
     setMedia((prevState) => {
       if (!prevState) return null;
@@ -90,7 +96,7 @@ const DetailMedia = () => {
 
   const handleReaction = async () => {
     try {
-      let feelingId = FeelingType.HEART; // Hiện tại chỉ có một icon
+      const feelingId = FeelingType.HEART; // Hiện tại chỉ có một icon
       let newReactionCount: number;
 
       // Tính toán số lượng phản ứng
@@ -141,6 +147,16 @@ const DetailMedia = () => {
     } else {
       navigate(ROUTES.USER_PROFILE.replace(":id", media.ownerUser.id));
     }
+  };
+
+  const handleCommentAdded = () => {
+    console.log("Comment added, opening comments dropdown");
+    setShouldOpenComments(true);
+    // Reset after a longer delay to allow the comment to be added and dropdown to open
+    setTimeout(() => {
+      console.log("Resetting shouldOpenComments to false");
+      setShouldOpenComments(false);
+    }, 1000);
   };
 
   return (
@@ -274,6 +290,7 @@ const DetailMedia = () => {
                     <ListComments
                       mediaId={media.id || id}
                       initialCommentCount={media.commentCount || 0}
+                      defaultOpen={shouldOpenComments}
                     />
                   )}
                   {!media?.is_comment && (
@@ -284,7 +301,9 @@ const DetailMedia = () => {
                 </div>
               </div>
               <div className="right-bottom-view">
-                {media?.is_comment && <Comment mediaId={id} />}
+                {media?.is_comment && (
+                  <Comment mediaId={id} onCommentAdded={handleCommentAdded} />
+                )}
               </div>
             </div>
           </div>

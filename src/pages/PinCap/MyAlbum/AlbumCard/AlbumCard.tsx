@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+
 import "./AlbumCard.less";
-import { EditFilled, LockFilled } from "@ant-design/icons";
-import { Album } from "type";
-import { toast } from "react-toastify";
-import { UpdateAlbumFormData } from "@/validation/album";
 import { useNavigate } from "react-router";
-import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal } from "@/components/modal/album";
-import { useAlbum } from "@/react-query/useAlbum";
+import { toast } from "react-toastify";
+
+import { EditFilled, LockFilled } from "@ant-design/icons";
+
+import {
+  EditAlbumModal,
+  DeleteAlbumModal,
+  InviteCollaboratorsModal,
+} from "@/components/modal/album";
 import { ROUTES } from "@/constants/routes";
+import { useAlbum } from "@/react-query/useAlbum";
+import { Album } from "@/types/type";
+import { UpdateAlbumFormData } from "@/validation/album";
 
 interface AlbumCardProps {
   album: Album;
@@ -19,16 +26,16 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const navigate = useNavigate();
-  const { updateAlbum, updateAlbumLoading, deleteAlbum, deleteAlbumLoading } = useAlbum();
+  const { updateAlbum, updateAlbumLoading, deleteAlbum, deleteAlbumLoading } =
+    useAlbum();
 
   const handleEditAlbum = async (albumRequest: UpdateAlbumFormData) => {
     try {
-      await updateAlbum({ 
-        id: album.id, 
-        data: albumRequest
+      await updateAlbum({
+        id: album.id,
+        data: albumRequest,
       });
       setEditModalVisible(false);
-      toast.success("Album updated successfully!");
     } catch (error) {
       console.error("Update failed:", error);
       toast.error("Failed to update album. Please try again.");
@@ -42,7 +49,9 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
       toast.success("Album deleted successfully!");
     } catch (error) {
       console.error("Error deleting album:", error);
-      toast.error("An error occurred while deleting the album. Please try again.");
+      toast.error(
+        "An error occurred while deleting the album. Please try again."
+      );
     }
   };
 
@@ -51,13 +60,14 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
     toast.info("Invite functionality will be implemented later");
   };
 
-
   return (
     <>
       <div
         className="album-card"
         onClick={() => {
-          navigate(ROUTES.ALBUM_DETAIL.replace(':id', album.id), { state: { albumId: album.id } });
+          navigate(ROUTES.ALBUM_DETAIL.replace(":id", album.id), {
+            state: { albumId: album.id },
+          });
         }}
       >
         <div className="img-container">

@@ -1,5 +1,9 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
+
+import { Form, Input } from "antd";
+
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
 import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
 import FieldItem from "@/components/form/fieldItem/FieldItem";
@@ -7,13 +11,13 @@ import Loading from "@/components/loading/Loading";
 import MediaThumbnailSelector from "@/components/mediaThumbnailSelector/MediaThumbnailSelector";
 import { CollaboratorsListModal } from "@/components/modal/album";
 import ModalComponent from "@/components/modal/ModalComponent";
+import { MEDIA_TYPES } from "@/constants/constants";
 import { useFormValidation } from "@/hooks";
 import { useAlbum } from "@/react-query/useAlbum";
 import type { UpdateAlbumRequest } from "@/types/Album/AlbumRequest";
+import { Album, Media } from "@/types/type";
+import { getFirstImageUrl } from "@/utils/utils";
 import { updateAlbumSchema } from "@/validation/album";
-import { Form, Input } from "antd";
-import React, { useEffect } from "react";
-import type { Album } from "type";
 
 interface EditAlbumModalProps {
   visible: boolean;
@@ -35,12 +39,11 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
   loading = false,
 }) => {
   const [form] = Form.useForm();
-  const [privacy, setPrivacy] = React.useState(false);
-  const [selectedThumbnail, setSelectedThumbnail] = React.useState<string>("");
-  const [showThumbnailSelector, setShowThumbnailSelector] =
-    React.useState(false);
+  const [privacy, setPrivacy] = useState(false);
+  const [selectedThumbnail, setSelectedThumbnail] = useState<string>("");
+  const [showThumbnailSelector, setShowThumbnailSelector] = useState(false);
   const [collaboratorsListModalVisible, setCollaboratorsListModalVisible] =
-    React.useState(false);
+    useState(false);
   const { validate, validateField, getFieldError } =
     useFormValidation(updateAlbumSchema);
   const { getAlbumById } = useAlbum();
@@ -76,10 +79,18 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
 
     try {
       const formValues = await form.validateFields();
+
+      // Process image_cover: if it's a JSON array (from FLEXIBLE), get first image URL
+      let imageCover = selectedThumbnail || undefined;
+      if (selectedThumbnail) {
+        const firstImageUrl = getFirstImageUrl(selectedThumbnail);
+        imageCover = firstImageUrl || undefined;
+      }
+
       const albumRequest = {
         album_name: formValues.album_name,
         privacy: (privacy && "0") || "1",
-        image_cover: selectedThumbnail || undefined,
+        image_cover: imageCover,
       };
 
       // Validate with Zod before submitting
@@ -93,8 +104,8 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
     }
   };
 
-  const handlePrivacyChange = (e: any) => {
-    setPrivacy(e.target.checked);
+  const handlePrivacyChange = (checked: boolean) => {
+    setPrivacy(checked);
   };
 
   const handleThumbnailSelect = (mediaUrl: string | null) => {
@@ -104,12 +115,27 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
 
   // Get current thumbnail image for display
   const getCurrentThumbnail = () => {
-    if (selectedThumbnail) return selectedThumbnail;
+    if (selectedThumbnail) {
+      // If selectedThumbnail is a JSON array (from FLEXIBLE media), parse it to get first image
+      // If it's a regular URL (from IMAGE media), return as is
+      return getFirstImageUrl(selectedThumbnail);
+    }
     if (detailAlbum?.medias && detailAlbum.medias.length > 0) {
+      // Tìm ảnh đầu tiên từ IMAGE type
       const firstImage = detailAlbum.medias.find(
-        (media: any) => media.type === "IMAGE"
+        (media: Media) => media.type === MEDIA_TYPES.IMAGE
       );
-      return firstImage?.media_url;
+      if (firstImage?.media_url) {
+        return firstImage.media_url;
+      }
+
+      // Nếu không có IMAGE, tìm FLEXIBLE type và lấy ảnh đầu tiên
+      const firstFlexible = detailAlbum.medias.find(
+        (media: Media) => media.type === MEDIA_TYPES.FLEXIBLE
+      );
+      if (firstFlexible?.media_url) {
+        return getFirstImageUrl(firstFlexible.media_url);
+      }
     }
     return null;
   };
@@ -196,7 +222,9 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
                         loadingDetail ||
                         !detailAlbum?.medias ||
                         detailAlbum.medias.filter(
-                          (m: any) => m.type === "IMAGE"
+                          (m: Media) =>
+                            m.type === MEDIA_TYPES.IMAGE ||
+                            m.type === MEDIA_TYPES.FLEXIBLE
                         ).length === 0
                       }
                       className="!m-0 !px-4 !py-2 !border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -210,13 +238,17 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
                       {!loadingDetail &&
                         detailAlbum?.medias &&
                         detailAlbum.medias.filter(
-                          (m: any) => m.type === "IMAGE"
+                          (m: Media) =>
+                            m.type === MEDIA_TYPES.IMAGE ||
+                            m.type === MEDIA_TYPES.FLEXIBLE
                         ).length > 0 &&
                         "Change thumbnail"}
                       {!loadingDetail &&
                         (!detailAlbum?.medias ||
                           detailAlbum.medias.filter(
-                            (m: any) => m.type === "IMAGE"
+                            (m: Media) =>
+                              m.type === MEDIA_TYPES.IMAGE ||
+                              m.type === MEDIA_TYPES.FLEXIBLE
                           ).length === 0) &&
                         "No images available"}
                     </button>
@@ -229,7 +261,7 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
               title="Keep this album private"
               description="So only you and collaborator can see it."
               value={privacy}
-              onChange={handlePrivacyChange}
+              onChange={(e) => handlePrivacyChange(e.target.checked)}
               name="privacy"
             />
           </Form>

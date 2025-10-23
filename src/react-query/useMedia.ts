@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import * as media from '@/api/media';
 import { CreateMediaFormData, UpdateMediaFormData } from '@/validation';
 
@@ -34,6 +35,8 @@ export const useMedia = () => {
     mutationFn: (data: CreateMediaFormData) => media.createMedia(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medias'] });
+      queryClient.invalidateQueries({ queryKey: ['medias', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['medias', 'my-media'] });
     },
   });
 
@@ -42,6 +45,8 @@ export const useMedia = () => {
       media.updatedMedia(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['medias'] });
+      queryClient.invalidateQueries({ queryKey: ['medias', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['medias', 'my-media'] });
       queryClient.invalidateQueries({ queryKey: ['media', id] });
     },
   });
@@ -49,7 +54,10 @@ export const useMedia = () => {
   const deleteMediaMutation = useMutation({
     mutationFn: (ids: string[]) => media.deleteMedias(ids),
     onSuccess: () => {
+      // Invalidate all media-related queries
       queryClient.invalidateQueries({ queryKey: ['medias'] });
+      queryClient.invalidateQueries({ queryKey: ['medias', 'all'] });
+      queryClient.invalidateQueries({ queryKey: ['medias', 'my-media'] });
     },
   });
 

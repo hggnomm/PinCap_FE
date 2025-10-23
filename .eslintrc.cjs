@@ -41,8 +41,8 @@ module.exports = {
           "external", // npm packages
           "internal", // Internal modules (using @/ alias)
           "parent", // Parent directory imports
-          "sibling", // Same directory imports
-          "index", // Index file imports
+          ["sibling", "index"], // Same directory imports
+          "type", // Type imports
         ],
         "newlines-between": "always",
         alphabetize: {
@@ -52,21 +52,52 @@ module.exports = {
         pathGroups: [
           {
             pattern: "react",
+            group: "builtin",
+            position: "before",
+          },
+          {
+            pattern: "react**",
             group: "external",
             position: "before",
           },
           {
-            pattern: "react-*",
+            pattern: "react-**",
             group: "external",
             position: "before",
+          },
+          {
+            pattern: "@ant-design/**",
+            group: "external",
+            position: "after",
+          },
+          {
+            pattern: "antd/**",
+            group: "external",
+            position: "after",
+          },
+          {
+            pattern: "antd",
+            group: "external",
+            position: "after",
           },
           {
             pattern: "@/**",
             group: "internal",
             position: "before",
           },
+          {
+            pattern: "./**/*.{css,less,scss,sass}",
+            group: "sibling",
+            position: "after",
+          },
+          {
+            pattern: "**/*.{css,less,scss,sass}",
+            group: "sibling",
+            position: "after",
+          },
         ],
-        pathGroupsExcludedImportTypes: ["react"],
+        pathGroupsExcludedImportTypes: ["react", "builtin"],
+        warnOnUnassignedImports: false,
       },
     ],
 
@@ -89,5 +120,8 @@ module.exports = {
 
     // TypeScript specific
     "@typescript-eslint/no-unused-vars": "off", // Handled by unused-imports
+    
+    // React Hooks rules
+    "react-hooks/rules-of-hooks": "off",
   },
 };

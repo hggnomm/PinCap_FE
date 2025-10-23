@@ -1,3 +1,16 @@
+import React, { useEffect, useMemo, useState } from "react";
+
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import clsx from "clsx";
+import { motion } from "framer-motion";
+
+import { EditFilled } from "@ant-design/icons/lib";
+
+import { Form } from "antd";
+
 import { getDetailMedia } from "@/api/media";
 import AlbumDropdown from "@/components/albumDropdown";
 import DotsPagination from "@/components/dotsPagination/DotsPagination";
@@ -5,16 +18,10 @@ import { DeleteMediaModal, EditMediaModal } from "@/components/modal/media";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { useMedia } from "@/react-query/useMedia";
 import { ParsedMediaUrl, parseMediaUrl } from "@/utils/utils";
-import { EditFilled } from "@ant-design/icons/lib";
-import { Form } from "antd";
-import clsx from "clsx";
-import { motion } from "framer-motion";
-import React, { useEffect, useMemo, useState } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
+
 import "react-lazy-load-image-component/src/effects/blur.css";
 import "react-medium-image-zoom/dist/styles.css";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+
 import { Media } from "type";
 import "./index.less";
 

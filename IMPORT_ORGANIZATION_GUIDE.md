@@ -24,9 +24,53 @@ Dự án đã được cấu hình để tự động sắp xếp và tối ưu 
 Imports sẽ được sắp xếp theo thứ tự:
 
 1. **React** (ưu tiên đầu tiên)
-2. **External packages** (npm packages)
-3. **Internal modules** (sử dụng @/ alias)
-4. **Parent/Sibling imports** (relative imports)
+
+   ```typescript
+   import React, { useState, useEffect } from "react";
+   ```
+
+2. **React ecosystem packages** (react-router-dom, react-redux, etc.)
+
+   ```typescript
+   import { useNavigate } from "react-router-dom";
+   import { useSelector } from "react-redux";
+   ```
+
+3. **UI Library packages** (antd, @ant-design/icons)
+
+   ```typescript
+   import { Button, Form, Input } from "antd";
+   import Title from "antd/es/typography/Title";
+   ```
+
+4. **Other external packages** (axios, clsx, file-saver, etc.) - Alphabetical
+
+   ```typescript
+   import axios from "axios";
+   import clsx from "clsx";
+   import { saveAs } from "file-saver";
+   ```
+
+5. **Internal modules** (@/ alias paths)
+
+   ```typescript
+   import { getUser } from "@/api/users";
+   import { useAuth } from "@/react-query/useAuth";
+   import { ROUTES } from "@/constants/routes";
+   ```
+
+6. **Relative imports** (./Component, ../utils)
+
+   ```typescript
+   import Component from "./Component";
+   import { helper } from "../utils";
+   ```
+
+7. **Style imports** (CSS, LESS, SCSS) - Luôn cuối cùng
+   ```typescript
+   import "./styles.less";
+   import "./index.css";
+   ```
 
 ## Cách sử dụng
 
@@ -39,11 +83,14 @@ Imports sẽ được sắp xếp theo thứ tự:
 ### Thủ công
 
 ```bash
-# Fix imports cho toàn bộ dự án
-npm run lint:fix
+# Fix imports và format code cho toàn bộ dự án
+npm run format
 
-# Hoặc chỉ kiểm tra
-npm run lint
+# Hoặc chỉ kiểm tra lỗi
+npm run format:check
+
+# Hoặc dùng lint:fix
+npm run lint:fix
 ```
 
 ## Ví dụ
@@ -53,6 +100,7 @@ npm run lint
 ```typescript
 import { useState, useEffect } from "react";
 import { useAuth } from "@/react-query/useAuth";
+import "./index.less";
 import { useUser } from "@/react-query/useUser";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
@@ -62,19 +110,36 @@ import FollowButton from "@/components/FollowButton";
 import BackButton from "@/components/backButton/BackButton";
 import React from "react";
 import axios from "axios";
-import { Button } from "antd";
+import { Button, Form } from "antd";
+import clsx from "clsx";
+import { saveAs } from "file-saver";
+import "./styles.css";
+import Title from "antd/es/typography/Title";
 ```
 
 ### Sau khi save (Ctrl + S):
 
 ```typescript
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { Button } from "antd";
+import { Button, Form } from "antd";
+import Title from "antd/es/typography/Title";
+import axios from "axios";
+import clsx from "clsx";
+import { saveAs } from "file-saver";
+import { Calendar, Mail, MapPin, Phone, Star, User } from "lucide-react";
 
+import BackButton from "@/components/backButton/BackButton";
+import FollowButton from "@/components/FollowButton";
+import Loading from "@/components/loading/Loading";
+import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query/useAuth";
+import { useUser } from "@/react-query/useUser";
+
+import "./index.less";
+import "./styles.css";
 ```
 
 ## Lợi ích

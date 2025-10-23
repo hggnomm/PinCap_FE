@@ -1,20 +1,25 @@
 import React, { useState, useRef, useEffect } from "react";
+
 import "./Comment.less";
-import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
+
 import {
   SmileOutlined,
   SendOutlined,
   FileImageOutlined,
 } from "@ant-design/icons";
-import { useComment } from "@/react-query/useComment";
+
 import { notification } from "antd";
+
+import { useComment } from "@/react-query/useComment";
 
 interface CommentProps {
   mediaId: string;
+  onCommentAdded?: () => void;
 }
 
-const Comment: React.FC<CommentProps> = ({ mediaId }) => {
+const Comment: React.FC<CommentProps> = ({ mediaId, onCommentAdded }) => {
   const [inputValue, setInputValue] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -36,7 +41,7 @@ const Comment: React.FC<CommentProps> = ({ mediaId }) => {
 
   const sendMessage = async () => {
     if (inputValue.trim() === "" && !selectedImage) return;
-    
+
     const content = inputValue.trim() || "";
 
     try {
@@ -50,11 +55,15 @@ const Comment: React.FC<CommentProps> = ({ mediaId }) => {
       setInputValue("");
       setSelectedImage(null);
       setShowEmojiPicker(false);
+      onCommentAdded?.();
     } catch (error: any) {
       console.error("Error posting comment:", error);
-      
-      const errorMessage = error?.response?.data?.message || error?.message || "Failed to post comment";
-      
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to post comment";
+
       notification.error({
         message: "Failed to post comment",
         description: errorMessage,

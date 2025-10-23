@@ -1,0 +1,10 @@
+export { default as PinCap } from "./PinCap";
+export { default as CreateMedia } from "./CreateMedia/CreateMedia";
+export { default as DetailMedia } from "./DetailMedia/DetailMedia";
+export { default as DetailAlbum } from "./DetailAlbum/DetailAlbum";
+export { default as EditProfile } from "./EditProfile/EditProfile";
+export { default as MyAlbum } from "./MyAlbum/MyAlbum";
+export { default as MyMedia } from "./MyMedia/MyMedia";
+export { default as Profile } from "./Profile/Profile";
+export { default as Search } from "./Search/Search";
+export { default as UserProfile } from "./UserProfile/UserProfile";
