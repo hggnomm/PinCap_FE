@@ -1,7 +1,9 @@
 import type React from "react";
-import clsx from "clsx";
-import { CustomTooltip } from "@/components/tooltip";
+
+import { clsx } from "clsx";
 import { ExternalLink } from "lucide-react";
+
+import { CustomTooltip } from "@/components/tooltip";
 
 interface Collaborator {
   id: string;
@@ -78,7 +80,6 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
                   "-ml-3": index > 0,
                 })}
               >
-                {/* Avatar container with gradient border */}
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-400 via-pink-500 to-rose-600 p-0.5 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
                   <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
                     {collaborator.avatar && (
@@ -114,7 +115,7 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
           <CustomTooltip title="Add collaborator" placement="top">
             <button
               onClick={onAddCollaborator}
-              className="group relative w-12 h-12 !p-0 rounded-full !border-2 !border-dashed !border-gray-300 !bg-gray-50 hover:!bg-rose-50 hover:!border-rose-400 transition-all duration-300 hover:!scale-105"
+              className="group relative !min-w-12 h-12 !p-0 rounded-full !border-2 !border-dashed !border-gray-300 !bg-gray-50 hover:!bg-rose-50 hover:!border-rose-400 transition-all duration-300 hover:!scale-105"
             >
               <div className="flex items-center justify-center">
                 <svg

@@ -1,28 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getAllMedias } from "@/api/media";
+import { useEffect, useState } from "react";
 
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import { clsx } from "clsx";
+import { saveAs } from "file-saver";
 import { motion } from "framer-motion";
+
+import { getAllMedias } from "@/api/media";
 import download from "@/assets/img/PinCap/download.png";
 import more from "@/assets/img/PinCap/more.png";
-import { notification } from "antd";
-import Loading from "@/components/loading/Loading";
 import AlbumDropdown from "@/components/albumDropdown";
+import BackButton from "@/components/backButton/BackButton";
+import FollowButton from "@/components/FollowButton";
+import Loading from "@/components/loading/Loading";
 import MediaViewer from "@/components/mediaViewer/MediaViewer";
-
-import "./index.less";
+import MediaList from "@/components/viewPin/ViewPinComponent";
+import { ROUTES } from "@/constants/routes";
+import { useMedia } from "@/react-query/useMedia";
 import { Media } from "@/types/type";
 import { FeelingType, getImageReactionWithId } from "@/utils/utils";
+
 import Comment from "./Comment/Comment";
-import { useSelector } from "react-redux";
-import { saveAs } from "file-saver";
-import BackButton from "@/components/backButton/BackButton";
-import MediaList from "@/components/viewPin/ViewPinComponent";
 import ListComments from "./ListComments/ListComments";
-import { useMedia } from "@/react-query/useMedia";
-import { ROUTES } from "@/constants/routes";
-import FollowButton from "@/components/FollowButton";
-import clsx from "clsx";
+
+import "./index.less";
 
 interface TokenPayload {
   id: string;
@@ -90,7 +92,7 @@ const DetailMedia = () => {
 
   const handleReaction = async () => {
     try {
-      let feelingId = FeelingType.HEART; // Hiện tại chỉ có một icon
+      const feelingId = FeelingType.HEART; // Hiện tại chỉ có một icon
       let newReactionCount: number;
 
       // Tính toán số lượng phản ứng

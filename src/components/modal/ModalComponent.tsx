@@ -1,7 +1,9 @@
 import React from "react";
+
+import { clsx } from "clsx";
+
 import { Modal } from "antd";
-import clsx from "clsx";
-import "./ModalComponent.less";
+import "@/components/modal/ModalComponent.less";
 
 interface ModalComponentProps {
   titleDefault?: string;
@@ -45,7 +47,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       footer={
         showFooter && [
           <button
-            className="cancel"
+            className="button-modal cancel"
             key="cancel"
             onClick={onCancel}
             disabled={confirmLoading}
@@ -53,7 +55,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
             {buttonLabels.cancelLabel}
           </button>,
           <button
-            className={clsx("confirm", {
+            className={clsx("button-modal confirm", {
               "opacity-50 cursor-not-allowed": confirmLoading,
             })}
             key="confirm"

@@ -1,8 +1,12 @@
 import React from "react";
-import "./CheckBoxComponent.less";
-import { Form, Checkbox, Tooltip } from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+
+import "@/components/form/checkbox/CheckBoxComponent.less";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
+import type { Rule } from "antd/es/form";
+
+import { Checkbox, Form } from "antd";
+
+import InfoTooltip from "@/components/tooltip/InfoTooltip";
 
 interface CheckboxWithDescriptionProps {
   title: string;
@@ -10,7 +14,7 @@ interface CheckboxWithDescriptionProps {
   onChange?: (e: CheckboxChangeEvent) => void;
   value?: boolean;
   name: string;
-  rules?: any[];
+  rules?: Rule[];
 }
 
 const CheckboxWithDescription: React.FC<CheckboxWithDescriptionProps> = ({
@@ -31,13 +35,7 @@ const CheckboxWithDescription: React.FC<CheckboxWithDescriptionProps> = ({
             className="custom-checkbox"
           />
           <span className="checkbox-title">{title}</span>
-          {description && (
-            <Tooltip title={description} placement="top">
-              <span className="checkbox-description">
-                <QuestionCircleOutlined className="custom-icon" />
-              </span>
-            </Tooltip>
-          )}
+          {description && <InfoTooltip title={description} />}
         </div>
       </div>
     </Form.Item>

@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import { useState } from "react";
+
 import "./MyAlbum.less";
-import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import { Album } from "type";
 import { useNavigate } from "react-router";
-import CreateAlbumModal from "@/components/modal/album/CreateAlbumModal";
-import { Col, Row } from "antd";
 import { toast } from "react-toastify";
+
+import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
+
+import { Col, Row } from "antd";
+
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import Loading from "@/components/loading/Loading";
-import AlbumCard from "./AlbumCard/AlbumCard";
-import { useAlbum } from "@/react-query/useAlbum";
+import CreateAlbumModal from "@/components/modal/album/CreateAlbumModal";
+import { InfoTooltip } from "@/components/tooltip";
 import { ROUTES } from "@/constants/routes";
+import { useAlbum } from "@/react-query/useAlbum";
+
+import { Album } from "type";
+
+import AlbumCard from "./AlbumCard/AlbumCard";
 
 const MyAlbum = () => {
   const navigate = useNavigate();
@@ -52,8 +59,14 @@ const MyAlbum = () => {
 
   const renderAlbumSection = (sectionTitle: string, albumsList: Album[]) => (
     <div className="album-section pt-2 border-b-3 last:border-b-0 border-[#9eb8d9] px-[20px]">
-      <h2 className="pl-2 text-xl font-bold !my-2 text-gray-800">
+      <h2 className="pl-2 text-xl font-bold !my-2 text-gray-800 flex items-center">
         {sectionTitle}
+        {sectionTitle === "Albums Shared with Me" && (
+          <InfoTooltip
+            title="These are albums that you have been invited to as a member. You can view and contribute to these albums."
+            placement="top"
+          />
+        )}
       </h2>
       <div className="p-3">
         <Row gutter={[24, 12]}>

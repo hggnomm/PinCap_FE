@@ -1,12 +1,16 @@
-import React, { useState } from "react";
-import { getDetailMedia } from "@/api/media";
-import { Divider } from "antd/es";
-import { Media } from "type";
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import { EllipsisOutlined } from "@ant-design/icons/lib";
-import ModalComponent from "@/components/modal/ModalComponent";
+import { useState } from "react";
+
 import { toast } from "react-toastify";
+
+import { EllipsisOutlined } from "@ant-design/icons/lib";
+
+import { Divider } from "antd/es";
+
+import { getDetailMedia } from "@/api/media";
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
+import ModalComponent from "@/components/modal/ModalComponent";
 import { useMedia } from "@/react-query/useMedia";
+import { Media } from "@/types/type";
 
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;
@@ -56,13 +60,13 @@ const DraftMedia = ({
       await deleteMedia([detailMedia.id]);
       setDeleteModalVisible(false);
       toast.success("Draft deleted successfully!");
-      
+
       // Reset selected media if it was the deleted one
       if (isSelectedMedia?.id === detailMedia.id) {
         setIsSelectedMedia(null);
         resetFormAndCloseDrawer();
       }
-      
+
       // Callback to refresh drafts list
       if (onDraftDeleted) {
         onDraftDeleted();

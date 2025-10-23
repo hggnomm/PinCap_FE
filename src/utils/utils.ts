@@ -1,13 +1,16 @@
-import { UploadFile } from "antd";
 import jwtdecode from "jwt-decode";
 
-import haha from "../assets/img/PinCap/haha.png";
-import sad from "../assets/img/PinCap/sad.png";
-import angry from "../assets/img/PinCap/angry.png";
-import heart from "../assets/img/PinCap/heart.png";
-import wow from "../assets/img/PinCap/wow.png";
-import black_heart from "../assets/img/PinCap/black-heart.png";
+import { UploadFile } from "antd";
+
+
+import angry from "@/assets/img/PinCap/angry.png";
+import black_heart from "@/assets/img/PinCap/black-heart.png";
+import haha from "@/assets/img/PinCap/haha.png";
+import heart from "@/assets/img/PinCap/heart.png";
+import sad from "@/assets/img/PinCap/sad.png";
+import wow from "@/assets/img/PinCap/wow.png";
 import { MEDIA_TYPES } from "@/constants/constants";
+
 
 export enum FeelingType {
   HEART = "9bd68a9e-da0e-4889-8656-520818a8dadf",
@@ -24,7 +27,7 @@ interface IJwtToken {
   auth: string;
 }
 
-export const decodedToken = (token: any): IJwtToken | null => {
+export const decodedToken = (token: string | null): IJwtToken | null => {
   if (!token) return null;
   return jwtdecode<IJwtToken>(token);
 };
@@ -151,4 +154,32 @@ export const parseMediaUrl = (mediaUrl: string | null | undefined): ParsedMediaU
     acc.push({ url, type });
     return acc;
   }, []);
+};
+
+/**
+ * Lấy URL ảnh đầu tiên từ media có type FLEXIBLE
+ * @param mediaUrl - URL string có thể là JSON array hoặc single URL
+ * @returns URL ảnh đầu tiên hoặc null nếu không tìm thấy
+ */
+export const getFirstImageUrl = (mediaUrl: string | null | undefined): string | null => {
+  if (!mediaUrl) {
+    return null;
+  }
+
+  try {
+    // Parse JSON array
+    const parsed = JSON.parse(mediaUrl);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      const firstUrl = parsed[0];
+      
+      // Check if URL has escaped characters and decode them
+      const decodedUrl = firstUrl.replace(/\\/g, '');
+      
+      return decodedUrl;
+    }
+    return String(parsed);
+  } catch {
+    // Nếu không parse được JSON, coi như single URL
+    return mediaUrl;
+  }
 };

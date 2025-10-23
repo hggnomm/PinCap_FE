@@ -1,17 +1,25 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+
 import "./DetailAlbum.less";
 import { useLocation, useNavigate } from "react-router";
-import MediaList from "@/components/viewPin/ViewPinComponent";
 import { toast } from "react-toastify";
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
+
 import { LockFilled, MoreOutlined } from "@ant-design/icons/lib";
-import { UpdateAlbumFormData } from "@/validation/album";
-import Loading from "@/components/loading/Loading";
+
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
-import { EditAlbumModal, DeleteAlbumModal, InviteCollaboratorsModal, CollaboratorsListModal } from "@/components/modal/album";
 import Empty, { NoMediaIcon } from "@/components/Empty";
-import { useAlbum } from "@/react-query/useAlbum";
+import Loading from "@/components/loading/Loading";
+import {
+  EditAlbumModal,
+  DeleteAlbumModal,
+  InviteCollaboratorsModal,
+  CollaboratorsListModal,
+} from "@/components/modal/album";
+import MediaList from "@/components/viewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
+import { useAlbum } from "@/react-query/useAlbum";
+import { UpdateAlbumFormData } from "@/validation/album";
 
 const DetailAlbum = () => {
   const location = useLocation();
@@ -20,11 +28,16 @@ const DetailAlbum = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
-  const [collaboratorsListModalVisible, setCollaboratorsListModalVisible] = useState(false);
+  const [collaboratorsListModalVisible, setCollaboratorsListModalVisible] =
+    useState(false);
 
   // Use React Query hooks
   const { getAlbumById, updateAlbum, deleteAlbum } = useAlbum();
-  const { data: albumData, isLoading: loading, error: queryError } = getAlbumById(albumId);
+  const {
+    data: albumData,
+    isLoading: loading,
+    error: queryError,
+  } = getAlbumById(albumId);
 
   useEffect(() => {
     if (!albumId) {
@@ -37,10 +50,9 @@ const DetailAlbum = () => {
     try {
       await updateAlbum({
         id: albumId,
-        data: albumRequest
+        data: albumRequest,
       });
       setEditModalVisible(false);
-      toast.success("Album updated successfully!");
     } catch (error) {
       console.error("Update failed:", error);
       toast.error("Failed to update album. Please try again.");
@@ -55,7 +67,9 @@ const DetailAlbum = () => {
       toast.success("Album deleted successfully!");
     } catch (error) {
       console.error("Error deleting album:", error);
-      toast.error("An error occurred while deleting the album. Please try again.");
+      toast.error(
+        "An error occurred while deleting the album. Please try again."
+      );
     }
   };
 
@@ -63,7 +77,9 @@ const DetailAlbum = () => {
     setInviteModalVisible(false);
     toast.info("Invite functionality will be implemented later");
   };
-  const error = queryError ? "Failed to fetch album. Please try again later." : null;
+  const error = queryError
+    ? "Failed to fetch album. Please try again later."
+    : null;
 
   return (
     <Loading isLoading={loading} error={error}>
@@ -82,11 +98,13 @@ const DetailAlbum = () => {
             {albumData?.description && (
               <p className="album_description">{albumData?.description}</p>
             )}
-            
+
             <CollaboratorsSection
               collaborators={albumData?.allUser || []}
               onAddCollaborator={() => setInviteModalVisible(true)}
-              onViewAllCollaborators={() => setCollaboratorsListModalVisible(true)}
+              onViewAllCollaborators={() =>
+                setCollaboratorsListModalVisible(true)
+              }
             />
           </div>
           <div>
@@ -123,11 +141,17 @@ const DetailAlbum = () => {
         )}
 
         {albumData?.medias && albumData.medias.length > 0 && (
-          <MediaList 
-            medias={albumData?.medias} 
-            isEditMedia 
+          <MediaList
+            medias={albumData?.medias}
+            isEditMedia
             isSaveMedia={false}
-            albumContext={{ inAlbum: true, albumId: albumId, onRemoved: () => { /* refetch handled by useAlbum invalidate */ } }}
+            albumContext={{
+              inAlbum: true,
+              albumId: albumId,
+              onRemoved: () => {
+                /* refetch handled by useAlbum invalidate */
+              },
+            }}
           />
         )}
 

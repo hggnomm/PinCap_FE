@@ -1,0 +1,21 @@
+.info-tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  margin-left: 8px;
+
+  .custom-icon {
+    color: #a25772;
+    font-size: 18px;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #ad081b;
+    }
+  }
+
+  &:hover .custom-icon {
+    color: #ad081b;
+  }
+}
