@@ -1,33 +1,33 @@
-import React from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import "./App.less";
-import CreateMedia from "./pages/PinCap/CreateMedia/CreateMedia";
-import Layout, { Content } from "antd/es/layout/layout";
-import PinCap from "./pages/PinCap/PinCap";
-import SiderCommon from "./components/sider/SiderCommon";
-import HeaderCommon from "./components/header/HeaderCommon";
-import ImageAi from "./pages/AITools/Images/ImageAi";
-import DetailMedia from "./pages/PinCap/DetailMedia/DetailMedia";
-import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
-import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
-import Login from "./pages/Auth/Login";
-import Register from "./pages/Auth/Register";
-import Home from "./pages/Home/Home";
-import MyAlbum from "./pages/PinCap/MyAlbum/MyAlbum";
-import MyMedia from "./pages/PinCap/MyMedia/MyMedia";
-import DetailAlbum from "./pages/PinCap/DetailAlbum/DetailAlbum";
-import Profile from "./pages/PinCap/Profile/Profile";
-import EditProfile from "./pages/PinCap/EditProfile/EditProfile";
-import UserProfile from "./pages/PinCap/UserProfile/UserProfile";
-import Search from "./pages/PinCap/Search/Search";
-import NotFound from "./pages/NotFound";
-import Forbidden from "./pages/Forbidden";
-import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+
+import Layout, { Content } from "antd/es/layout/layout";
+
+import { ConfigProvider } from "antd";
+
 import ChatbotProvider from "./components/chatbot/ChatbotProvider";
+import HeaderCommon from "./components/header/HeaderCommon";
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import SiderCommon from "./components/sider/SiderCommon";
 import { ROUTES } from "./constants/routes";
+import { ImageAi } from "./pages/AITools";
+import { Login, Register } from "./pages/Auth";
+import { Home, NotFound, Forbidden } from "./pages/Common";
+import {
+  PinCap,
+  CreateMedia,
+  DetailMedia,
+  DetailAlbum,
+  EditProfile,
+  MyAlbum,
+  MyMedia,
+  Profile,
+  Search,
+  UserProfile,
+} from "./pages/PinCap";
 import { useAuth } from "./react-query";
-import { Navigate } from "react-router-dom";
 
 const HomeRouteHandler = () => {
   const { user } = useAuth();

@@ -46,6 +46,7 @@ const DetailMedia = () => {
 
   const [media, setMedia] = useState<Media | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [shouldOpenComments, setShouldOpenComments] = useState(false);
 
   // Redirect to 404 if no media ID provided
   useEffect(() => {
@@ -53,6 +54,15 @@ const DetailMedia = () => {
       navigate(ROUTES.NOT_FOUND, { replace: true });
     }
   }, [id, navigate]);
+
+  useEffect(() => {
+    const rightLayout = document.querySelector(".right-layout");
+    if (rightLayout) {
+      rightLayout.scrollTo({ top: 0, left: 0 });
+    } else {
+      window.scrollTo({ top: 0, left: 0 });
+    }
+  }, [location.pathname]);
 
   // Redirect to 404 if media not found
   useEffect(() => {
@@ -69,12 +79,6 @@ const DetailMedia = () => {
       setError("Lỗi khi lấy chi tiết media: " + queryError.message);
     }
   }, [mediaData, queryError]);
-
-  useEffect(() => {
-    if (id) {
-      window.scrollTo(0, 0);
-    }
-  }, [id]);
 
   const handleFollowChange = (isFollowing: boolean, followersCount: number) => {
     setMedia((prevState) => {
@@ -143,6 +147,16 @@ const DetailMedia = () => {
     } else {
       navigate(ROUTES.USER_PROFILE.replace(":id", media.ownerUser.id));
     }
+  };
+
+  const handleCommentAdded = () => {
+    console.log("Comment added, opening comments dropdown");
+    setShouldOpenComments(true);
+    // Reset after a longer delay to allow the comment to be added and dropdown to open
+    setTimeout(() => {
+      console.log("Resetting shouldOpenComments to false");
+      setShouldOpenComments(false);
+    }, 1000);
   };
 
   return (
@@ -276,6 +290,7 @@ const DetailMedia = () => {
                     <ListComments
                       mediaId={media.id || id}
                       initialCommentCount={media.commentCount || 0}
+                      defaultOpen={shouldOpenComments}
                     />
                   )}
                   {!media?.is_comment && (
@@ -286,7 +301,9 @@ const DetailMedia = () => {
                 </div>
               </div>
               <div className="right-bottom-view">
-                {media?.is_comment && <Comment mediaId={id} />}
+                {media?.is_comment && (
+                  <Comment mediaId={id} onCommentAdded={handleCommentAdded} />
+                )}
               </div>
             </div>
           </div>

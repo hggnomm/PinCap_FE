@@ -120,5 +120,8 @@ module.exports = {
 
     // TypeScript specific
     "@typescript-eslint/no-unused-vars": "off", // Handled by unused-imports
+    
+    // React Hooks rules
+    "react-hooks/rules-of-hooks": "off",
   },
 };

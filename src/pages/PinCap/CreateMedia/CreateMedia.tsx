@@ -1,32 +1,33 @@
 import React, { useState, useEffect } from "react";
+
 import "./index.less";
 import "./FilePond.less";
-import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
-import Title from "antd/es/typography/Title";
-import { getDetailMedia, getMyMedias } from "@/api/media";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import clsx from "clsx";
-import { useMedia } from "@/react-query/useMedia";
-
 import { FilePond, registerPlugin } from "react-filepond";
+
+import { clsx } from "clsx";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "filepond-plugin-media-preview/dist/filepond-plugin-media-preview.min.css";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import FilePondPluginImageEdit from "filepond-plugin-image-edit";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginImageEdit from "filepond-plugin-image-edit";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
-// @ts-ignore
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginMediaPreview from "filepond-plugin-media-preview";
-import DraftMedia from "./DraftMedia";
-import { MediaFormValues } from "@/types/Media/MediaRequest";
-import { Media } from "@/types/type";
+
+import Title from "antd/es/typography/Title";
+
+import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
+
+import { getDetailMedia, getMyMedias } from "@/api/media";
 import ImageEditor from "@/components/imageEditor";
-import { EditOutlined } from "@ant-design/icons";
-import { MediaResponse } from "@/types/Media/MediaResponse";
 import { PRIVACY } from "@/constants/constants";
+import { useMedia } from "@/react-query/useMedia";
+import { Media } from "@/types/type";
+
+import DraftMedia from "./DraftMedia";
 
 registerPlugin(
   FilePondPluginImagePreview,
@@ -47,7 +48,6 @@ const CreateMedia: React.FC = () => {
   const { createMedia, updateMedia } = useMedia();
   const [isLoad, setIsLoad] = useState<boolean>(false);
   const [fileList, setFileList] = useState<File[]>([]);
-  const [isProcessingFiles, setIsProcessingFiles] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
   const [isSelectedDraft, setIsSelectedDraft] = useState<boolean>(false);
@@ -461,10 +461,7 @@ const CreateMedia: React.FC = () => {
                     files={fileList}
                     onupdatefiles={(fileItems) => {
                       setFileList(fileItems.map((item): any => item.file));
-                      setIsProcessingFiles(false);
                     }}
-                    onaddfilestart={() => setIsProcessingFiles(true)}
-                    onprocessfiles={() => setIsProcessingFiles(false)}
                     allowMultiple={true}
                     maxFiles={6}
                     maxFileSize="50MB"
