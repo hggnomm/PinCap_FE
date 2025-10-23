@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { clsx } from "clsx";
 import { saveAs } from "file-saver";
@@ -18,6 +18,7 @@ import MediaViewer from "@/components/mediaViewer/MediaViewer";
 import MediaList from "@/components/viewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 import { useMedia } from "@/react-query/useMedia";
+import { TokenPayload } from "@/types/Auth";
 import { Media } from "@/types/type";
 import { FeelingType, getImageReactionWithId } from "@/utils/utils";
 
@@ -26,15 +27,14 @@ import ListComments from "./ListComments/ListComments";
 
 import "./index.less";
 
-interface TokenPayload {
-  id: string;
-}
-
 const DetailMedia = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const id = location.state?.mediaId;
-  const tokenPayload = useSelector((state: any) => state.auth) as TokenPayload;
+  const params = useParams();
+  const id = params.id || location.state?.mediaId;
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
 
   const { mediaReaction, mediaReactionLoading } = useMedia();
 

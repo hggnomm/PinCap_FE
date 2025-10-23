@@ -10,6 +10,7 @@ import heart from "@/assets/img/PinCap/heart.png";
 import sad from "@/assets/img/PinCap/sad.png";
 import wow from "@/assets/img/PinCap/wow.png";
 import { MEDIA_TYPES } from "@/constants/constants";
+import { TokenPayload } from "@/types/Auth";
 
 
 export enum FeelingType {
@@ -20,16 +21,9 @@ export enum FeelingType {
   ANGRY = "9bd68b3e-dc1c-4327-9f23-69d8dc40dcb",
 }
 
-interface IJwtToken {
-  id: number;
-  exp: number;
-  sub: string;
-  auth: string;
-}
-
-export const decodedToken = (token: string | null): IJwtToken | null => {
+export const decodedToken = (token: string | null): TokenPayload | null => {
   if (!token) return null;
-  return jwtdecode<IJwtToken>(token);
+  return jwtdecode<TokenPayload>(token);
 };
 
 export const isImageFile = (file: UploadFile): boolean => {
