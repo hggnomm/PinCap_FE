@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import "./index.less";
 import "./FilePond.less";
+import { FilePond, registerPlugin } from "react-filepond";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FilePond, FileItem, registerPlugin } from "react-filepond";
 
 import { clsx } from "clsx";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "filepond-plugin-media-preview/dist/filepond-plugin-media-preview.min.css";
+import { FilePondFile } from "filepond";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginImageEdit from "filepond-plugin-image-edit";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
@@ -21,8 +22,9 @@ import Title from "antd/es/typography/Title";
 
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 
-import { getDetailMedia, getMyMedias } from "@/api/media";
+import { getDetailMedia } from "@/api/media";
 import ImageEditor from "@/components/imageEditor";
+import MediaViewer from "@/components/mediaViewer/MediaViewer";
 import { PRIVACY } from "@/constants/constants";
 import { useMediaToast } from "@/contexts/MediaToastContext";
 import { useMedia } from "@/react-query/useMedia";
@@ -45,7 +47,7 @@ const CreateMedia: React.FC = () => {
   const tokenPayload = useSelector(
     (state: { auth: TokenPayload }) => state.auth
   );
-  const { createMedia, updateMedia } = useMedia();
+  const { createMedia, updateMedia, getMyMedia } = useMedia();
   const { showToast } = useMediaToast();
   const [isLoad, setIsLoad] = useState<boolean>(false);
   const [fileList, setFileList] = useState<File[]>([]);
@@ -60,9 +62,13 @@ const CreateMedia: React.FC = () => {
   const [textCreateDraft, setTextCreateDraft] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
 
-  const [drafts, setDrafts] = useState<Media[]>([]);
-  const [loadingDrafts, setLoadingDrafts] = useState<boolean>(false);
   const [draftId, setDraftId] = useState<string>("");
+
+  const {
+    data: drafts = [],
+    isLoading: loadingDrafts,
+    refetch: refetchDrafts,
+  } = getMyMedia(1, false, drawerVisible);
 
   // Image Editor states
   const [isImageEditorVisible, setIsImageEditorVisible] =
@@ -71,11 +77,41 @@ const CreateMedia: React.FC = () => {
   const [editingImageIndex, setEditingImageIndex] = useState<number>(-1);
 
   // Ref for FilePond container
-  const filepondRef = React.useRef<HTMLDivElement>(null);
+  const filepondRef = useRef<HTMLDivElement>(null);
 
+  // Load media preview plugin dynamically
   useEffect(() => {
-    fetchDrafts();
+    const loadMediaPreview = async () => {
+      try {
+        const FilePondPluginMediaPreview = await import(
+          "filepond-plugin-media-preview"
+        );
+        registerPlugin(FilePondPluginMediaPreview.default);
+        console.log("Media preview plugin loaded successfully");
+      } catch (error) {
+        console.warn("Could not load media preview plugin:", error);
+      }
+    };
+    loadMediaPreview();
   }, []);
+
+  const handleSelectMedia = useCallback(
+    (media: Media) => {
+      form.setFieldsValue({
+        media_name: media.media_name,
+        description: media.description,
+        privacy: media.privacy == "PUBLIC" ? PRIVACY.PUBLIC : PRIVACY.PRIVATE,
+        tags_name: media.tags_name,
+        id: media.id,
+      });
+
+      setImageUrl(media.media_url);
+      setIsSelectedDraft(true);
+      setFileList([]);
+      setTags(media.tags_name || []);
+    },
+    [form]
+  );
 
   useEffect(() => {
     if (!form.getFieldValue("privacy")) {
@@ -98,30 +134,7 @@ const CreateMedia: React.FC = () => {
     };
 
     fetchDraftDetail();
-  }, [draftId, drafts]);
-
-  const fetchDrafts = async (isGenerateDraft = false) => {
-    setLoadingDrafts(true);
-    try {
-      const draftList = await getMyMedias({
-        pageParam: 1,
-        is_created: false,
-      });
-
-      if (draftList) {
-        setDrafts(draftList);
-
-        if (isGenerateDraft && draftList.length > 0) {
-          setDraftId(draftList[0].id);
-          handleSelectMedia(draftList[0]);
-        }
-      }
-    } catch (error) {
-      toast.error("Error fetching drafts: " + error);
-    } finally {
-      setLoadingDrafts(false);
-    }
-  };
+  }, [draftId, drafts, handleSelectMedia]);
 
   useEffect(() => {
     if (fileList.length > 0) {
@@ -252,7 +265,7 @@ const CreateMedia: React.FC = () => {
       }
 
       setDraftId("");
-      fetchDrafts();
+      refetchDrafts();
       resetForm();
     } catch (error: unknown) {
       toast.error(
@@ -277,21 +290,6 @@ const CreateMedia: React.FC = () => {
     setIsFormDisabled(true);
     setIsSelectedDraft(false);
     setDraftId("");
-  };
-
-  const handleSelectMedia = (media: Media) => {
-    form.setFieldsValue({
-      media_name: media.media_name,
-      description: media.description,
-      privacy: media.privacy == "PUBLIC" ? PRIVACY.PUBLIC : PRIVACY.PRIVATE,
-      tags_name: media.tags_name,
-      id: media.id,
-    });
-
-    setImageUrl(media.media_url);
-    setIsSelectedDraft(true);
-    setFileList([]);
-    setTags(media.tags_name || []);
   };
 
   const handleOpenImageEditor = (index: number = 0) => {
@@ -394,6 +392,7 @@ const CreateMedia: React.FC = () => {
       timers.forEach((timer) => clearTimeout(timer));
       observer.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileList]);
 
   return (
@@ -452,19 +451,39 @@ const CreateMedia: React.FC = () => {
           >
             {imageUrl && (
               <div className="draft-img relative">
-                <img
-                  className="transition-all duration-300"
-                  src={imageUrl}
-                  alt="media preview"
-                />
-                {/* <Button
-                  type="primary"
-                  shape="circle"
-                  icon={<EditOutlined />}
-                  onClick={() => handleOpenImageEditor(0)}
-                  className="absolute top-2 right-2 !bg-rose-600 hover:!bg-rose-700 !border-rose-600 hover:!border-rose-700 shadow-lg z-10 !p-2"
-                  size="large"
-                /> */}
+                {(() => {
+                  const isFlexibleMedia = (() => {
+                    try {
+                      const parsed = JSON.parse(imageUrl);
+                      return Array.isArray(parsed) && parsed.length > 1;
+                    } catch {
+                      return false;
+                    }
+                  })();
+
+                  if (isFlexibleMedia) {
+                    const mockMedia = {
+                      id: draftId,
+                      media_url: imageUrl,
+                      type: null,
+                    } as Media;
+
+                    return (
+                      <MediaViewer
+                        media={mockMedia}
+                        className="!min-h-0 !w-auto [&_.media-viewer]:!min-h-0 [&_.media-viewer]:!w-auto [&_.media-viewer-container]:!min-h-0 [&_.media-viewer-container]:!w-auto [&_.media-element]:!max-h-[65vh] [&_.media-element]:!w-auto"
+                      />
+                    );
+                  } else {
+                    return (
+                      <img
+                        className="transition-all duration-300"
+                        src={imageUrl}
+                        alt="media preview"
+                      />
+                    );
+                  }
+                })()}
               </div>
             )}
             {!imageUrl && (
@@ -478,15 +497,21 @@ const CreateMedia: React.FC = () => {
                   <FilePond
                     files={fileList}
                     onupdatefiles={(fileItems) => {
-                      setFileList(fileItems.map((item: FileItem) => item.file));
+                      setFileList(
+                        fileItems.map((item: FilePondFile) => item.file as File)
+                      );
                     }}
                     allowMultiple={true}
                     maxFiles={6}
-                    maxFileSize="50MB"
+                    maxFileSize={(20 * 1024 * 1024).toString()}
                     acceptedFileTypes={["image/*", "video/*"]}
                     labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
                     imagePreviewMarkupShow
                     itemInsertLocation="after"
+                    allowRevert={false}
+                    allowRemove={true}
+                    allowReplace={true}
+                    instantUpload={false}
                   />
                 </Form.Item>
               </div>
@@ -570,7 +595,7 @@ const CreateMedia: React.FC = () => {
           onSelectMedia={handleSelectMedia}
           drafts={drafts}
           loadingDrafts={loadingDrafts}
-          onDraftDeleted={fetchDrafts}
+          onDraftDeleted={refetchDrafts}
         />
       </Drawer>
 

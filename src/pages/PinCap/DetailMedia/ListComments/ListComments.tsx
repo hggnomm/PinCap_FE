@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import { useInView } from "react-intersection-observer";
 import Zoom from "react-medium-image-zoom";
@@ -31,6 +31,7 @@ const ListComments: React.FC<ListCommentsProps> = ({
   const [allComments, setAllComments] = useState<Comment[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const { ref, inView } = useInView();
+  const commentsContainerRef = useRef<HTMLDivElement>(null);
 
   const {
     data,
@@ -65,6 +66,20 @@ const ListComments: React.FC<ListCommentsProps> = ({
     }
   }, [defaultOpen]);
 
+  useEffect(() => {
+    if (defaultOpen && isOpen) {
+      setTimeout(() => {
+        const mainView = document.querySelector(".main-view.custom-scroll-bar");
+        if (mainView) {
+          mainView.scrollTo({
+            top: mainView.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      }, 500);
+    }
+  }, [defaultOpen, isOpen]);
+
   const handleNavigateToProfile = (userId: string) => {
     if (!userId) return;
 
@@ -93,7 +108,7 @@ const ListComments: React.FC<ListCommentsProps> = ({
         )}
 
         {!isLoading && displayComments.length > 0 && (
-          <div>
+          <div ref={commentsContainerRef}>
             {displayComments?.map((comment: Comment, index: number) => {
               const isLastComment = index === displayComments.length - 1;
 

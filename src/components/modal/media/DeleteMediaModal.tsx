@@ -1,4 +1,5 @@
 import React from "react";
+
 import ModalComponent from "@/components/modal/ModalComponent";
 import { Media } from "@/types/type";
 
@@ -26,7 +27,15 @@ const DeleteMediaModal: React.FC<DeleteMediaModalProps> = ({
     >
       <div className="delete-media-modal">
         <p className="text-base text-gray-700 mb-4">
-          Are you sure you want to delete <span className="font-semibold">"{media?.media_name}"</span>?
+          Are you sure you want to delete{" "}
+          {media?.media_name ? (
+            <span className="font-semibold">
+              &quot;{media.media_name}&quot;
+            </span>
+          ) : (
+            "this Media"
+          )}
+          ?
         </p>
         <p className="text-sm text-gray-500">
           This action cannot be undone. The media will be permanently deleted.
@@ -37,4 +46,3 @@ const DeleteMediaModal: React.FC<DeleteMediaModalProps> = ({
 };
 
 export default DeleteMediaModal;
-

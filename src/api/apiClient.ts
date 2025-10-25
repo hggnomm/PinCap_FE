@@ -1,8 +1,9 @@
 import axios from "axios";
-import { showApiError } from "@/utils/errorHandler";
-import { ROUTES } from "@/constants/routes";
 
-const baseUrl = (import.meta as any).env.VITE_BASE_API;
+import { ROUTES } from "@/constants/routes";
+import { showApiError } from "@/utils/errorHandler";
+
+const baseUrl = (import.meta as unknown as { env: { VITE_BASE_API: string } }).env.VITE_BASE_API;
 
 const apiClient = axios.create({
   baseURL: baseUrl,
@@ -69,7 +70,7 @@ apiClient.interceptors.response.use(
       };
     }
 
-    if (!error.config?.skipErrorNotification) {
+    if (error.config?.showErrorNotification) {
       showApiError(errorData);
     }
 

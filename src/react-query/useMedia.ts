@@ -23,20 +23,27 @@ export const useMedia = () => {
     });
   };
 
-  const getMyMedia = (page = 1, isCreated = true) => {
+  const getMyMedia = (page = 1, isCreated = true, enabled = true) => {
     return useQuery({
       queryKey: ['medias', 'my-media', isCreated ? 'created' : 'saved', page],
       queryFn: () => media.getMyMedias({ pageParam: page, is_created: isCreated }),
+      enabled: enabled,
       staleTime: 5 * 60 * 1000,
     });
   };
 
   const createMediaMutation = useMutation({
     mutationFn: (data: CreateMediaFormData) => media.createMedia(data),
-    onSuccess: () => {
+    onSuccess: (_, data) => {
       queryClient.invalidateQueries({ queryKey: ['medias'] });
       queryClient.invalidateQueries({ queryKey: ['medias', 'all'] });
       queryClient.invalidateQueries({ queryKey: ['medias', 'my-media'] });
+      
+      if (data.is_created === false) {
+        queryClient.invalidateQueries({ queryKey: ['medias', 'my-media', 'saved'] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['medias', 'my-media', 'created'] });
+      }
     },
   });
 
