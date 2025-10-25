@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input } from "antd";
+
 import { toast } from "react-toastify";
-import ModalComponent from "@/components/modal/ModalComponent";
-import FieldItem from "@/components/form/fieldItem/FieldItem";
+
+import { CheckboxChangeEvent } from "antd/es/checkbox";
+
+import { Form, Input } from "antd";
+
 import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
-import { Media } from "@/types/type";
-import { useMedia } from "@/react-query/useMedia";
-import { PRIVACY } from "@/constants/constants";
-import MediaViewer from "@/components/mediaViewer/MediaViewer";
+import FieldItem from "@/components/form/fieldItem/FieldItem";
 import Loading from "@/components/loading/Loading";
+import MediaViewer from "@/components/mediaViewer/MediaViewer";
+import ModalComponent from "@/components/modal/ModalComponent";
+import { PRIVACY } from "@/constants/constants";
 import { useAlbum } from "@/react-query/useAlbum";
+import { useMedia } from "@/react-query/useMedia";
+import { Media } from "@/types/type";
 
 interface EditMediaModalProps {
   visible: boolean;
@@ -75,8 +80,8 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
       onCancel();
       toast.success("Media updated successfully!");
       onSuccess?.();
-    } catch (error: any) {
-      if (error.errorFields) {
+    } catch (error: unknown) {
+      if (error instanceof Error && "errorFields" in error) {
         toast.error("Please fill in all required fields!");
       } else {
         console.error("Update error:", error);
@@ -85,11 +90,11 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
     }
   };
 
-  const handlePrivacyChange = (e: any) => {
+  const handlePrivacyChange = (e: CheckboxChangeEvent) => {
     setPrivacy(e.target.checked);
   };
 
-  const handleCommentChange = (e: any) => {
+  const handleCommentChange = (e: CheckboxChangeEvent) => {
     setIsComment(e.target.checked);
   };
 
@@ -110,9 +115,6 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
               <FieldItem
                 label="Title"
                 name="media_name"
-                rules={[
-                  { required: true, message: "Please input the media title!" },
-                ]}
                 placeholder="Add a title"
               >
                 <Input />
@@ -158,7 +160,10 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
                 className="cursor-pointer p-2 text-left hover:scale-[0.99] hover:bg-gray-100 transition-transform mt-3 rounded-lg"
                 onClick={async () => {
                   try {
-                    await removeMediasFromAlbum({ album_id: albumId, medias_id: [media.id] });
+                    await removeMediasFromAlbum({
+                      album_id: albumId,
+                      medias_id: [media.id],
+                    });
                     toast.success("Removed media from album");
                     onRemovedFromAlbum?.();
                     onCancel();
@@ -167,9 +172,12 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
                   }
                 }}
               >
-                <p className="font-medium text-lg text-gray-900">Remove from this album</p>
+                <p className="font-medium text-lg text-gray-900">
+                  Remove from this album
+                </p>
                 <p className="text-sm text-gray-500 font-medium">
-                  This only removes the media from the album, it will not be deleted.
+                  This only removes the media from the album, it will not be
+                  deleted.
                 </p>
               </div>
             )}

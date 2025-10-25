@@ -1,13 +1,18 @@
+import { useEffect } from "react";
+
+import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router";
+
+import { useInfiniteQuery } from "@tanstack/react-query";
+
+import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
+
 import { getMyMedias } from "@/api/media";
 import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import MediaList from "@/components/viewPin/ViewPinComponent";
 import Loading from "@/components/loading/Loading";
+import MediaList from "@/components/viewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
-import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
-import { useNavigate } from "react-router";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useInView } from "react-intersection-observer";
+
 import "./MyMedia.less";
 
 const MyMedia = () => {
@@ -18,7 +23,6 @@ const MyMedia = () => {
   const {
     data,
     status,
-    error,
     fetchNextPage,
     isFetchingNextPage,
     isFetching,
@@ -42,7 +46,7 @@ const MyMedia = () => {
   const medias = data?.pages.flat() || [];
 
   return (
-    <Loading isLoading={isFetching || isFetchingNextPage} error={error}>
+    <Loading isLoading={isFetching || isFetchingNextPage}>
       <div className="media-container">
         <div className="fixed-topbar !sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]">
           <div className="text-head">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 
 import "./MyAlbum.less";
 import { useSelector } from "react-redux";
@@ -11,7 +11,6 @@ import { Col, Row } from "antd";
 
 import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import Loading from "@/components/loading/Loading";
-import CreateAlbumModal from "@/components/modal/album/CreateAlbumModal";
 import { InfoTooltip } from "@/components/tooltip";
 import { ROUTES } from "@/constants/routes";
 import { useAlbum } from "@/react-query/useAlbum";
@@ -21,6 +20,9 @@ import { Album } from "type";
 
 import AlbumCard from "./AlbumCard/AlbumCard";
 
+const CreateAlbumModal = lazy(
+  () => import("@/components/modal/album/CreateAlbumModal")
+);
 const MyAlbum = () => {
   const navigate = useNavigate();
   const tokenPayload = useSelector(
@@ -125,12 +127,14 @@ const MyAlbum = () => {
           </div>
         </div>
 
-        <CreateAlbumModal
-          visible={modalVisible}
-          onCancel={handleCancel}
-          onConfirm={handleConfirm}
-          loading={createAlbumLoading}
-        />
+        <Suspense fallback={<></>}>
+          <CreateAlbumModal
+            visible={modalVisible}
+            onCancel={handleCancel}
+            onConfirm={handleConfirm}
+            loading={createAlbumLoading}
+          />
+        </Suspense>
       </div>
     </Loading>
   );

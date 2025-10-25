@@ -1,6 +1,5 @@
-import React from "react";
-import MediaList from "@/components/viewPin/ViewPinComponent";
 import { getAllMedias } from "@/api/media";
+import MediaList from "@/components/viewPin/ViewPinComponent";
 
 const PinCap = () => {
   window.scrollTo(0, 0);

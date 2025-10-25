@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense, lazy } from "react";
 
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,6 @@ import { Form } from "antd";
 import { getDetailMedia } from "@/api/media";
 import AlbumDropdown from "@/components/albumDropdown";
 import DotsPagination from "@/components/dotsPagination/DotsPagination";
-import { DeleteMediaModal, EditMediaModal } from "@/components/modal/media";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { useMedia } from "@/react-query/useMedia";
 import { ParsedMediaUrl, parseMediaUrl } from "@/utils/utils";
@@ -25,6 +24,12 @@ import "react-medium-image-zoom/dist/styles.css";
 import { Media } from "type";
 import "./index.less";
 
+const EditMediaModal = lazy(
+  () => import("@/components/modal/media/EditMediaModal")
+);
+const DeleteMediaModal = lazy(
+  () => import("@/components/modal/media/DeleteMediaModal")
+);
 interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
   srcUrl: string;
@@ -242,39 +247,41 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         )}
       </motion.div>
 
-      {/* Edit Media Modal */}
-      <EditMediaModal
-        visible={editModalVisible}
-        media={loading ? null : media || null}
-        onCancel={() => {
-          setEditModalVisible(false);
-          setIsFirstOpen(true); // Reset for next open
-        }}
-        onDeleteClick={() => {
-          setEditModalVisible(false);
-          setDeleteModalVisible(true);
-        }}
-        onSuccess={() => {
-          // Refetch media detail to update UI
-          fetchMediaDetail(data.id);
-        }}
-        inAlbumContext={!!albumContext?.inAlbum}
-        albumId={albumContext?.albumId}
-        onRemovedFromAlbum={() => {
-          albumContext?.onRemoved?.();
-        }}
-      />
+      <Suspense fallback={<></>}>
+        {/* Edit Media Modal */}
+        <EditMediaModal
+          visible={editModalVisible}
+          media={loading ? null : media || null}
+          onCancel={() => {
+            setEditModalVisible(false);
+            setIsFirstOpen(true); // Reset for next open
+          }}
+          onDeleteClick={() => {
+            setEditModalVisible(false);
+            setDeleteModalVisible(true);
+          }}
+          onSuccess={() => {
+            // Refetch media detail to update UI
+            fetchMediaDetail(data.id);
+          }}
+          inAlbumContext={!!albumContext?.inAlbum}
+          albumId={albumContext?.albumId}
+          onRemovedFromAlbum={() => {
+            albumContext?.onRemoved?.();
+          }}
+        />
 
-      {/* Delete Media Modal */}
-      <DeleteMediaModal
-        visible={deleteModalVisible}
-        media={media || null}
-        onCancel={() => {
-          setDeleteModalVisible(false);
-          setEditModalVisible(true);
-        }}
-        onConfirm={handleDeleteMedia}
-      />
+        {/* Delete Media Modal */}
+        <DeleteMediaModal
+          visible={deleteModalVisible}
+          media={media || null}
+          onCancel={() => {
+            setDeleteModalVisible(false);
+            setEditModalVisible(true);
+          }}
+          onConfirm={handleDeleteMedia}
+        />
+      </Suspense>
     </>
   );
 };

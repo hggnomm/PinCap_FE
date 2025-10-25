@@ -37,7 +37,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            zIndex: 9999,
+            zIndex: 10,
           }}
         >
           <ClipLoader size={50} color={"#fff"} loading={isLoading} />

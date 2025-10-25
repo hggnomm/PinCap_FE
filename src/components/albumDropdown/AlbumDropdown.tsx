@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense, lazy } from "react";
+
 import { createPortal } from "react-dom";
 import { toast } from "react-toastify";
+
+import { useQueryClient } from "@tanstack/react-query";
+import { clsx } from "clsx";
+
 import { addMediasToAlbum } from "@/api/album";
-import clsx from "clsx";
-import { CreateAlbumModal } from "@/components/modal/album";
+import { BaseTabs } from "@/components/baseTabs";
+import Empty from "@/components/Empty/Empty";
+import Loading from "@/components/loading/Loading";
+import { ALBUM_TABS } from "@/constants/constants";
 import { useAlbum } from "@/react-query/useAlbum";
 import { CreateAlbumFormData } from "@/validation";
-import { BaseTabs } from "@/components/baseTabs";
-import { useQueryClient } from "@tanstack/react-query";
-import Loading from "@/components/loading/Loading";
-import Empty from "@/components/Empty/Empty";
-import { ALBUM_TABS } from "@/constants/constants";
 
-// Global state to track which dropdown is open
+const CreateAlbumModal = lazy(
+  () => import("@/components/modal/album/CreateAlbumModal")
+);
+
 let currentOpenDropdown: string | null = null;
 const dropdownListeners: Map<string, () => void> = new Map();
 
@@ -425,7 +430,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
       {showDropdown &&
         createPortal(
           <div
-            className="album-dropdown-menu min-h-[430px] absolute w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] max-h-96 flex flex-col"
+            className="album-dropdown-menu min-h-[430px] absolute w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-[10] max-h-96 flex flex-col"
             style={{
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,
@@ -592,12 +597,14 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
           document.body
         )}
 
-      <CreateAlbumModal
-        visible={showCreateModal}
-        onCancel={handleCreateModalCancel}
-        onConfirm={handleCreateAlbum}
-        loading={createAlbumLoading}
-      />
+      <Suspense fallback={<></>}>
+        <CreateAlbumModal
+          visible={showCreateModal}
+          onCancel={handleCreateModalCancel}
+          onConfirm={handleCreateAlbum}
+          loading={createAlbumLoading}
+        />
+      </Suspense>
     </>
   );
 };
