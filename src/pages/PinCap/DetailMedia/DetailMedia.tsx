@@ -42,7 +42,7 @@ const DetailMedia = () => {
     data: mediaData,
     isLoading: loading,
     error: queryError,
-  } = useMedia().getMediaById(id);
+  } = useMedia().getMediaById(id, true);
 
   const [media, setMedia] = useState<Media | null>(null);
   const [error, setError] = useState<string | null>(null);

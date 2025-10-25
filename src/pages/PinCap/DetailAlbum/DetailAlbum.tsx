@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import "./DetailAlbum.less";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
@@ -19,12 +20,17 @@ import {
 import MediaList from "@/components/viewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 import { useAlbum } from "@/react-query/useAlbum";
+import { TokenPayload } from "@/types/Auth";
+import { isAlbumOwner } from "@/utils/utils";
 import { UpdateAlbumFormData } from "@/validation/album";
 
 const DetailAlbum = () => {
   const location = useLocation();
   const albumId = location.state?.albumId;
   const navigate = useNavigate();
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
@@ -77,12 +83,11 @@ const DetailAlbum = () => {
     setInviteModalVisible(false);
     toast.info("Invite functionality will be implemented later");
   };
-  const error = queryError
-    ? "Failed to fetch album. Please try again later."
-    : null;
+
+  const isOwner = albumData ? isAlbumOwner(albumData, tokenPayload.id) : false;
 
   return (
-    <Loading isLoading={loading} error={error}>
+    <Loading isLoading={loading}>
       <div className="album-detail-container">
         <div className="top-container">
           <div className="detail">
@@ -105,6 +110,7 @@ const DetailAlbum = () => {
               onViewAllCollaborators={() =>
                 setCollaboratorsListModalVisible(true)
               }
+              isOwner={isOwner}
             />
           </div>
           <div>
@@ -124,9 +130,12 @@ const DetailAlbum = () => {
                 {
                   key: "1",
                   title: "Edit Album",
-                  onClick: () => {
-                    setEditModalVisible(true);
-                  },
+                  onClick: isOwner
+                    ? () => setEditModalVisible(true)
+                    : () =>
+                        toast.warning(
+                          "You don't have permission to edit this album"
+                        ),
                 },
               ]}
             />

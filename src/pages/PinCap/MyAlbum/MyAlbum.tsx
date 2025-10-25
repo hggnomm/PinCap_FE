@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import "./MyAlbum.less";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
@@ -14,6 +15,7 @@ import CreateAlbumModal from "@/components/modal/album/CreateAlbumModal";
 import { InfoTooltip } from "@/components/tooltip";
 import { ROUTES } from "@/constants/routes";
 import { useAlbum } from "@/react-query/useAlbum";
+import { TokenPayload } from "@/types/Auth";
 
 import { Album } from "type";
 
@@ -21,15 +23,15 @@ import AlbumCard from "./AlbumCard/AlbumCard";
 
 const MyAlbum = () => {
   const navigate = useNavigate();
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
   const { getAlbumList, getAlbumMemberList, createAlbum, createAlbumLoading } =
     useAlbum();
 
-  const { data: albumsData, isLoading, error, refetch } = getAlbumList();
-  const {
-    data: memberAlbumsData,
-    isLoading: isMemberLoading,
-    error: memberError,
-  } = getAlbumMemberList();
+  const { data: albumsData, isLoading } = getAlbumList();
+  const { data: memberAlbumsData, isLoading: isMemberLoading } =
+    getAlbumMemberList();
 
   // MODAL COMPONENTS
   const [modalVisible, setModalVisible] = useState(false);
@@ -72,7 +74,11 @@ const MyAlbum = () => {
         <Row gutter={[24, 12]}>
           {albumsList?.map((album: Album) => (
             <Col key={album.id} xs={24} sm={12} md={8} lg={8} xl={6}>
-              <AlbumCard album={album} fetchAlbums={refetch} />
+              <AlbumCard
+                album={album}
+                currentUserId={tokenPayload.id}
+                isMyAlbum={sectionTitle === "My Albums"}
+              />
             </Col>
           ))}
         </Row>
@@ -81,14 +87,7 @@ const MyAlbum = () => {
   );
 
   return (
-    <Loading
-      isLoading={isLoading || isMemberLoading}
-      error={
-        error || memberError
-          ? "Failed to fetch albums. Please try again later."
-          : null
-      }
-    >
+    <Loading isLoading={isLoading || isMemberLoading}>
       <div className="album-container">
         <div className="my-list-media">
           <div className="action sticky top-0 !z-20 bg-white !pb-3 shadow-[0_2px_4px_rgba(0,0,0,0.05)]">

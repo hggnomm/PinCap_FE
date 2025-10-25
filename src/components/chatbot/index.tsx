@@ -1,15 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Send } from "lucide-react";
-import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
+
 import Markdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { addMessage, setTyping } from "@/store/chatSlice";
-import "./index.less";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+
+import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
+import { motion } from "framer-motion";
+import { Send } from "lucide-react";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 import { CloseCircleOutlined } from "@ant-design/icons";
+
+import { addMessage, setTyping } from "@/store/chatSlice";
+import { RootState } from "@/store/store";
+import "./index.less";
 
 interface ChatbotProps {
   toggleChatbot: () => void;
@@ -118,16 +122,35 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
         </code>
       );
     },
-    h1: ({ node, ...props }: any) => (
-      <h1 style={{ fontSize: "2em", fontWeight: "bold" }} {...props} />
-    ),
-    h2: ({ node, ...props }: any) => (
-      <h2 style={{ fontSize: "1.5em", fontWeight: "bold" }} {...props} />
-    ),
-    h3: ({ node, ...props }: any) => (
-      <h3 style={{ fontSize: "1.17em", fontWeight: "bold" }} {...props} />
-    ),
-    li: ({ node, children, ...props }: any) => (
+    h1: ({
+      node,
+      ...props
+    }: {
+      node?: React.ReactNode;
+      children: React.ReactNode;
+    }) => <h1 style={{ fontSize: "2em", fontWeight: "bold" }} {...props} />,
+    h2: ({
+      node,
+      ...props
+    }: {
+      node?: React.ReactNode;
+      children: React.ReactNode;
+    }) => <h2 style={{ fontSize: "1.5em", fontWeight: "bold" }} {...props} />,
+    h3: ({
+      node,
+      ...props
+    }: {
+      node?: React.ReactNode;
+      children: React.ReactNode;
+    }) => <h3 style={{ fontSize: "1.17em", fontWeight: "bold" }} {...props} />,
+    li: ({
+      node,
+      children,
+      ...props
+    }: {
+      node?: React.ReactNode;
+      children: React.ReactNode;
+    }) => (
       <li style={{ listStyleType: "none", marginBottom: "0.5em" }} {...props}>
         {children}
       </li>
@@ -140,7 +163,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 100 }}
       transition={{ duration: 0.5 }}
-      className="chatbot-window"
+      className="chatbot-window z-10"
     >
       <div className="chatbot-header">
         <span style={{ fontWeight: 500 }}>Pinbot: Virtual Assistant</span>

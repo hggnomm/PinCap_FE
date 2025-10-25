@@ -25,11 +25,12 @@ const ListComments: React.FC<ListCommentsProps> = ({
   initialCommentCount = 0,
   defaultOpen = false,
 }) => {
-  const { getInfiniteComments } = useComment();
+  const { getInfiniteCommentsWithEnabled } = useComment();
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
   const [allComments, setAllComments] = useState<Comment[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [hasBeenOpened, setHasBeenOpened] = useState(false);
   const { ref, inView } = useInView();
   const commentsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +41,7 @@ const ListComments: React.FC<ListCommentsProps> = ({
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
-  } = getInfiniteComments(mediaId);
+  } = getInfiniteCommentsWithEnabled(mediaId, hasBeenOpened);
 
   useEffect(() => {
     if (data?.pages) {
@@ -63,6 +64,7 @@ const ListComments: React.FC<ListCommentsProps> = ({
   useEffect(() => {
     if (defaultOpen) {
       setIsOpen(true);
+      setHasBeenOpened(true);
     }
   }, [defaultOpen]);
 
@@ -97,7 +99,11 @@ const ListComments: React.FC<ListCommentsProps> = ({
       className="user_comment"
       activeKey={totalComments === 0 ? [] : isOpen ? ["1"] : []}
       onChange={(keys) => {
-        setIsOpen(keys.includes("1"));
+        const isOpening = keys.includes("1");
+        setIsOpen(isOpening);
+        if (isOpening && !hasBeenOpened) {
+          setHasBeenOpened(true);
+        }
       }}
     >
       <Collapse.Panel key="1" header={`${totalComments} Comments`}>

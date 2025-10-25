@@ -1,4 +1,7 @@
+import { CreateMediaFormData } from "@/validation/media";
+
 import { Media } from "type";
+
 import apiClient from "./apiClient";
 
 export const getAllMedias = async ({
@@ -41,7 +44,7 @@ export const getMyMedias = async ({
   }
 };
 
-export const createMedia = async (request: any) => {
+export const createMedia = async (request: CreateMediaFormData) => {
   try {
     const res = await apiClient.post("/api/medias", request, {
       headers: {
@@ -54,7 +57,7 @@ export const createMedia = async (request: any) => {
   }
 };
 
-export const updatedMedia = async (mediaId: string, request: any) => {
+export const updatedMedia = async (mediaId: string, request: CreateMediaFormData) => {
   try {
     const res = await apiClient.put(`/api/medias/${mediaId}`, request);
     return res.data;
@@ -63,7 +66,7 @@ export const updatedMedia = async (mediaId: string, request: any) => {
   }
 };
 
-export const getDetailMedia = async (id: any, tag_flg?: boolean) => {
+export const getDetailMedia = async (id: string, tag_flg?: boolean) => {
   try {
     const res = await apiClient.get(`/api/medias/${id}`, {
       params: {
@@ -76,7 +79,10 @@ export const getDetailMedia = async (id: any, tag_flg?: boolean) => {
   }
 };
 
-export const mediaReactions = async (request: any) => {
+export const mediaReactions = async (request: {
+  media_id: string;
+  feeling_id: string;
+}) => {
   try {
     const res = await apiClient.post(`/api/medias/reactions`, request);
     return res.data;

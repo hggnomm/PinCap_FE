@@ -142,7 +142,6 @@ export const useAlbum = () => {
     updateAlbumLoading: updateAlbumMutation.isPending,
     updateAlbumError: updateAlbumMutation.error,
     deleteAlbum: deleteAlbumMutation.mutateAsync,
-    deleteAlbumLoading: deleteAlbumMutation.isPending,
     deleteAlbumError: deleteAlbumMutation.error,
     removeMediasFromAlbum: removeMediasFromAlbumMutation.mutateAsync,
     removeMediasFromAlbumLoading: removeMediasFromAlbumMutation.isPending,
