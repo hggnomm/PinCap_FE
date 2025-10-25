@@ -14,20 +14,27 @@ import {
 import { ROUTES } from "@/constants/routes";
 import { useAlbum } from "@/react-query/useAlbum";
 import { Album } from "@/types/type";
+import { isAlbumOwner } from "@/utils/utils";
 import { UpdateAlbumFormData } from "@/validation/album";
 
 interface AlbumCardProps {
   album: Album;
-  fetchAlbums: () => void; // Accept the fetchAlbums function as a prop
+  currentUserId: string; // Current user ID to check permissions
+  isMyAlbum?: boolean; // Whether this is from "My Albums" (always owner) or "Shared Albums"
 }
 
-const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
+const AlbumCard: React.FC<AlbumCardProps> = ({
+  album,
+  currentUserId,
+  isMyAlbum = false,
+}) => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const navigate = useNavigate();
-  const { updateAlbum, updateAlbumLoading, deleteAlbum, deleteAlbumLoading } =
-    useAlbum();
+  const { updateAlbum, updateAlbumLoading, deleteAlbum } = useAlbum();
+
+  const isOwner = isMyAlbum || isAlbumOwner(album, currentUserId);
 
   const handleEditAlbum = async (albumRequest: UpdateAlbumFormData) => {
     try {
@@ -81,15 +88,17 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ album, fetchAlbums }) => {
             </div>
           )}
           <div className="overlay">
-            <div
-              className="circle-button right-bottom"
-              onClick={(e) => {
-                e.stopPropagation(); // Ngừng sự kiện click của phần tử cha khi nhấn vào button
-                setEditModalVisible(true);
-              }}
-            >
-              <EditFilled />
-            </div>
+            {isOwner && (
+              <div
+                className="circle-button right-bottom"
+                onClick={(e) => {
+                  e.stopPropagation(); // Ngừng sự kiện click của phần tử cha khi nhấn vào button
+                  setEditModalVisible(true);
+                }}
+              >
+                <EditFilled />
+              </div>
+            )}
 
             {album.privacy === "PRIVATE" && (
               <div className="circle-button left-top">

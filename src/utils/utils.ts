@@ -3,14 +3,16 @@ import jwtdecode from "jwt-decode";
 import { UploadFile } from "antd";
 
 
+
 import angry from "@/assets/img/PinCap/angry.png";
 import black_heart from "@/assets/img/PinCap/black-heart.png";
 import haha from "@/assets/img/PinCap/haha.png";
 import heart from "@/assets/img/PinCap/heart.png";
 import sad from "@/assets/img/PinCap/sad.png";
 import wow from "@/assets/img/PinCap/wow.png";
-import { MEDIA_TYPES } from "@/constants/constants";
+import { ALBUM_ROLES , MEDIA_TYPES } from "@/constants/constants";
 import { TokenPayload } from "@/types/Auth";
+import { Album, AlbumUser } from "@/types/type";
 
 
 export enum FeelingType {
@@ -225,4 +227,15 @@ export const isMediaVideo = (mediaUrl: string | null | undefined, type: string |
   }
   
   return false;
+};
+
+// Check if current user is the owner of an album
+export const isAlbumOwner = (album: Album, currentUserId: string): boolean => {
+  if (!album.allUser || !currentUserId) return false;
+  
+  const currentUserInAlbum = album.allUser.find(
+    (user: AlbumUser) => user.id === currentUserId
+  );
+  
+  return currentUserInAlbum?.album_role === ALBUM_ROLES.OWNER;
 };

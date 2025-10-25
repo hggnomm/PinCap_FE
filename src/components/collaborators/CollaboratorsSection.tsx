@@ -1,9 +1,11 @@
 import type React from "react";
+import { useMemo } from "react";
 
 import { clsx } from "clsx";
 import { ExternalLink } from "lucide-react";
 
 import { CustomTooltip } from "@/components/tooltip";
+import { ALBUM_INVITATION_STATUS } from "@/constants/constants";
 
 interface Collaborator {
   id: string;
@@ -11,6 +13,7 @@ interface Collaborator {
   first_name?: string;
   last_name?: string;
   avatar?: string;
+  status?: string;
 }
 
 interface CollaboratorsSectionProps {
@@ -18,9 +21,9 @@ interface CollaboratorsSectionProps {
   maxDisplay?: number;
   showAddButton?: boolean;
   onAddCollaborator?: () => void;
-  showLearnMore?: boolean;
   onViewAllCollaborators?: () => void;
   className?: string;
+  isOwner?: boolean;
 }
 
 const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
@@ -28,13 +31,25 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
   maxDisplay = 5,
   showAddButton = true,
   onAddCollaborator,
-  showLearnMore = true,
   onViewAllCollaborators,
   className = "",
+  isOwner = true,
 }) => {
-  const displayCollaborators = collaborators.slice(0, maxDisplay);
+  const acceptedCollaborators = useMemo(
+    () =>
+      collaborators.filter(
+        (collaborator) =>
+          collaborator.status === ALBUM_INVITATION_STATUS.ACCEPTED
+      ),
+    [collaborators]
+  );
 
-  if (collaborators.length === 0) {
+  const displayCollaborators = useMemo(
+    () => acceptedCollaborators.slice(0, maxDisplay),
+    [acceptedCollaborators, maxDisplay]
+  );
+
+  if (acceptedCollaborators.length === 0) {
     return null;
   }
 
@@ -68,7 +83,10 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="flex items-center">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={onViewAllCollaborators}
+        >
           {displayCollaborators.map((collaborator, index) => (
             <CustomTooltip
               key={collaborator.id}
@@ -112,14 +130,32 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
         </div>
 
         {showAddButton && (
-          <CustomTooltip title="Add collaborator" placement="top">
+          <CustomTooltip
+            title={
+              isOwner
+                ? "Add collaborator"
+                : "Only album owner can add collaborators"
+            }
+            placement="top"
+          >
             <button
-              onClick={onAddCollaborator}
-              className="group relative !min-w-12 h-12 !p-0 rounded-full !border-2 !border-dashed !border-gray-300 !bg-gray-50 hover:!bg-rose-50 hover:!border-rose-400 transition-all duration-300 hover:!scale-105"
+              onClick={isOwner ? onAddCollaborator : undefined}
+              disabled={!isOwner}
+              className={clsx(
+                "group relative !min-w-12 h-12 !p-0 rounded-full !border-2 !border-dashed transition-all duration-300",
+                isOwner
+                  ? "!border-gray-300 !bg-gray-50 hover:!bg-rose-50 hover:!border-rose-400 hover:!scale-105 cursor-pointer"
+                  : "!border-gray-200 !bg-gray-100 cursor-not-allowed opacity-50"
+              )}
             >
               <div className="flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-gray-400 group-hover:text-rose-500 transition-colors duration-200"
+                  className={clsx(
+                    "w-5 h-5 transition-colors duration-200",
+                    isOwner
+                      ? "text-gray-400 group-hover:text-rose-500"
+                      : "text-gray-300"
+                  )}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

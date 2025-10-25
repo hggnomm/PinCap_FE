@@ -1,5 +1,5 @@
-export const ACCESS_TOKEN_KEY = (import.meta as any).env.VITE_ACCESS_TOKEN_KEY || "";
-export const REFRESH_TOKEN_KEY = (import.meta as any).env.VITE_REFRESH_TOKEN_KEY || "";
+export const ACCESS_TOKEN_KEY = (import.meta as unknown as { env: { VITE_ACCESS_TOKEN_KEY: string } }).env.VITE_ACCESS_TOKEN_KEY || "";
+export const REFRESH_TOKEN_KEY = (import.meta as unknown as { env: { VITE_REFRESH_TOKEN_KEY: string } }).env.VITE_REFRESH_TOKEN_KEY || "";
 
 export const NOTIFICATION_TYPES = {
   MEDIA_CREATED: "MEDIA_CREATED",

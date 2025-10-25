@@ -8,11 +8,12 @@
     height: 100%;
 
     .text-draft-change {
-      color: #767676; /* Màu xám */
+      color: #767676;
       font-size: 16px;
       font-weight: 400;
-      letter-spacing: 1px; /* Khoảng cách giữa các chữ */
+      letter-spacing: 1px;
     }
+
     .btn-publish-media {
       background-color: #ad081b;
       color: white;
@@ -46,10 +47,12 @@
       }
     }
   }
+
   .publish-loading {
     position: absolute;
     justify-content: center;
   }
+
   .field-form-create-media {
     display: flex;
     justify-content: center;
@@ -92,7 +95,6 @@
             border-radius: 28px;
           }
 
-          // Edit button styling
           .ant-btn-circle {
             position: absolute;
             top: 0.5rem;
@@ -128,7 +130,6 @@
           }
         }
 
-        // FilePond container with edit button
         .relative {
           .ant-btn-circle {
             position: absolute;
@@ -144,6 +145,10 @@
         }
       }
 
+      &:not(.flex-col) .upload-image {
+        padding-bottom: 0rem;
+      }
+
       .field-input {
         padding: 2rem;
         display: flex;
@@ -153,18 +158,21 @@
         .ant-form-item {
           margin: 0;
         }
+
         .ant-input {
           padding: 0.6rem 0.8rem;
           border-radius: 15px;
-          // background-color: transparent;
         }
+
         .my-select-container .ant-select .ant-select-selector {
           border-radius: 15px !important;
         }
+
         .ant-select-selector {
           border-radius: 15px;
           padding: 1rem;
         }
+
         .field-item-create {
           display: block;
           margin-bottom: 1rem;
@@ -202,6 +210,7 @@
               background-color: #e6f7ff;
               color: #1890ff;
             }
+
             svg {
               font-size: 1rem;
               padding: 0;
@@ -308,10 +317,11 @@
       width: 90% !important;
 
       .upload-image {
-        padding: 30px !important;
+        padding: 30px 30px 0 30px !important;
         margin: 0 auto;
         width: 100% !important;
       }
+
       .field-input {
         padding: 30px auto !important;
         width: 100%;

@@ -1,14 +1,22 @@
 import React, { useCallback, useState } from "react";
+
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+
+import { clsx } from "clsx";
 import { User, Crown, Edit, Eye, ChevronsUpDown, Trash2 } from "lucide-react";
-import clsx from "clsx";
-import ModalComponent from "@/components/modal/ModalComponent";
-import { AlbumUser } from "@/types/type";
-import { ALBUM_ROLES, ALBUM_INVITATION_STATUS } from "@/constants/constants";
+
+import type { MenuProps } from "antd";
+
 import { Dropdown } from "@/components/dropdown";
 import Empty from "@/components/Empty";
+import Loading from "@/components/loading/Loading";
+import ModalComponent from "@/components/modal/ModalComponent";
+import { ALBUM_ROLES, ALBUM_INVITATION_STATUS } from "@/constants/constants";
 import { useAlbum } from "@/react-query/useAlbum";
-import { toast } from "react-toastify";
-import type { MenuProps } from "antd";
+import { TokenPayload } from "@/types/Auth";
+import { Album, AlbumUser } from "@/types/type";
+import { isAlbumOwner } from "@/utils/utils";
 
 interface CollaboratorsListModalProps {
   visible: boolean;
@@ -25,17 +33,34 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
   const [selectedCollaborator, setSelectedCollaborator] =
     useState<AlbumUser | null>(null);
 
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
+
   // Use React Query hooks
-  const { getUsersInAlbum, updateMemberRole, removeMemberFromAlbum } = useAlbum();
-  const { data: collaboratorsData, isLoading: loading, error } = getUsersInAlbum(albumId, {
-    per_page: 50, // Get more collaborators
-    page: 1,
-  });
+  const { getUsersInAlbum, updateMemberRole, removeMemberFromAlbum } =
+    useAlbum();
+  const { data: collaboratorsData, isLoading: loading } = getUsersInAlbum(
+    albumId,
+    {
+      per_page: 50, // Get more collaborators
+      page: 1,
+    }
+  );
+
+  // Check if current user is owner
+  const isOwner = collaboratorsData
+    ? isAlbumOwner(
+        { allUser: collaboratorsData.data || [] } as Album,
+        tokenPayload.id
+      )
+    : false;
 
   // Filter only accepted collaborators and sort with Owner first
   const acceptedCollaborators = (collaboratorsData?.data || [])
     .filter(
-      (collaborator: AlbumUser) => collaborator.status === ALBUM_INVITATION_STATUS.ACCEPTED
+      (collaborator: AlbumUser) =>
+        collaborator.status === ALBUM_INVITATION_STATUS.ACCEPTED
     )
     .sort((a: AlbumUser, b: AlbumUser) => {
       // Owner always comes first
@@ -87,7 +112,7 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
         await updateMemberRole({
           albumId,
           userId: collaboratorId,
-          data: { role: newRole as "VIEW" | "EDIT" }
+          data: { role: newRole as "VIEW" | "EDIT" },
         });
         toast.success("Role updated successfully!");
       } catch (error) {
@@ -108,7 +133,7 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
       try {
         await removeMemberFromAlbum({
           albumId,
-          userId: selectedCollaborator.id
+          userId: selectedCollaborator.id,
         });
         toast.success("Member removed successfully!");
         setRemoveModalVisible(false);
@@ -194,20 +219,39 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
 
   const renderMemberRole = useCallback(
     (collaborator: AlbumUser) => {
+      if (!isOwner) {
+        // If not owner, just show role text without dropdown
+        return (
+          <div className="flex items-center space-x-2">
+            <span
+              className={clsx(
+                "text-sm font-medium",
+                collaborator.album_role === ALBUM_ROLES.EDIT
+                  ? "text-blue-700"
+                  : "text-gray-700"
+              )}
+            >
+              {getRoleText(collaborator.album_role)}
+            </span>
+            {getRoleIcon(collaborator.album_role)}
+          </div>
+        );
+      }
+
       return (
-         <div className="cursor-pointer">
-           <Dropdown
-             items={getRoleMenuItems(collaborator)}
-             placement="bottomRight"
-             buttonProps={{
-               type: "default",
-               size: "large",
-               className: "min-w-[140px] h-12",
-             }}
-             showArrow={true}
-             dropdownStyle={{ minWidth: "180px" }}
-             overlayClassName="py-2"
-           >
+        <div className="cursor-pointer">
+          <Dropdown
+            items={getRoleMenuItems(collaborator)}
+            placement="bottomRight"
+            buttonProps={{
+              type: "default",
+              size: "large",
+              className: "min-w-[140px] h-12",
+            }}
+            showArrow={true}
+            dropdownStyle={{ minWidth: "180px" }}
+            overlayClassName="py-2"
+          >
             <div className="flex items-center justify-center space-x-2 w-full">
               <span
                 className={clsx(
@@ -225,7 +269,7 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
         </div>
       );
     },
-    [getRoleMenuItems]
+    [getRoleMenuItems, isOwner]
   );
 
   const renderCollaboratorItem = useCallback(
@@ -372,32 +416,25 @@ const CollaboratorsListModal: React.FC<CollaboratorsListModalProps> = ({
             </div>
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
-            {loading && (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
-                <span className="ml-3 text-gray-600">
-                  Loading collaborators...
-                </span>
-              </div>
-            )}
+          <Loading isLoading={loading}>
+            <div className="max-h-96 overflow-y-auto">
+              {acceptedCollaborators.length === 0 && (
+                <Empty
+                  icon={<User className="w-12 h-12 text-gray-300" />}
+                  title="No Collaborators"
+                  description="No collaborators have been added to this album yet."
+                />
+              )}
 
-            {!loading && acceptedCollaborators.length === 0 && (
-              <Empty
-                icon={<User className="w-12 h-12 text-gray-300" />}
-                title="No Collaborators"
-                description="No collaborators have been added to this album yet."
-              />
-            )}
-
-            {!loading && acceptedCollaborators.length > 0 && (
-              <div className="space-y-3">
-                {acceptedCollaborators.map((collaborator: AlbumUser) =>
-                  renderCollaboratorItem(collaborator)
-                )}
-              </div>
-            )}
-          </div>
+              {acceptedCollaborators.length > 0 && (
+                <div className="space-y-3">
+                  {acceptedCollaborators.map((collaborator: AlbumUser) =>
+                    renderCollaboratorItem(collaborator)
+                  )}
+                </div>
+              )}
+            </div>
+          </Loading>
 
           {/* Footer Info */}
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
