@@ -1,21 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { notification, Checkbox, Col, Row, Form, Input, Button } from "antd";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState, useCallback } from "react";
 
-import LoginImage from "@/assets/img/PinCap/login_page_image.jpg";
+import { useDispatch } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
+
+import { motion } from "framer-motion";
+
+import Title from "antd/es/typography/Title";
+
+import { notification, Checkbox, Col, Row, Form, Input, Button } from "antd";
+
+import { login, getGoogleOAuthUrl } from "@/api/auth";
 import { LogoIcon } from "@/assets/img";
 import GoogleIcon from "@/assets/img/PinCap/googleIcon.png";
-import Title from "antd/es/typography/Title";
-import { login, getGoogleOAuthUrl } from "@/api/auth";
-import { addToken } from "@/store/authSlice";
-import { motion } from "framer-motion";
-import { LoginRequest } from "@/types/Auth/LoginRequest";
-import { loginSchema } from "@/validation/auth";
+import LoginImage from "@/assets/img/PinCap/login_page_image.jpg";
+import { ROUTES } from "@/constants/routes";
 import { useFormValidation } from "@/hooks";
 import { useAuth } from "@/react-query";
+import { addToken } from "@/store/authSlice";
+import { LoginRequest } from "@/types/Auth/LoginRequest";
+import { showErrorToast } from "@/utils/apiErrorHandler";
+import { loginSchema } from "@/validation/auth";
+
 import "./index.less";
-import { ROUTES } from "@/constants/routes";
 interface LoginFormValues {
   email: string;
   password: string;
@@ -38,6 +44,44 @@ const Login: React.FC = () => {
   const params = new URLSearchParams(location.search);
   const verifiedToken = params.get("verified-token");
   const googleToken = params.get("google-token");
+
+  const resetLoginAttempts = useCallback(() => {
+    localStorage.removeItem("loginAttempts");
+    localStorage.removeItem("loginLockExpiry");
+    setIsAccountLocked(false);
+    setLockTimeRemaining(0);
+  }, []);
+
+  const checkAccountLockStatus = useCallback(() => {
+    const lockExpiryTime = localStorage.getItem("loginLockExpiry");
+    if (lockExpiryTime) {
+      const expiryTime = parseInt(lockExpiryTime);
+      const currentTime = Date.now();
+
+      if (currentTime < expiryTime) {
+        // Account is still locked
+        setIsAccountLocked(true);
+        setLockTimeRemaining(Math.ceil((expiryTime - currentTime) / 1000));
+      } else {
+        // Lock has expired
+        resetLoginAttempts();
+      }
+    }
+  }, [resetLoginAttempts]);
+
+  const handleLoginSuccess = useCallback(
+    (data: LoginRequest) => {
+      localStorage.setItem("token", data.token || "");
+      dispatch(addToken(data.token || ""));
+      resetLoginAttempts();
+      navigate(ROUTES.HOME);
+    },
+    [dispatch, navigate, resetLoginAttempts]
+  );
+
+  const onSwitchCreate = () => {
+    navigate(ROUTES.REGISTER);
+  };
 
   useEffect(() => {
     if (user && !verifiedToken && !googleToken) {
@@ -99,42 +143,16 @@ const Login: React.FC = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [form, verifiedToken, googleToken, isAccountLocked, lockTimeRemaining]);
-
-  const checkAccountLockStatus = () => {
-    const lockExpiryTime = localStorage.getItem("loginLockExpiry");
-    if (lockExpiryTime) {
-      const expiryTime = parseInt(lockExpiryTime);
-      const currentTime = Date.now();
-
-      if (currentTime < expiryTime) {
-        // Account is still locked
-        setIsAccountLocked(true);
-        setLockTimeRemaining(Math.ceil((expiryTime - currentTime) / 1000));
-      } else {
-        // Lock has expired
-        resetLoginAttempts();
-      }
-    }
-  };
-
-  const resetLoginAttempts = () => {
-    localStorage.removeItem("loginAttempts");
-    localStorage.removeItem("loginLockExpiry");
-    setIsAccountLocked(false);
-    setLockTimeRemaining(0);
-  };
-
-  const onSwitchCreate = () => {
-    navigate(ROUTES.REGISTER);
-  };
-
-  const handleLoginSuccess = (data: LoginRequest) => {
-    localStorage.setItem("token", data.token || "");
-    dispatch(addToken(data.token || ""));
-    resetLoginAttempts();
-    navigate(ROUTES.HOME);
-  };
+  }, [
+    form,
+    verifiedToken,
+    googleToken,
+    isAccountLocked,
+    lockTimeRemaining,
+    checkAccountLockStatus,
+    handleLoginSuccess,
+    resetLoginAttempts,
+  ]);
 
   const formatRemainingTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -142,7 +160,6 @@ const Login: React.FC = () => {
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
-  // Hàm xử lý đăng nhập
   const onLogin = async (values: LoginFormValues) => {
     if (isAccountLocked) {
       api.error({
@@ -166,7 +183,8 @@ const Login: React.FC = () => {
     try {
       const { email, password, remember } = values;
 
-      const data: LoginRequest = await login(values);
+      const data: LoginRequest & { status?: number; message?: string } =
+        await login(values);
 
       if (data.token) {
         localStorage.setItem("token", data.token);
@@ -183,7 +201,11 @@ const Login: React.FC = () => {
         resetLoginAttempts();
         navigate(ROUTES.HOME);
       } else {
-        // Handle failed login attempt
+        if (data.status === 401 && data.message) {
+          const error = new Error(data.message) as Error & { status: number };
+          error.status = 401;
+          throw error;
+        }
         if (process.env.VITE_DEBUG_LOGIN === "true") {
           const attempts =
             parseInt(localStorage.getItem("loginAttempts") || "0") + 1;
@@ -196,12 +218,13 @@ const Login: React.FC = () => {
             setIsAccountLocked(true);
             setLockTimeRemaining(60 * 60); // 3600 seconds = 1 hour
 
-            // Error notification will be shown automatically by apiClient interceptor
+            // Account locked due to too many failed attempts
           }
         }
       }
-    } catch (error: any) {
-      // Handle login error
+    } catch (error: unknown) {
+      showErrorToast(error);
+
       if (process.env.VITE_DEBUG_LOGIN === "true") {
         const attempts =
           parseInt(localStorage.getItem("loginAttempts") || "0") + 1;
@@ -218,18 +241,14 @@ const Login: React.FC = () => {
     }
   };
 
-  // Hàm xử lý đăng nhập Google
   const handleGoogleLogin = async () => {
     try {
       const response = await getGoogleOAuthUrl();
       if (response?.url) {
         window.location.href = response.url;
       }
-    } catch (error: any) {
-      api.error({
-        message: "Google Login Error",
-        description: "Unable to connect to Google. Please try again later.",
-      });
+    } catch (error: unknown) {
+      showErrorToast(error);
     }
   };
 
@@ -334,8 +353,8 @@ const Login: React.FC = () => {
                 Login
               </Button>
 
-              <Button 
-                className="button btn-login-icon" 
+              <Button
+                className="button btn-login-icon"
                 onClick={handleGoogleLogin}
               >
                 <img src={GoogleIcon} alt="" />

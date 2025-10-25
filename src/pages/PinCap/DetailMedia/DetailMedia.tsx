@@ -161,7 +161,7 @@ const DetailMedia = () => {
 
   return (
     <div className="min-h-screen">
-      <Loading isLoading={loading} error={error}>
+      <Loading isLoading={loading}>
         <motion.div
           initial="hidden"
           animate="visible"

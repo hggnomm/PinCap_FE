@@ -1,11 +1,11 @@
 import React, { useEffect, ReactNode } from "react";
+
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 
 interface LoadingSpinnerProps {
   isLoading: boolean;
-  error?: string;
   isOpenSuccess?: boolean;
   successMessage?: string;
   children: ReactNode;
@@ -13,20 +13,15 @@ interface LoadingSpinnerProps {
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   isLoading,
-  error,
   isOpenSuccess = false,
   successMessage,
   children,
 }) => {
   useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-
     if (isOpenSuccess && successMessage) {
       toast.success(successMessage);
     }
-  }, [error, isOpenSuccess, successMessage]);
+  }, [isOpenSuccess, successMessage]);
 
   return (
     <div>

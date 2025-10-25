@@ -5,22 +5,30 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import Zoom from "react-medium-image-zoom";
+
+import { clsx } from "clsx";
+import { motion, AnimatePresence } from "framer-motion";
 import "react-medium-image-zoom/dist/styles.css";
-import clsx from "clsx";
+
+import DotsPagination from "@/components/dotsPagination/DotsPagination";
+import { MEDIA_TYPES } from "@/constants/constants";
 import { Media } from "@/types/type";
 import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";
-import { MEDIA_TYPES } from "@/constants/constants";
-import DotsPagination from "@/components/dotsPagination/DotsPagination";
 import "./MediaViewer.less";
 
 interface MediaViewerProps {
   media: Media | null;
   className?: string;
+  mediaClassName?: string;
 }
 
-const MediaViewer: React.FC<MediaViewerProps> = ({ media, className }) => {
+const MediaViewer: React.FC<MediaViewerProps> = ({
+  media,
+  className,
+  mediaClassName,
+}) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState<number>(0);
   const [direction, setDirection] = useState<number>(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -75,7 +83,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({ media, className }) => {
   };
 
   const updateContainerSizeFromVideo = () => {
-    const el = videoRef.current as any;
+    const el = videoRef.current as HTMLVideoElement;
     if (el && el.videoWidth && el.videoHeight) {
       setContainerMinWidth(el.videoWidth);
       setContainerMinHeight(el.videoHeight);
@@ -203,7 +211,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({ media, className }) => {
                 controls
                 autoPlay
                 muted
-                className="media-element"
+                className={clsx("media-element", mediaClassName)}
                 onLoadStart={() => setIsImageLoaded(false)}
                 onLoadedData={() => {
                   setIsImageLoaded(true);
@@ -219,6 +227,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({ media, className }) => {
                   alt={media?.media_name}
                   className={clsx(
                     "media-element",
+                    mediaClassName,
                     isImageLoaded ? "opacity-100" : "opacity-0"
                   )}
                   onLoad={() => {
@@ -226,7 +235,6 @@ const MediaViewer: React.FC<MediaViewerProps> = ({ media, className }) => {
                     updateContainerSizeFromImage();
                     setDidInitialShow(true);
                   }}
-                  onLoadStart={() => setIsImageLoaded(false)}
                 />
               </Zoom>
             )}
@@ -320,7 +328,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({ media, className }) => {
               ref={imgRef}
               src={media.media_url}
               alt={media.media_name}
-              className="media-element"
+              className={clsx("media-element", mediaClassName)}
               onLoad={updateContainerSizeFromImage}
             />
           </Zoom>
@@ -343,7 +351,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({ media, className }) => {
           controls
           autoPlay
           muted
-          className="media-element"
+          className={clsx("media-element", mediaClassName)}
           onLoadedData={updateContainerSizeFromVideo}
         />
       </div>

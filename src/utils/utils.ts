@@ -177,3 +177,52 @@ export const getFirstImageUrl = (mediaUrl: string | null | undefined): string | 
     return mediaUrl;
   }
 };
+
+/**
+ * Lấy URL media phù hợp dựa trên type
+ * @param mediaUrl - URL của media
+ * @param type - Type của media (IMAGE, VIDEO, FLEXIBLE)
+ * @returns URL phù hợp để preview
+ */
+export const getMediaPreviewUrl = (
+  mediaUrl: string | null | undefined, 
+  type: string | null
+): string | null => {
+  if (!mediaUrl) {
+    return null;
+  }
+
+  // Handle null type as FLEXIBLE
+  if (type === null || type === MEDIA_TYPES.FLEXIBLE) {
+    return getFirstImageUrl(mediaUrl);
+  }
+
+  switch (type) {
+    case MEDIA_TYPES.IMAGE:
+      return mediaUrl;
+    case MEDIA_TYPES.VIDEO:
+      return mediaUrl;
+    default:
+      return mediaUrl;
+  }
+};
+
+/**
+ * Kiểm tra xem media có phải là video không
+ * @param mediaUrl - URL của media
+ * @param type - Type của media
+ * @returns true nếu là video
+ */
+export const isMediaVideo = (mediaUrl: string | null | undefined, type: string | null): boolean => {
+  if (type === MEDIA_TYPES.VIDEO) {
+    return true;
+  }
+  
+  // Handle null type as FLEXIBLE
+  if ((type === null || type === MEDIA_TYPES.FLEXIBLE) && mediaUrl) {
+    const firstUrl = getFirstImageUrl(mediaUrl);
+    return firstUrl ? isVideo(firstUrl) : false;
+  }
+  
+  return false;
+};

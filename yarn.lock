@@ -2467,7 +2467,7 @@ filepond-plugin-image-preview@^4.6.12:
   resolved "https://registry.npmjs.org/filepond-plugin-image-preview/-/filepond-plugin-image-preview-4.6.12.tgz"
   integrity sha512-Y8ETX5QVV0mbPB0586UH8AUmG9tZg8PuN5bdEAIlZVJFTct5ebViJ7+Am94/VhTPjLqZjBf1zmDq5JU6XRsZKw==
 
-filepond-plugin-media-preview@1.0.11:
+filepond-plugin-media-preview@^1.0.11:
   version "1.0.11"
   resolved "https://registry.npmjs.org/filepond-plugin-media-preview/-/filepond-plugin-media-preview-1.0.11.tgz"
   integrity sha512-6rzt8ZpNCIzgG/dvkgAb7gd2trxwr3x/6Za9/HfTRfqUgmWkye7hlPaPxzLLIfM3nDfdKwt6s+GYb9A5J6cH5A==

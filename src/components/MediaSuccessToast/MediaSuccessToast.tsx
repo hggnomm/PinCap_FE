@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye } from "lucide-react";
 
 import { MediaData } from "@/contexts/MediaToastContext";
+import { getMediaPreviewUrl, isMediaVideo } from "@/utils/utils";
 
 interface MediaSuccessToastProps {
   isVisible: boolean;
@@ -22,7 +23,6 @@ const MediaSuccessToast: React.FC<MediaSuccessToastProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Auto close after 7 seconds
   useEffect(() => {
     if (isVisible) {
       const timer = setTimeout(() => {
@@ -36,6 +36,36 @@ const MediaSuccessToast: React.FC<MediaSuccessToastProps> = ({
   const handleViewMedia = () => {
     navigate(`/media/${mediaData.id}`);
     onClose();
+  };
+
+  const getMediaElement = () => {
+    const mediaUrl = getMediaPreviewUrl(mediaData.media_url, mediaData.type);
+    const isVideo = isMediaVideo(mediaData.media_url, mediaData.type);
+
+    if (isVideo) {
+      return (
+        <video
+          className="w-full h-full object-cover"
+          muted
+          playsInline
+          preload="metadata"
+        >
+          <source src={mediaUrl || ""} type="video/mp4" />
+        </video>
+      );
+    }
+
+    return (
+      <img
+        src={mediaUrl || ""}
+        alt={mediaData.media_name}
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.src = "/placeholder.jpg";
+        }}
+      />
+    );
   };
   return (
     <AnimatePresence>
@@ -62,15 +92,7 @@ const MediaSuccessToast: React.FC<MediaSuccessToastProps> = ({
         >
           <div className="bg-[#1a1a1a] rounded-xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/10 flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 sm:w-10 sm:h-10">
-              <img
-                src={mediaData.media_url}
-                alt={mediaData.media_name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "/placeholder.jpg";
-                }}
-              />
+              {getMediaElement()}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-gray-50 text-base font-normal sm:text-base">

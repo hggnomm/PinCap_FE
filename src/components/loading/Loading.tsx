@@ -1,26 +1,15 @@
-import React, { useEffect, ReactNode } from "react";
-import { ClipLoader } from "react-spinners";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import styles
-import clsx from "clsx";
+import React, { ReactNode } from "react";
 
-interface LoadingSpinnerProps {
+import { ClipLoader } from "react-spinners";
+
+import "react-toastify/dist/ReactToastify.css"; // Import styles
+import { clsx } from "clsx";
+
+interface LoadingProps {
   isLoading: boolean;
-  error?: string | Error | null;
   children: ReactNode;
 }
-
-const Loading: React.FC<LoadingSpinnerProps> = ({
-  isLoading,
-  error,
-  children,
-}) => {
-  useEffect(() => {
-    if (error) {
-      toast.error(error.toString());
-    }
-  }, [error]);
-
+const Loading: React.FC<LoadingProps> = ({ isLoading, children }) => {
   return (
     <div className="relative h-full w-full">
       {isLoading && (
