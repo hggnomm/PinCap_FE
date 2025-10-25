@@ -14,10 +14,10 @@ export const useMedia = () => {
     });
   };
 
-  const getMediaById = (id: string) => {
+  const getMediaById = (id: string, tag_flg?: boolean) => {
     return useQuery({
       queryKey: ['media', id],
-      queryFn: () => media.getDetailMedia(id),
+      queryFn: () => media.getDetailMedia(id, tag_flg),
       enabled: !!id,
       staleTime: 5 * 60 * 1000,
     });

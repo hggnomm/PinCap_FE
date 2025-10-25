@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+
 import * as comments from '@/api/comments';
 
 export const useComment = () => {
@@ -18,13 +19,29 @@ export const useComment = () => {
       queryKey: ['comments', mediaId, 'infinite'],
       queryFn: ({ pageParam }) => comments.getComments(mediaId, pageParam),
       initialPageParam: 1,
-      getNextPageParam: (lastPage, allPages) => {
+      getNextPageParam: (lastPage, _allPages) => {
         if (lastPage?.current_page < lastPage?.last_page) {
           return lastPage.current_page + 1;
         }
         return undefined;
       },
       enabled: !!mediaId,
+      staleTime: 5 * 60 * 1000,
+    });
+  };
+
+  const getInfiniteCommentsWithEnabled = (mediaId: string, enabled: boolean = true) => {
+    return useInfiniteQuery({
+      queryKey: ['comments', mediaId, 'infinite'],
+      queryFn: ({ pageParam }) => comments.getComments(mediaId, pageParam),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage, _allPages) => {
+        if (lastPage?.current_page < lastPage?.last_page) {
+          return lastPage.current_page + 1;
+        }
+        return undefined;
+      },
+      enabled: !!mediaId && enabled,
       staleTime: 5 * 60 * 1000,
     });
   };
@@ -76,6 +93,7 @@ export const useComment = () => {
   return {
     getComments,
     getInfiniteComments,
+    getInfiniteCommentsWithEnabled,
     getReplies,
     createComment: createComment.mutateAsync,
     createCommentLoading: createComment.isPending,

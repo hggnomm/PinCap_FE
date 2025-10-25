@@ -162,7 +162,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         onHoverEnd={() => setIsHovered(false)}
       >
         {data?.type === MEDIA_TYPES.VIDEO && (
-          <video autoPlay loop muted>
+          <video autoPlay loop muted className="mb-[0.25vw]">
             <source src={srcUrl} />
           </video>
         )}
@@ -175,7 +175,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
           />
         )}
         {isFlexibleVideo && (
-          <video autoPlay loop muted>
+          <video autoPlay loop muted className="mb-[0.25vw]">
             <source src={currentFlexibleMedia!.url} />
           </video>
         )}
@@ -190,12 +190,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
 
         <motion.div
           className={clsx(
-            "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
-            {
-              "bottom-[5px]":
-                data?.type === MEDIA_TYPES.IMAGE || isFlexibleImage,
-              "bottom-0": data?.type === MEDIA_TYPES.VIDEO || isFlexibleVideo,
-            }
+            "overlay absolute top-0 bottom-1.25 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]"
           )}
           whileHover={{ opacity: 1 }}
         >

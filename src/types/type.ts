@@ -60,7 +60,7 @@ export type Media = {
   type: "IMAGE" | "VIDEO" | null;
   userComments: Comment | null;
   privacy: string;
-  tags_name: string[];
+  tags: Tag[];
   reaction: Reaction;
   feelings: Feeling[];
   commentCount: number;
@@ -82,8 +82,8 @@ export type Album = {
 
 export type Tag = {
   id: string;
-  tag_name: string;
-  latestMediaUrl: string;
+  name: string;
+  latestMediaUrl?: string;
 };
 
 export type ReportReason = {
