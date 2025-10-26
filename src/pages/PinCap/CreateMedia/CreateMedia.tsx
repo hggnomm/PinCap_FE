@@ -72,7 +72,10 @@ const CreateMedia: React.FC = () => {
     handleFormChange,
     handleGenerateClick,
     resetForm,
-  } = useCreateMedia(() => form.resetFields());
+  } = useCreateMedia(
+    () => form.resetFields(),
+    (values) => form.setFieldsValue(values)
+  );
 
   const handleTagInput = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {

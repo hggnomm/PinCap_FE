@@ -1,14 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import * as media from '@/api/media';
-import { CreateMediaFormData, UpdateMediaFormData } from '@/validation';
+import * as media from "@/api/media";
+import { CreateMediaFormData, UpdateMediaFormData } from "@/validation";
 
 export const useMedia = () => {
   const queryClient = useQueryClient();
 
   const getMediaList = (page = 1) => {
     return useQuery({
-      queryKey: ['medias', 'all', page],
+      queryKey: ["medias", "all", page],
       queryFn: () => media.getAllMedias({ pageParam: page }),
       staleTime: 5 * 60 * 1000, // 5 minutes
     });
@@ -16,7 +16,7 @@ export const useMedia = () => {
 
   const getMediaById = (id: string, tag_flg?: boolean) => {
     return useQuery({
-      queryKey: ['media', id],
+      queryKey: ["media", id],
       queryFn: () => media.getDetailMedia(id, tag_flg),
       enabled: !!id,
       staleTime: 5 * 60 * 1000,
@@ -25,8 +25,9 @@ export const useMedia = () => {
 
   const getMyMedia = (page = 1, isCreated = true, enabled = true) => {
     return useQuery({
-      queryKey: ['medias', 'my-media', isCreated ? 'created' : 'saved', page],
-      queryFn: () => media.getMyMedias({ pageParam: page, is_created: isCreated }),
+      queryKey: ["medias", "my-media", isCreated ? "created" : "saved", page],
+      queryFn: () =>
+        media.getMyMedias({ pageParam: page, is_created: isCreated }),
       enabled: enabled,
       staleTime: 5 * 60 * 1000,
     });
@@ -35,14 +36,18 @@ export const useMedia = () => {
   const createMediaMutation = useMutation({
     mutationFn: (data: CreateMediaFormData) => media.createMedia(data),
     onSuccess: (_, data) => {
-      queryClient.invalidateQueries({ queryKey: ['medias'] });
-      queryClient.invalidateQueries({ queryKey: ['medias', 'all'] });
-      queryClient.invalidateQueries({ queryKey: ['medias', 'my-media'] });
-      
+      queryClient.invalidateQueries({ queryKey: ["medias"] });
+      queryClient.invalidateQueries({ queryKey: ["medias", "all"] });
+      queryClient.invalidateQueries({ queryKey: ["medias", "my-media"] });
+
       if (data.is_created === false) {
-        queryClient.invalidateQueries({ queryKey: ['medias', 'my-media', 'saved'] });
+        queryClient.invalidateQueries({
+          queryKey: ["medias", "my-media", "saved"],
+        });
       } else {
-        queryClient.invalidateQueries({ queryKey: ['medias', 'my-media', 'created'] });
+        queryClient.invalidateQueries({
+          queryKey: ["medias", "my-media", "created"],
+        });
       }
     },
   });
@@ -51,10 +56,10 @@ export const useMedia = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateMediaFormData }) =>
       media.updatedMedia(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['medias'] });
-      queryClient.invalidateQueries({ queryKey: ['medias', 'all'] });
-      queryClient.invalidateQueries({ queryKey: ['medias', 'my-media'] });
-      queryClient.invalidateQueries({ queryKey: ['media', id] });
+      queryClient.invalidateQueries({ queryKey: ["medias"] });
+      queryClient.invalidateQueries({ queryKey: ["medias", "all"] });
+      queryClient.invalidateQueries({ queryKey: ["medias", "my-media"] });
+      queryClient.invalidateQueries({ queryKey: ["media", id] });
     },
   });
 
@@ -62,16 +67,17 @@ export const useMedia = () => {
     mutationFn: (ids: string[]) => media.deleteMedias(ids),
     onSuccess: () => {
       // Invalidate all media-related queries
-      queryClient.invalidateQueries({ queryKey: ['medias'] });
-      queryClient.invalidateQueries({ queryKey: ['medias', 'all'] });
-      queryClient.invalidateQueries({ queryKey: ['medias', 'my-media'] });
+      queryClient.invalidateQueries({ queryKey: ["medias"] });
+      queryClient.invalidateQueries({ queryKey: ["medias", "all"] });
+      queryClient.invalidateQueries({ queryKey: ["medias", "my-media"] });
     },
   });
 
   const mediaReactionMutation = useMutation({
-    mutationFn: (data: { mediaId: string; feelingId: string }) => media.mediaReactions(data),
+    mutationFn: (data: { mediaId: string; feelingId: string }) =>
+      media.mediaReactions(data),
     onSuccess: (_, { mediaId }) => {
-      queryClient.invalidateQueries({ queryKey: ['media', mediaId] });
+      queryClient.invalidateQueries({ queryKey: ["media", mediaId] });
     },
   });
 

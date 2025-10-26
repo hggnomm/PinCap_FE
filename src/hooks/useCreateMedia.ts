@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 import { getDetailMedia } from "@/api/media";
 import { checkImageSafety, checkMultipleImagesSafety } from "@/api/vision";
+import { PRIVACY } from "@/constants/constants";
 import { ENV } from "@/constants/env";
 import { useMediaToast } from "@/contexts/MediaToastContext";
 import { useMedia } from "@/react-query/useMedia";
@@ -13,7 +14,10 @@ import { Media } from "@/types/type";
 import { getTagName } from "@/utils/tagMapping";
 import { CreateMediaFormData, UpdateMediaFormData } from "@/validation/media";
 
-export const useCreateMedia = (resetFormFields?: () => void) => {
+export const useCreateMedia = (
+  resetFormFields?: () => void,
+  updateFormFields?: (values: Partial<CreateMediaFormData>) => void
+) => {
   const tokenPayload = useSelector(
     (state: { auth: TokenPayload }) => state.auth
   );
@@ -34,6 +38,7 @@ export const useCreateMedia = (resetFormFields?: () => void) => {
   const [textCreateDraft, setTextCreateDraft] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
   const [draftId, setDraftId] = useState<string>("");
+  const [fetchedDraftId, setFetchedDraftId] = useState<string>("");
 
   const {
     data: drafts = [],
@@ -41,12 +46,25 @@ export const useCreateMedia = (resetFormFields?: () => void) => {
     refetch: refetchDrafts,
   } = getMyMedia(1, false, drawerVisible);
 
-  const handleSelectMedia = useCallback((media: Media) => {
-    setImageUrl(media.media_url);
-    setIsSelectedDraft(true);
-    setFileList([]);
-    setTags(media.tags?.map(getTagName) || []);
-  }, []);
+  const handleSelectMedia = useCallback(
+    (media: Media, shouldUpdateForm = false) => {
+      setImageUrl(media.media_url);
+      setIsSelectedDraft(true);
+      setFileList([]);
+      setTags(media.tags?.map(getTagName) || []);
+
+      if (shouldUpdateForm && updateFormFields) {
+        updateFormFields({
+          id: media.id,
+          media_name: media.media_name,
+          description: media.description,
+          privacy: media.privacy === "1" ? PRIVACY.PUBLIC : PRIVACY.PRIVATE,
+          tags_name: media.tags?.map(getTagName) || [],
+        });
+      }
+    },
+    [updateFormFields]
+  );
 
   const handleFormChange = (formValue: CreateMediaFormData) => {
     if (debounceTimeout) {
@@ -93,7 +111,13 @@ export const useCreateMedia = (resetFormFields?: () => void) => {
       }
 
       if (response?.media?.id) {
-        setDraftId(response.media.id);
+        const newDraftId = response.media.id;
+        setDraftId(newDraftId);
+
+        if (!isCreated && !formValue.id && updateFormFields) {
+          updateFormFields({ id: newDraftId });
+        }
+
         if (isCreated && response?.media) {
           showToast(response.media, formValue.id ? "update" : "create");
         }
@@ -188,16 +212,39 @@ export const useCreateMedia = (resetFormFields?: () => void) => {
     setIsFormDisabled(true);
     setIsSelectedDraft(false);
     setDraftId("");
+    setFetchedDraftId("");
   };
 
   // Effects
   useEffect(() => {
     const fetchDraftDetail = async () => {
-      if (draftId && drafts.length > 0) {
+      // Only fetch if draftId exists and hasn't been fetched yet
+      if (draftId && draftId !== fetchedDraftId) {
         try {
           const detailDraft = await getDetailMedia(draftId);
           if (detailDraft) {
-            handleSelectMedia(detailDraft);
+            // Update state
+            setImageUrl(detailDraft.media_url);
+            setIsSelectedDraft(true);
+            setFileList([]);
+            setTags(detailDraft.tags?.map(getTagName) || []);
+
+            // Update form
+            if (updateFormFields) {
+              updateFormFields({
+                id: detailDraft.id,
+                media_name: detailDraft.media_name,
+                description: detailDraft.description,
+                privacy:
+                  detailDraft.privacy === "1"
+                    ? PRIVACY.PUBLIC
+                    : PRIVACY.PRIVATE,
+                tags_name: detailDraft.tags?.map(getTagName) || [],
+              });
+            }
+
+            // Mark as fetched
+            setFetchedDraftId(draftId);
           }
         } catch (error) {
           toast.error("Error fetching draft details: " + error);
@@ -206,7 +253,8 @@ export const useCreateMedia = (resetFormFields?: () => void) => {
     };
 
     fetchDraftDetail();
-  }, [draftId, drafts, handleSelectMedia]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftId]);
 
   useEffect(() => {
     if (fileList.length > 0) {

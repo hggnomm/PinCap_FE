@@ -82,7 +82,7 @@ const ButtonCircle = ({
       onClick={onClick}
       tabIndex={0} // focus button
     >
-      {icon && <span className="icon">{icon}</span>}
+      {icon && <span className="icon !m-0">{icon}</span>}
     </button>
   );
 
