@@ -17,10 +17,17 @@
   /* Input Styles */
   .ant-input {
     padding: 0.6rem 0.8rem;
-    border-radius: 15px;
-    border: 2px solid rgb(167, 166, 166) !important; /* Default border color */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease,
-      border-width 0.3s ease; /* Smooth transition for border width */
+    border-radius: 12px;
+    border: 2px solid rgb(167, 166, 166) !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    border-width: 2px;
+  }
+
+  .ant-input[type="textarea"],
+  textarea.ant-input {
+    min-height: 80px;
+    resize: vertical;
+    overflow-y: auto;
   }
 
   /* Focused input border color and increased border width */
@@ -34,5 +41,4 @@
   .ant-input:hover {
     border-color: #a25772 !important; /* Red-pink border color on hover */
   }
-
 }
