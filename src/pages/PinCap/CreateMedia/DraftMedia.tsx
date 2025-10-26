@@ -60,7 +60,6 @@ const DraftMedia = ({
     const mediaUrl = getMediaPreviewUrl(media.media_url, mediaType);
     const isVideo = isMediaVideo(media.media_url, mediaType);
 
-    console.log("Media type:", mediaType, "Media URL:", mediaUrl);
     if (isVideo) {
       return (
         <video className="thumbnail-image" muted playsInline preload="metadata">

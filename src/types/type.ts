@@ -8,6 +8,7 @@ export type User = {
   avatar: string;
   background: string;
   phone: string | null;
+  bio: string | null;
   role: string;
   followers_count: number;
   followees_count: number;

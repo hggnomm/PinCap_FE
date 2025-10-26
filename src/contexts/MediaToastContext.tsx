@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
+import { useLocation } from "react-router-dom";
+
 import { Reaction } from "@/types/type";
 
 export interface MediaData {
@@ -41,11 +43,20 @@ export const MediaToastProvider: React.FC<MediaToastProviderProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [mediaData, setMediaData] = useState<MediaData | null>(null);
   const [action, setAction] = useState<"create" | "update" | null>(null);
+  const location = useLocation();
 
   const showToast = (
     newMediaData: MediaData,
     newAction: "create" | "update"
   ) => {
+    const isOnMediaDetailPage = location.pathname.includes(
+      `/media/${newMediaData.id}`
+    );
+
+    if (isOnMediaDetailPage) {
+      return;
+    }
+
     setMediaData(newMediaData);
     setAction(newAction);
     setIsVisible(true);

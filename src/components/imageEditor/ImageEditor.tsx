@@ -44,6 +44,31 @@ const ImageEditorComponent: React.FC<ImageEditorProps> = ({
       document.body.style.overflow = "unset";
     }
 
+    // Only add keyboard handler when editor is NOT visible to prevent conflicts
+    if (!isVisible) {
+      const handleGlobalKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Enter") {
+          const target = e.target as HTMLElement;
+
+          // Block Enter for empty input fields to prevent image editor opening
+          if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+            const inputValue = (target as HTMLInputElement).value?.trim();
+            if (!inputValue) {
+              e.preventDefault();
+              e.stopPropagation();
+              return false;
+            }
+          }
+        }
+      };
+
+      document.addEventListener("keydown", handleGlobalKeyDown, true);
+
+      return () => {
+        document.removeEventListener("keydown", handleGlobalKeyDown, true);
+      };
+    }
+
     // Inject custom CSS to hide download button
     if (isVisible) {
       const styleElement = document.createElement("style");
@@ -55,7 +80,7 @@ const ImageEditorComponent: React.FC<ImageEditorProps> = ({
     }
 
     if (isVisible && editorRef.current && !tuiEditorRef.current) {
-      tuiEditorRef.current = new ImageEditor(editorRef.current, {
+      tuiEditorRef.current = new ImageEditor(editorRef.current as Element, {
         includeUI: {
           loadImage: {
             path: imageSrc,

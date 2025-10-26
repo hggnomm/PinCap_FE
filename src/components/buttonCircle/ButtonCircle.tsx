@@ -22,8 +22,9 @@ interface ButtonCircleProps {
     | "padding-medium"
     | "padding-large"
     | "padding-huge"
-    | "padding-0-8";
-  dropdownMenu?: DropdownItem[]; // Mảng các đối tượng cấu hình cho menu
+    | "padding-0-8"
+    | string;
+  dropdownMenu?: DropdownItem[];
 }
 
 const ButtonCircle = ({
@@ -33,7 +34,6 @@ const ButtonCircle = ({
   paddingClass = "padding-medium",
   dropdownMenu,
 }: ButtonCircleProps) => {
-  // function render menu when receive DropdownItem to implement function whatever
   const renderMenu = () => {
     if (dropdownMenu) {
       return (
@@ -82,7 +82,7 @@ const ButtonCircle = ({
       onClick={onClick}
       tabIndex={0} // focus button
     >
-      {icon && <span className="icon">{icon}</span>}
+      {icon && <span className="icon !m-0">{icon}</span>}
     </button>
   );
 

@@ -49,6 +49,8 @@ const CreateMedia: React.FC = () => {
   // Ref for FilePond container
   const filepondRef = useRef<HTMLDivElement>(null);
 
+  const isUserTagActionRef = useRef<boolean>(false);
+
   const {
     isLoad,
     fileList,
@@ -72,17 +74,38 @@ const CreateMedia: React.FC = () => {
     handleFormChange,
     handleGenerateClick,
     resetForm,
-  } = useCreateMedia(() => form.resetFields());
+  } = useCreateMedia(
+    () => form.resetFields(),
+    (values) => form.setFieldsValue(values)
+  );
 
   const handleTagInput = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      const input = e.target as HTMLInputElement;
+      e.preventDefault();
+      const input = e.currentTarget;
       const newTag = input.value.trim();
-      if (newTag && !tags.includes(newTag)) {
-        setTags((prevTags) => [...prevTags, newTag]);
-        form.resetFields(["tags_name"]);
+
+      if (newTag) {
+        setTags((prevTags) => {
+          if (prevTags.length >= 10) {
+            return prevTags;
+          }
+          if (prevTags.includes(newTag)) {
+            return prevTags;
+          }
+          isUserTagActionRef.current = true;
+          return [...prevTags, newTag];
+        });
       }
+
+      input.value = "";
+      form.setFieldValue("tags_name", "");
     }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    isUserTagActionRef.current = true;
+    setTags((prevTags) => prevTags.filter((t) => t !== tagToRemove));
   };
 
   const handleSelectMediaWithForm = (media: Media) => {
@@ -175,11 +198,12 @@ const CreateMedia: React.FC = () => {
   }, [form]);
 
   useEffect(() => {
-    form.setFieldsValue({
-      tags_name: tags,
-    });
-    form.resetFields(["tags_name"]);
-  }, [tags, form]);
+    if (isUserTagActionRef.current) {
+      isUserTagActionRef.current = false;
+      handleFormChangeWithDebounce();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tags]);
 
   useEffect(() => {
     const addEditButtons = () => {
@@ -410,7 +434,7 @@ const CreateMedia: React.FC = () => {
                   <Tag
                     key={index}
                     closable
-                    onClose={() => setTags(tags.filter((t) => t !== tag))}
+                    onClose={() => handleRemoveTag(tag)}
                     className="custom-tag"
                   >
                     {tag}

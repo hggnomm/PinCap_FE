@@ -109,7 +109,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     setLoading(true);
     setError(null);
     try {
-      const detail: Media = await getDetailMedia(idMedia);
+      const detail: Media = await getDetailMedia(idMedia, true);
       if (detail) {
         setMedia(detail);
         form.setFieldsValue({

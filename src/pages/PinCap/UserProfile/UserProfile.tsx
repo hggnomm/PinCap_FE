@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
+
+import { useParams, Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import { Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";
+
+import { MoreOutlined } from "@ant-design/icons/lib";
+
+import BackButton from "@/components/backButton/BackButton";
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
+import FollowButton from "@/components/FollowButton";
+import Loading from "@/components/loading/Loading";
+import ReportUserModal from "@/components/modal/user/ReportUserModal";
+import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query/useAuth";
 import { useUser } from "@/react-query/useUser";
-import { useNavigate, useParams, Navigate } from "react-router-dom";
-import Loading from "@/components/loading/Loading";
-import { Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";
-import { ROUTES } from "@/constants/routes";
-import FollowButton from "@/components/FollowButton";
-import BackButton from "@/components/backButton/BackButton";
 
 // Reusable StatCard component
 interface StatCardProps {
@@ -67,20 +75,24 @@ const InfoItem: React.FC<InfoItemProps> = ({
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser } = useAuth();
-  const { getUserProfile } = useUser();
-  const navigate = useNavigate();
+  const { getUserProfile, reportUser, getReportReasons } = useUser();
 
   const [followersCount, setFollowersCount] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+
+  const reportReasonsQuery = getReportReasons();
+  const reportReasons = Array.isArray(reportReasonsQuery.data)
+    ? reportReasonsQuery.data
+    : [];
 
   if (id && currentUser && id === currentUser.id) {
     return <Navigate to={ROUTES.PROFILE} replace />;
   }
 
   // Fetch user profile
-  const { data: userProfile, isLoading, error } = getUserProfile(id || "");
+  const { data: userProfile, isLoading } = getUserProfile(id || "");
 
-  // Update local state when profile data changes
   useEffect(() => {
     if (userProfile) {
       setFollowersCount(userProfile.followers_count ?? 0);
@@ -96,8 +108,33 @@ const UserProfile = () => {
     setFollowersCount(newFollowersCount);
   };
 
+  const handleReportUser = async (reasonId?: string, otherReasons?: string) => {
+    if (!id) return;
+
+    try {
+      await reportUser({
+        user_id: id,
+        reason_report_id: reasonId,
+        other_reasons: otherReasons,
+      });
+      toast.success("User reported successfully!");
+      setReportModalVisible(false);
+    } catch (error) {
+      console.error("Error reporting user:", error);
+      toast.error("Failed to report user. Please try again.");
+    }
+  };
+
+  const handleOpenReportModal = () => {
+    setReportModalVisible(true);
+  };
+
+  const handleCloseReportModal = () => {
+    setReportModalVisible(false);
+  };
+
   return (
-    <Loading isLoading={isLoading} error={error}>
+    <Loading isLoading={isLoading}>
       <div className="min-h-screen p-4 md:p-8">
         <div className="max-w-4xl mx-auto relative">
           <BackButton />
@@ -151,14 +188,53 @@ const UserProfile = () => {
                     </p>
                   </div>
 
-                  {/* Follow Button */}
-                  <div className="flex-shrink-0">
+                  <div className="flex items-center gap-3">
+                    {/* Follow Button */}
                     <FollowButton
                       userId={id || ""}
                       initialIsFollowing={isFollowing}
                       initialFollowersCount={followersCount}
                       onFollowChange={handleFollowChange}
                       variant="profile"
+                    />
+
+                    <ButtonCircle
+                      text="More"
+                      paddingClass="p-2.5"
+                      icon={
+                        <MoreOutlined
+                          style={{
+                            fontSize: "26px",
+                            strokeWidth: "40",
+                            stroke: "black",
+                          }}
+                        />
+                      }
+                      dropdownMenu={[
+                        {
+                          key: "report",
+                          title: "Report User",
+                          onClick: handleOpenReportModal,
+                        },
+                        {
+                          key: "block",
+                          title: "Block User",
+                          onClick: () => {
+                            // TODO: Implement block user functionality
+                            toast.info("Block user functionality coming soon!");
+                          },
+                        },
+                        {
+                          key: "share",
+                          title: "Share Profile",
+                          onClick: () => {
+                            // TODO: Implement share profile functionality
+                            toast.info(
+                              "Share profile functionality coming soon!"
+                            );
+                          },
+                        },
+                      ]}
                     />
                   </div>
                 </div>
@@ -183,7 +259,8 @@ const UserProfile = () => {
                       textColor: "text-purple-600 dark:text-purple-400",
                     },
                     {
-                      value: userProfile.reaction_media_count?.toLocaleString() || 0,
+                      value:
+                        userProfile.reaction_media_count?.toLocaleString() || 0,
                       label: "Reaction",
                       icon: <Star className="w-3 h-3 fill-current" />,
                       gradientColors:
@@ -276,9 +353,7 @@ const UserProfile = () => {
                         About
                       </h4>
                       <p className="text-muted-foreground leading-relaxed">
-                        Passionate developer and designer creating beautiful
-                        digital experiences. Love working with modern
-                        technologies and building user-friendly applications.
+                        {userProfile.bio || "No bio available yet."}
                       </p>
                     </div>
                   </div>
@@ -288,6 +363,18 @@ const UserProfile = () => {
           )}
         </div>
       </div>
+
+      <ReportUserModal
+        visible={reportModalVisible}
+        onCancel={handleCloseReportModal}
+        onConfirm={handleReportUser}
+        reportReasons={reportReasons}
+        userName={
+          userProfile
+            ? `${userProfile.first_name} ${userProfile.last_name}`
+            : ""
+        }
+      />
     </Loading>
   );
 };

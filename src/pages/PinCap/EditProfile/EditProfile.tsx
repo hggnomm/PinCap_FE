@@ -1,13 +1,17 @@
+import React, { useRef, useState } from "react";
+
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import { ArrowLeft, Save, Upload, X } from "lucide-react";
+
+import { Form, Input } from "antd";
+
 import FieldItem from "@/components/form/fieldItem/FieldItem";
 import Loading from "@/components/loading/Loading";
 import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query/useAuth";
 import { useUser } from "@/react-query/useUser";
-import { Form, Input } from "antd";
-import { ArrowLeft, Save, Upload, X } from "lucide-react";
-import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 const { TextArea } = Input;
 
@@ -60,7 +64,13 @@ const EditProfile = () => {
     }
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone?: string;
+    bio?: string;
+  }) => {
     try {
       const formData = new FormData();
 
@@ -78,7 +88,7 @@ const EditProfile = () => {
       await updateMyProfile(formData);
       toast.success("Profile updated successfully!");
       navigate(ROUTES.PROFILE);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile. Please try again.");
     }
@@ -93,7 +103,7 @@ const EditProfile = () => {
   const isLoading = isLoadingUser;
 
   return (
-    <Loading isLoading={isLoading} error={null}>
+    <Loading isLoading={isLoading}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
           {userData && (
