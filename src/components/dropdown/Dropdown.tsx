@@ -1,8 +1,11 @@
 import React from "react";
+
+import { clsx } from "clsx";
+
+import { DownOutlined } from "@ant-design/icons";
+
 import { Dropdown as AntDropdown, Button } from "antd";
 import type { MenuProps } from "antd";
-import { DownOutlined } from "@ant-design/icons";
-import clsx from "clsx";
 import "./Dropdown.less";
 
 interface DropdownProps {
@@ -80,10 +83,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       className={className}
       dropdownRender={(menu) => (
         <div
-          className={clsx(
-            "custom-dropdown-menu",
-            overlayClassName
-          )}
+          className={clsx("custom-dropdown-menu", overlayClassName)}
           style={dropdownStyle}
         >
           {menu}

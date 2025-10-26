@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 
 import { clsx } from "clsx";
 
-import ModalComponent from "@/components/modal/ModalComponent";
 import { MEDIA_TYPES } from "@/constants/constants";
 import type { Media } from "@/types/type";
 import { getFirstImageUrl } from "@/utils/utils";
+
+const ModalComponent = lazy(() => import("@/components/modal/ModalComponent"));
 
 interface MediaThumbnailSelectorProps {
   visible: boolean;
@@ -55,170 +56,172 @@ const MediaThumbnailSelector: React.FC<MediaThumbnailSelectorProps> = ({
   );
 
   return (
-    <ModalComponent
-      title={title}
-      visible={visible}
-      onCancel={onCancel}
-      onConfirm={handleConfirm}
-      buttonLabels={{
-        confirmLabel: "Select Thumbnail",
-        cancelLabel: "Cancel",
-      }}
-      className="!w-[800px]"
-    >
-      <div
-        className="media-thumbnail-selector"
-        style={{
-          background: "hsl(var(--background))",
-          color: "hsl(var(--foreground))",
+    <Suspense fallback={<></>}>
+      <ModalComponent
+        title={title}
+        visible={visible}
+        onCancel={onCancel}
+        onConfirm={handleConfirm}
+        buttonLabels={{
+          confirmLabel: "Select Thumbnail",
+          cancelLabel: "Cancel",
         }}
+        className="!w-[800px]"
       >
-        {imageMedias.length === 0 ? (
-          <div
-            className="text-center py-12"
-            style={{
-              background:
-                "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%)",
-              borderRadius: "var(--radius)",
-              border: "1px solid hsl(var(--border))",
-            }}
-          >
+        <div
+          className="media-thumbnail-selector"
+          style={{
+            background: "hsl(var(--background))",
+            color: "hsl(var(--foreground))",
+          }}
+        >
+          {imageMedias.length === 0 ? (
             <div
-              className="text-6xl mb-4 opacity-40"
-              style={{ color: "hsl(var(--muted-foreground))" }}
-            >
-              📷
-            </div>
-            <h3
-              className="text-xl font-semibold mb-2"
-              style={{ color: "hsl(var(--foreground))" }}
-            >
-              No images available
-            </h3>
-            <p
-              className="text-sm opacity-70"
-              style={{ color: "hsl(var(--muted-foreground))" }}
-            >
-              Add some images to this album to set as thumbnail
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="mb-6">
-              <p
-                className="text-sm font-medium mb-2"
-                style={{ color: "hsl(var(--foreground))" }}
-              >
-                Choose your album thumbnail
-              </p>
-              <p
-                className="text-xs opacity-70"
-                style={{ color: "hsl(var(--muted-foreground))" }}
-              >
-                Select an image that best represents your album
-              </p>
-            </div>
-
-            <div
-              className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scroll-bar"
+              className="text-center py-12"
               style={{
-                scrollbarWidth: "thin",
-                scrollbarColor: "hsl(var(--border)) transparent",
+                background:
+                  "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%)",
+                borderRadius: "var(--radius)",
+                border: "1px solid hsl(var(--border))",
               }}
             >
-              {imageMedias.map((media) => {
-                // Get the appropriate image URL based on media type
-                const getImageUrl = () => {
-                  if (media.type === MEDIA_TYPES.IMAGE) {
+              <div
+                className="text-6xl mb-4 opacity-40"
+                style={{ color: "hsl(var(--muted-foreground))" }}
+              >
+                📷
+              </div>
+              <h3
+                className="text-xl font-semibold mb-2"
+                style={{ color: "hsl(var(--foreground))" }}
+              >
+                No images available
+              </h3>
+              <p
+                className="text-sm opacity-70"
+                style={{ color: "hsl(var(--muted-foreground))" }}
+              >
+                Add some images to this album to set as thumbnail
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6">
+                <p
+                  className="text-sm font-medium mb-2"
+                  style={{ color: "hsl(var(--foreground))" }}
+                >
+                  Choose your album thumbnail
+                </p>
+                <p
+                  className="text-xs opacity-70"
+                  style={{ color: "hsl(var(--muted-foreground))" }}
+                >
+                  Select an image that best represents your album
+                </p>
+              </div>
+
+              <div
+                className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scroll-bar"
+                style={{
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "hsl(var(--border)) transparent",
+                }}
+              >
+                {imageMedias.map((media) => {
+                  // Get the appropriate image URL based on media type
+                  const getImageUrl = () => {
+                    if (media.type === MEDIA_TYPES.IMAGE) {
+                      return media.media_url;
+                    } else if (media.type === MEDIA_TYPES.FLEXIBLE) {
+                      return getFirstImageUrl(media.media_url);
+                    }
                     return media.media_url;
-                  } else if (media.type === MEDIA_TYPES.FLEXIBLE) {
-                    return getFirstImageUrl(media.media_url);
-                  }
-                  return media.media_url;
-                };
+                  };
 
-                const imageUrl = getImageUrl();
-                // For FLEXIBLE type, we need to compare with the original media_url (JSON array)
-                // For IMAGE type, we compare with the media_url directly
-                const isSelected = tempSelectedUrl === media.media_url;
+                  const imageUrl = getImageUrl();
+                  // For FLEXIBLE type, we need to compare with the original media_url (JSON array)
+                  // For IMAGE type, we compare with the media_url directly
+                  const isSelected = tempSelectedUrl === media.media_url;
 
-                return (
-                  <div
-                    key={media.id}
-                    className={clsx(
-                      "relative cursor-pointer rounded-xl overflow-hidden transition-all duration-300"
-                    )}
-                    onClick={() => handleMediaClick(media.media_url)}
-                    style={{
-                      border: isSelected
-                        ? "2px solid hsl(var(--primary))"
-                        : "2px solid hsl(var(--border))",
-                      boxShadow: isSelected
-                        ? "0 0 20px hsla(var(--primary), 0.3)"
-                        : "0 4px 12px hsla(0, 0%, 0%, 0.1)",
-                      background: "hsl(var(--card))",
-                    }}
-                  >
-                    <div className="aspect-square relative">
-                      <img
-                        src={imageUrl || "/placeholder.svg"}
-                        alt={media.media_name}
-                        className="w-full h-full object-cover"
-                        style={{
-                          filter: isSelected
-                            ? "brightness(1.1)"
-                            : "brightness(0.95)",
-                        }}
-                      />
+                  return (
+                    <div
+                      key={media.id}
+                      className={clsx(
+                        "relative cursor-pointer rounded-xl overflow-hidden transition-all duration-300"
+                      )}
+                      onClick={() => handleMediaClick(media.media_url)}
+                      style={{
+                        border: isSelected
+                          ? "2px solid hsl(var(--primary))"
+                          : "2px solid hsl(var(--border))",
+                        boxShadow: isSelected
+                          ? "0 0 20px hsla(var(--primary), 0.3)"
+                          : "0 4px 12px hsla(0, 0%, 0%, 0.1)",
+                        background: "hsl(var(--card))",
+                      }}
+                    >
+                      <div className="aspect-square relative">
+                        <img
+                          src={imageUrl || "/placeholder.svg"}
+                          alt={media.media_name}
+                          className="w-full h-full object-cover"
+                          style={{
+                            filter: isSelected
+                              ? "brightness(1.1)"
+                              : "brightness(0.95)",
+                          }}
+                        />
 
-                      {/* Hover overlay */}
-                      <div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, hsla(var(--primary), 0.1) 0%, hsla(var(--accent), 0.1) 100%)",
-                        }}
-                      />
-                    </div>
-
-                    {/* Selection indicator */}
-                    {isSelected && (
-                      <div
-                        className="absolute inset-0 flex items-center justify-center"
-                        style={{
-                          background: "hsla(var(--primary), 0.15)",
-                        }}
-                      >
+                        {/* Hover overlay */}
                         <div
-                          className="rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
+                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                           style={{
                             background:
-                              "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)",
-                            color: "hsl(var(--primary-foreground))",
+                              "linear-gradient(135deg, hsla(var(--primary), 0.1) 0%, hsla(var(--accent), 0.1) 100%)",
+                          }}
+                        />
+                      </div>
+
+                      {/* Selection indicator */}
+                      {isSelected && (
+                        <div
+                          className="absolute inset-0 flex items-center justify-center"
+                          style={{
+                            background: "hsla(var(--primary), 0.15)",
                           }}
                         >
-                          <svg
-                            className="w-6 h-6"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
+                          <div
+                            className="rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
+                            style={{
+                              background:
+                                "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)",
+                              color: "hsl(var(--primary-foreground))",
+                            }}
                           >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                            <svg
+                              className="w-6 h-6"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </div>
-    </ModalComponent>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </ModalComponent>
+    </Suspense>
   );
 };
 

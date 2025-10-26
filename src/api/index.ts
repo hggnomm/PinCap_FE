@@ -16,6 +16,9 @@ export * from './comments';
 // AI APIs
 export * from './ai';
 
+// Vision APIs
+export * from './vision';
+
 // Notification APIs
 export * from './notifications';
 

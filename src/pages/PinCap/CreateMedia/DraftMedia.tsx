@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 
 import { toast } from "react-toastify";
 
@@ -9,11 +9,12 @@ import { Divider } from "antd/es";
 import { getDetailMedia } from "@/api/media";
 import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import Loading from "@/components/loading/Loading";
-import ModalComponent from "@/components/modal/ModalComponent";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { useMedia } from "@/react-query/useMedia";
 import { Media } from "@/types/type";
 import { getMediaPreviewUrl, isMediaVideo } from "@/utils/utils";
+
+const ModalComponent = lazy(() => import("@/components/modal/ModalComponent"));
 
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;
@@ -154,38 +155,40 @@ const DraftMedia = ({
           ))}
         </div>
 
-        <ModalComponent
-          titleDefault="Delete this draft?"
-          visible={deleteModalVisible}
-          onCancel={() => setDeleteModalVisible(false)}
-          onConfirm={deleteDraft}
-          buttonLabels={{
-            confirmLabel: deleteMediaLoading ? "Deleting..." : "Delete",
-            cancelLabel: "Cancel",
-          }}
-          confirmLoading={deleteMediaLoading}
-        >
-          <div
-            style={{
-              marginBottom: 20,
-              marginTop: 20,
+        <Suspense fallback={<></>}>
+          <ModalComponent
+            titleDefault="Delete this draft?"
+            visible={deleteModalVisible}
+            onCancel={() => setDeleteModalVisible(false)}
+            onConfirm={deleteDraft}
+            buttonLabels={{
+              confirmLabel: deleteMediaLoading ? "Deleting..." : "Delete",
+              cancelLabel: "Cancel",
             }}
+            confirmLoading={deleteMediaLoading}
           >
-            Are you sure you want to delete this draft
-            <p
+            <div
               style={{
-                fontWeight: 500,
-                fontSize: "1.1em",
-                display: "inline",
-                marginRight: "5px",
-                marginLeft: "5px",
+                marginBottom: 20,
+                marginTop: 20,
               }}
             >
-              {detailMedia?.media_name}
-            </p>
-            This action cannot be undone.
-          </div>
-        </ModalComponent>
+              Are you sure you want to delete this draft
+              <p
+                style={{
+                  fontWeight: 500,
+                  fontSize: "1.1em",
+                  display: "inline",
+                  marginRight: "5px",
+                  marginLeft: "5px",
+                }}
+              >
+                {detailMedia?.media_name}
+              </p>
+              This action cannot be undone.
+            </div>
+          </ModalComponent>
+        </Suspense>
       </Loading>
     </div>
   );

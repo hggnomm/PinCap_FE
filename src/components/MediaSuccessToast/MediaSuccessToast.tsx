@@ -88,7 +88,7 @@ const MediaSuccessToast: React.FC<MediaSuccessToastProps> = ({
             damping: 25,
             duration: 0.6,
           }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] max-w-[450px] w-[90%] sm:w-[95%]"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[199] max-w-[450px] w-[90%] sm:w-[95%]"
         >
           <div className="bg-[#1a1a1a] rounded-xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/10 flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 sm:w-10 sm:h-10">

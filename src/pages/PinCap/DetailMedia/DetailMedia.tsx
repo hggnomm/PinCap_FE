@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import { clsx } from "clsx";
 import { saveAs } from "file-saver";
@@ -12,6 +13,7 @@ import download from "@/assets/img/PinCap/download.png";
 import more from "@/assets/img/PinCap/more.png";
 import AlbumDropdown from "@/components/albumDropdown";
 import BackButton from "@/components/backButton/BackButton";
+import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
 import FollowButton from "@/components/FollowButton";
 import Loading from "@/components/loading/Loading";
 import MediaViewer from "@/components/mediaViewer/MediaViewer";
@@ -27,6 +29,13 @@ import ListComments from "./ListComments/ListComments";
 
 import "./index.less";
 
+const EditMediaModal = lazy(
+  () => import("@/components/modal/media/EditMediaModal")
+);
+const DeleteMediaModal = lazy(
+  () => import("@/components/modal/media/DeleteMediaModal")
+);
+
 const DetailMedia = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,7 +46,7 @@ const DetailMedia = () => {
   );
 
   const { mediaReaction, mediaReactionLoading } = useMedia();
-
+  const { deleteMedia } = useMedia();
   const {
     data: mediaData,
     isLoading: loading,
@@ -47,6 +56,8 @@ const DetailMedia = () => {
   const [media, setMedia] = useState<Media | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [shouldOpenComments, setShouldOpenComments] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   // Redirect to 404 if no media ID provided
   useEffect(() => {
@@ -113,22 +124,22 @@ const DetailMedia = () => {
       });
 
       if (response) {
-        setMedia((prevState): any => {
+        setMedia((prevState: Media | null): Media | null => {
           if (!prevState) return null;
-
           return {
             ...prevState,
-            reaction_user_count: Math.max(0, newReactionCount), // Đảm bảo không âm
+            reaction_user_count: Math.max(0, newReactionCount),
             reaction: {
               ...prevState.reaction,
               feeling_id:
-                prevState.reaction?.feeling_id === feelingId ? null : feelingId, // Cập nhật trạng thái react
-              id: prevState.reaction?.id || "", // Đảm bảo reaction.id luôn là string
+                prevState.reaction?.feeling_id === feelingId ? null : feelingId,
+              id: prevState.reaction?.id || "",
             },
-          };
+          } as Media;
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error("Error when reacting to a media:", error);
       setError("Error when reacting to a media!");
     }
   };
@@ -157,6 +168,41 @@ const DetailMedia = () => {
       console.log("Resetting shouldOpenComments to false");
       setShouldOpenComments(false);
     }, 1000);
+  };
+
+  const handleEditMedia = () => {
+    setIsEditModalVisible(true);
+  };
+
+  const handleEditModalCancel = () => {
+    setIsEditModalVisible(false);
+  };
+
+  const handleEditModalSuccess = () => {
+    if (mediaData) {
+      setMedia(mediaData);
+    }
+  };
+
+  const handleDeleteMedia = () => {
+    setIsDeleteModalVisible(true);
+    setIsEditModalVisible(false);
+  };
+
+  const handleDeleteModalCancel = () => {
+    setIsDeleteModalVisible(false);
+    setIsEditModalVisible(true);
+  };
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteMedia([media?.id || ""]);
+      toast.success("Media deleted successfully!");
+      setIsDeleteModalVisible(false);
+      setIsEditModalVisible(false);
+      navigate(ROUTES.MY_MEDIA);
+    } catch (error) {
+      console.error("Error deleting media:", error);
+    }
   };
 
   return (
@@ -203,9 +249,28 @@ const DetailMedia = () => {
                     <button onClick={handleDownload}>
                       <img src={download} alt="download" />
                     </button>
-                    <button>
-                      <img src={more} alt="more" />
-                    </button>
+                    <ButtonCircle
+                      icon={<img src={more} alt="more" />}
+                      dropdownMenu={[
+                        ...(media?.ownerUser?.id === tokenPayload.id
+                          ? [
+                              {
+                                key: "edit-media",
+                                title: "Edit Media",
+                                onClick: handleEditMedia,
+                              },
+                            ]
+                          : []),
+                        {
+                          key: "report-media",
+                          title: "Report Media",
+                          onClick: () => {
+                            // TODO: Implement report media logic
+                            console.log("Report Media clicked");
+                          },
+                        },
+                      ]}
+                    />
                   </div>
                   <div className="action-right flex">
                     <AlbumDropdown
@@ -314,6 +379,23 @@ const DetailMedia = () => {
         queryKey={["medias", "detail-page"]}
         queryFn={(pageParam) => getAllMedias({ pageParam })}
       />
+
+      <Suspense fallback={<></>}>
+        <EditMediaModal
+          visible={isEditModalVisible}
+          media={media}
+          onCancel={handleEditModalCancel}
+          onDeleteClick={handleDeleteMedia}
+          onSuccess={handleEditModalSuccess}
+        />
+
+        <DeleteMediaModal
+          visible={isDeleteModalVisible}
+          media={media}
+          onCancel={handleDeleteModalCancel}
+          onConfirm={handleDeleteConfirm}
+        />
+      </Suspense>
     </div>
   );
 };

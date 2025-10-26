@@ -64,6 +64,8 @@ export type Media = {
   reaction: Reaction;
   feelings: Feeling[];
   commentCount: number;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type Album = {
@@ -82,7 +84,7 @@ export type Album = {
 
 export type Tag = {
   id: string;
-  name: string;
+  tag_name?: string;
   latestMediaUrl?: string;
 };
 

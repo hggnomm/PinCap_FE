@@ -3,6 +3,7 @@
 // If you are unsure about how to use it, feel free to explore other references or implementations of similar button components for guidance.
 
 import React from "react";
+
 import "./ButtonCircle.less";
 import { Dropdown, Menu } from "antd";
 
@@ -44,7 +45,7 @@ const ButtonCircle = ({
             boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
             borderRadius: 10,
             background: "#F6F6F6",
-            zIndex: 9999,
+            zIndex: 10,
           }}
         >
           {text && (

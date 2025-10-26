@@ -11,6 +11,7 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import { CloseCircleOutlined } from "@ant-design/icons";
 
+import { ENV } from "@/constants/env";
 import { addMessage, setTyping } from "@/store/chatSlice";
 import { RootState } from "@/store/store";
 import "./index.less";
@@ -21,7 +22,7 @@ interface ChatbotProps {
 }
 
 // Initialize connection with Google Generative AI
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(ENV.GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {

@@ -1,11 +1,15 @@
 import React, { useEffect, useMemo, useCallback } from "react";
+
 import "./ViewPinComponent.less";
-import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
-import Loading from "@/components/loading/Loading";
-import { motion } from "framer-motion";
-import { Media } from "type";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
+
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+
+import Loading from "@/components/loading/Loading";
+import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
+
+import { Media } from "type";
 
 /**
  * MediaList Component - Hiển thị danh sách media với infinite scroll
@@ -69,7 +73,6 @@ const MediaList: React.FC<MediaListProps> = ({
   const {
     data,
     status,
-    error,
     fetchNextPage,
     isFetchingNextPage,
     isFetching,
@@ -169,7 +172,7 @@ const MediaList: React.FC<MediaListProps> = ({
   }
 
   return (
-    <Loading isLoading={isFetching || isFetchingNextPage} error={error}>
+    <Loading isLoading={isFetching || isFetchingNextPage}>
       {contentWrapper}
     </Loading>
   );
