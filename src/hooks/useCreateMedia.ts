@@ -118,6 +118,18 @@ export const useCreateMedia = (
           updateFormFields({ id: newDraftId });
         }
 
+        // If updating an existing draft, refresh the current data
+        if (!isCreated && formValue.id) {
+          try {
+            const refreshedDraft = await getDetailMedia(newDraftId, true);
+            if (refreshedDraft) {
+              handleSelectMedia(refreshedDraft, true);
+            }
+          } catch (error) {
+            console.error("Error refreshing draft data:", error);
+          }
+        }
+
         if (isCreated && response?.media) {
           showToast(response.media, formValue.id ? "update" : "create");
         }
@@ -221,7 +233,7 @@ export const useCreateMedia = (
       // Only fetch if draftId exists and hasn't been fetched yet
       if (draftId && draftId !== fetchedDraftId) {
         try {
-          const detailDraft = await getDetailMedia(draftId);
+          const detailDraft = await getDetailMedia(draftId, true);
           if (detailDraft) {
             // Update state
             setImageUrl(detailDraft.media_url);
