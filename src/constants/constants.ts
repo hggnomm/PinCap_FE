@@ -1,5 +1,7 @@
-export const ACCESS_TOKEN_KEY = (import.meta as unknown as { env: { VITE_ACCESS_TOKEN_KEY: string } }).env.VITE_ACCESS_TOKEN_KEY || "";
-export const REFRESH_TOKEN_KEY = (import.meta as unknown as { env: { VITE_REFRESH_TOKEN_KEY: string } }).env.VITE_REFRESH_TOKEN_KEY || "";
+import { ENV } from "./env";
+
+export const ACCESS_TOKEN_KEY = ENV.ACCESS_TOKEN_KEY;
+export const REFRESH_TOKEN_KEY = ENV.REFRESH_TOKEN_KEY;
 
 export const NOTIFICATION_TYPES = {
   MEDIA_CREATED: "MEDIA_CREATED",
@@ -33,17 +35,17 @@ export const ALBUM_ROLES = {
   OWNER: "OWNER",
   EDIT: "EDIT",
   VIEW: "VIEW",
-}
+};
 
 export const PRIVACY = {
   PRIVATE: "0",
-  PUBLIC: "1"
+  PUBLIC: "1",
 } as const;
 
 export const MEDIA_TYPES = {
   VIDEO: "VIDEO",
   IMAGE: "IMAGE",
   FLEXIBLE: null,
-  // FLEXIBLE MEDIA TYPES IS ARRAY OF MEDIA TYPES LIKES 
+  // FLEXIBLE MEDIA TYPES IS ARRAY OF MEDIA TYPES LIKES
   // "[\"https:\\/\\/pincap.s3.ap-southeast-1.amazonaws.com\\/Medias\\/Image\\/1760702415-z6703733586885_cbc333e3c0161e0613dfd5f22a5c5bab.jpg\",\"https:\\/\\/pincap.s3.ap-southeast-1.amazonaws.com\\/Medias\\/Image\\/1760702415-z6703733534203_1da507f170e5820f45beb9b78ba14664.jpg\",\"https:\\/\\/pincap.s3.ap-southeast-1.amazonaws.com\\/Medias\\/Image\\/1760702415-z6703736889409_61f264815eccb2ee20b3a921a1b0d7af.jpg\"]"
 };

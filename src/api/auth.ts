@@ -1,7 +1,9 @@
 import axios from "axios";
 import apiClient from "./apiClient";
 import type { User } from "@/types/type";
-const baseUrl = (import.meta as any).env.VITE_BASE_API as string;
+import { ENV } from "@/constants/env";
+
+const baseUrl = ENV.BASE_API;
 
 export const login = async (data: any) => {
   var config = {
@@ -55,7 +57,7 @@ export const register = async (data: any) => {
 
 export const getCurrentUser = async (): Promise<User> => {
   try {
-    const response = await apiClient.get('/api/users/my-profile');
+    const response = await apiClient.get("/api/users/my-profile");
     return response.data;
   } catch (error) {
     throw error;
@@ -64,7 +66,7 @@ export const getCurrentUser = async (): Promise<User> => {
 
 export const logout = async () => {
   try {
-    const response = await apiClient.post('/api/auth/logout');
+    const response = await apiClient.post("/api/auth/logout");
     return response.data;
   } catch (error) {
     throw error;
@@ -84,7 +86,9 @@ export const verifyEmail = async (token: string) => {
 // Resend verification email
 export const resendVerifyEmail = async (email: string) => {
   try {
-    const response = await apiClient.post('/api/auth/resend-verify-email', { email });
+    const response = await apiClient.post("/api/auth/resend-verify-email", {
+      email,
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -94,7 +98,9 @@ export const resendVerifyEmail = async (email: string) => {
 // Forgot password
 export const forgotPassword = async (email: string) => {
   try {
-    const response = await apiClient.post('/api/auth/forgot-password', { email });
+    const response = await apiClient.post("/api/auth/forgot-password", {
+      email,
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -102,9 +108,12 @@ export const forgotPassword = async (email: string) => {
 };
 
 // Reset password
-export const resetPassword = async (data: { token: string; password: string }) => {
+export const resetPassword = async (data: {
+  token: string;
+  password: string;
+}) => {
   try {
-    const response = await apiClient.post('/api/auth/reset-password', data);
+    const response = await apiClient.post("/api/auth/reset-password", data);
     return response.data;
   } catch (error) {
     throw error;
@@ -114,7 +123,7 @@ export const resetPassword = async (data: { token: string; password: string }) =
 // Get Google OAuth URL
 export const getGoogleOAuthUrl = async () => {
   try {
-    const response = await apiClient.get('/api/auth/google/url');
+    const response = await apiClient.get("/api/auth/google/url");
     return response.data;
   } catch (error) {
     throw error;
@@ -124,7 +133,7 @@ export const getGoogleOAuthUrl = async () => {
 // Health check endpoint
 export const healthCheck = async () => {
   try {
-    const response = await apiClient.get('/api/health-check');
+    const response = await apiClient.get("/api/health-check");
     return response.data;
   } catch (error) {
     throw error;

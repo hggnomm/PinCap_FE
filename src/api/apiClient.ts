@@ -1,9 +1,10 @@
 import axios from "axios";
 
+import { ENV } from "@/constants/env";
 import { ROUTES } from "@/constants/routes";
 import { showApiError } from "@/utils/errorHandler";
 
-const baseUrl = (import.meta as unknown as { env: { VITE_BASE_API: string } }).env.VITE_BASE_API;
+const baseUrl = ENV.BASE_API;
 
 const apiClient = axios.create({
   baseURL: baseUrl,
@@ -33,14 +34,14 @@ apiClient.interceptors.response.use(
     let errorData = {
       status: 500,
       message: "An unknown error occurred",
-      errors: []
+      errors: [],
     };
 
     if (error.response) {
       const status = error.response.status;
       const message = error.response.data.message || "An error occurred";
       const errors = error.response.data.errors || [];
-      
+
       errorData = {
         status: status,
         message: message,
@@ -50,10 +51,13 @@ apiClient.interceptors.response.use(
       if (status === 401) {
         localStorage.removeItem("token");
         const currentPath = window.location.pathname;
-        if (!currentPath.includes(ROUTES.LOGIN) && !currentPath.includes(ROUTES.REGISTER)) {
+        if (
+          !currentPath.includes(ROUTES.LOGIN) &&
+          !currentPath.includes(ROUTES.REGISTER)
+        ) {
           window.location.href = ROUTES.LOGIN;
         }
-        
+
         return Promise.reject(errorData);
       }
     } else if (error.request) {

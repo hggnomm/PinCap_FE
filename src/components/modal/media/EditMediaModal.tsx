@@ -12,9 +12,11 @@ import Loading from "@/components/loading/Loading";
 import MediaViewer from "@/components/mediaViewer/MediaViewer";
 import ModalComponent from "@/components/modal/ModalComponent";
 import { PRIVACY } from "@/constants/constants";
+import { useMediaToast } from "@/contexts/MediaToastContext";
 import { useAlbum } from "@/react-query/useAlbum";
 import { useMedia } from "@/react-query/useMedia";
 import { Media } from "@/types/type";
+import { UpdateMediaFormData } from "@/validation/media";
 
 interface EditMediaModalProps {
   visible: boolean;
@@ -42,6 +44,7 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
   const [isComment, setIsComment] = useState(false);
   const { updateMedia } = useMedia();
   const { removeMediasFromAlbum } = useAlbum();
+  const { showToast } = useMediaToast();
 
   // Initialize form when modal opens with media data
   useEffect(() => {
@@ -69,16 +72,21 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
 
     try {
       const formValue = await form.validateFields();
-      const updatedData = {
+      const updatedData: UpdateMediaFormData = {
+        id: media.id,
         media_name: formValue.media_name,
         description: formValue.description,
         privacy: privacy ? PRIVACY.PRIVATE : PRIVACY.PUBLIC,
-        is_comment: isComment,
+        is_comment: isComment ? 1 : 0,
       };
 
-      await updateMedia({ id: media.id, data: updatedData });
+      const response = await updateMedia({ id: media.id, data: updatedData });
       onCancel();
-      toast.success("Media updated successfully!");
+
+      if (response?.media) {
+        showToast(response.media, "update");
+      }
+
       onSuccess?.();
     } catch (error: unknown) {
       if (error instanceof Error && "errorFields" in error) {
@@ -109,8 +117,8 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
       bodyClassName="!max-h-[75vh] !overflow-hidden"
     >
       <Loading isLoading={visible && !media}>
-        <div className="flex flex-col lg:flex-row items-start gap-6 h-full">
-          <div className="flex-shrink-0 w-full lg:max-w-[400px] max-h-[70vh] overflow-y-auto pr-2">
+        <div className="flex flex-col md:flex-row items-start gap-6 h-full">
+          <div className="flex-shrink-0 w-full md:max-w-[400px] max-h-[70vh] overflow-y-auto pr-2">
             <Form form={form} layout="vertical">
               <FieldItem
                 label="Title"
@@ -167,7 +175,7 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
                     toast.success("Removed media from album");
                     onRemovedFromAlbum?.();
                     onCancel();
-                  } catch (e) {
+                  } catch {
                     toast.error("Failed to remove media from album");
                   }
                 }}

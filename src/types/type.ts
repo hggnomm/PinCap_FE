@@ -84,7 +84,7 @@ export type Album = {
 
 export type Tag = {
   id: string;
-  name: string;
+  tag_name?: string;
   latestMediaUrl?: string;
 };
 

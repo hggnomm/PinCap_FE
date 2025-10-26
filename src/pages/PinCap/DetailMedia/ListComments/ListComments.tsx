@@ -133,6 +133,7 @@ const ListComments: React.FC<ListCommentsProps> = ({
                     <img
                       src={comment?.avatar ?? "/placeholder-user.jpg"}
                       alt="avatar"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="content">

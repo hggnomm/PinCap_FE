@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import "./index.less";
 import "./FilePond.less";
 import { FilePond, registerPlugin } from "react-filepond";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { clsx } from "clsx";
@@ -22,15 +20,12 @@ import Title from "antd/es/typography/Title";
 
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 
-import { getDetailMedia } from "@/api/media";
 import ImageEditor from "@/components/imageEditor";
 import MediaViewer from "@/components/mediaViewer/MediaViewer";
 import { PRIVACY } from "@/constants/constants";
-import { useMediaToast } from "@/contexts/MediaToastContext";
-import { useMedia } from "@/react-query/useMedia";
-import { TokenPayload } from "@/types/Auth";
+import { useCreateMedia } from "@/hooks";
 import { Media } from "@/types/type";
-import { CreateMediaFormData, UpdateMediaFormData } from "@/validation/media";
+import { getTagName } from "@/utils/tagMapping";
 
 import DraftMedia from "./DraftMedia";
 
@@ -44,31 +39,6 @@ registerPlugin(
 
 const CreateMedia: React.FC = () => {
   const [form] = Form.useForm();
-  const tokenPayload = useSelector(
-    (state: { auth: TokenPayload }) => state.auth
-  );
-  const { createMedia, updateMedia, getMyMedia } = useMedia();
-  const { showToast } = useMediaToast();
-  const [isLoad, setIsLoad] = useState<boolean>(false);
-  const [fileList, setFileList] = useState<File[]>([]);
-  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
-  const [tags, setTags] = useState<string[]>([]);
-  const [isSelectedDraft, setIsSelectedDraft] = useState<boolean>(false);
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
-    null
-  );
-  const [isFormDisabled, setIsFormDisabled] = useState<boolean>(true);
-  const [isLoadCreateDraft, setIsLoadCreateDraft] = useState<boolean>(false);
-  const [textCreateDraft, setTextCreateDraft] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState("");
-
-  const [draftId, setDraftId] = useState<string>("");
-
-  const {
-    data: drafts = [],
-    isLoading: loadingDrafts,
-    refetch: refetchDrafts,
-  } = getMyMedia(1, false, drawerVisible);
 
   // Image Editor states
   const [isImageEditorVisible, setIsImageEditorVisible] =
@@ -79,7 +49,110 @@ const CreateMedia: React.FC = () => {
   // Ref for FilePond container
   const filepondRef = useRef<HTMLDivElement>(null);
 
-  // Load media preview plugin dynamically
+  const {
+    isLoad,
+    fileList,
+    setFileList,
+    drawerVisible,
+    setDrawerVisible,
+    tags,
+    setTags,
+    isSelectedDraft,
+    setIsSelectedDraft,
+    isFormDisabled,
+    isLoadCreateDraft,
+    textCreateDraft,
+    imageUrl,
+    setImageUrl,
+    draftId,
+    drafts,
+    loadingDrafts,
+    refetchDrafts,
+    handleSelectMedia,
+    handleFormChange,
+    handleGenerateClick,
+    resetForm,
+  } = useCreateMedia(() => form.resetFields());
+
+  const handleTagInput = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const input = e.target as HTMLInputElement;
+      const newTag = input.value.trim();
+      if (newTag && !tags.includes(newTag)) {
+        setTags((prevTags) => [...prevTags, newTag]);
+        form.resetFields(["tags_name"]);
+      }
+    }
+  };
+
+  const handleSelectMediaWithForm = (media: Media) => {
+    form.setFieldsValue({
+      media_name: media.media_name,
+      description: media.description,
+      privacy: media.privacy === "1" ? PRIVACY.PUBLIC : PRIVACY.PRIVATE,
+      tags_name: media.tags?.map(getTagName) || [],
+      id: media.id,
+    });
+    handleSelectMedia(media);
+  };
+
+  const handleFormChangeWithDebounce = () => {
+    const formValue = form.getFieldsValue(true);
+    handleFormChange(formValue);
+  };
+
+  const handlePublish = async () => {
+    const formValue = form.getFieldsValue(true);
+    await handleGenerateClick(formValue);
+  };
+
+  const handleOpenImageEditor = (index: number = 0) => {
+    let imageSrc = "";
+
+    if (imageUrl && index === 0) {
+      imageSrc = imageUrl;
+    } else if (fileList.length > index) {
+      imageSrc = URL.createObjectURL(fileList[index]);
+    }
+
+    if (imageSrc) {
+      setEditingImageSrc(imageSrc);
+      setEditingImageIndex(index);
+      setIsImageEditorVisible(true);
+    }
+  };
+
+  const handleImageEdited = (editedBlob: Blob) => {
+    const editedFile = new File([editedBlob], "edited-image.jpg", {
+      type: "image/jpeg",
+    });
+
+    if (editingImageIndex === 0 && imageUrl) {
+      setFileList([editedFile]);
+      setImageUrl("");
+      setIsSelectedDraft(false);
+    } else {
+      const newFileList = [...fileList];
+      newFileList[editingImageIndex] = editedFile;
+      setFileList(newFileList);
+    }
+
+    setIsImageEditorVisible(false);
+    setEditingImageSrc("");
+    setEditingImageIndex(-1);
+  };
+
+  const handleCloseImageEditor = () => {
+    setIsImageEditorVisible(false);
+    setEditingImageSrc("");
+    setEditingImageIndex(-1);
+  };
+
+  const handleResetForm = () => {
+    form.resetFields();
+    resetForm();
+  };
+
   useEffect(() => {
     const loadMediaPreview = async () => {
       try {
@@ -95,24 +168,6 @@ const CreateMedia: React.FC = () => {
     loadMediaPreview();
   }, []);
 
-  const handleSelectMedia = useCallback(
-    (media: Media) => {
-      form.setFieldsValue({
-        media_name: media.media_name,
-        description: media.description,
-        privacy: media.privacy == "PUBLIC" ? PRIVACY.PUBLIC : PRIVACY.PRIVATE,
-        tags_name: media.tags_name,
-        id: media.id,
-      });
-
-      setImageUrl(media.media_url);
-      setIsSelectedDraft(true);
-      setFileList([]);
-      setTags(media.tags_name || []);
-    },
-    [form]
-  );
-
   useEffect(() => {
     if (!form.getFieldValue("privacy")) {
       form.setFieldsValue({ privacy: PRIVACY.PRIVATE });
@@ -120,225 +175,11 @@ const CreateMedia: React.FC = () => {
   }, [form]);
 
   useEffect(() => {
-    const fetchDraftDetail = async () => {
-      if (draftId && drafts.length > 0) {
-        try {
-          const detailDraft = await getDetailMedia(draftId);
-          if (detailDraft) {
-            handleSelectMedia(detailDraft);
-          }
-        } catch (error) {
-          toast.error("Error fetching draft details: " + error);
-        }
-      }
-    };
-
-    fetchDraftDetail();
-  }, [draftId, drafts, handleSelectMedia]);
-
-  useEffect(() => {
-    if (fileList.length > 0) {
-      setIsFormDisabled(false);
-    } else if (isSelectedDraft) {
-      setIsFormDisabled(false);
-    } else {
-      setIsFormDisabled(true);
-    }
-  }, [fileList, isSelectedDraft]);
-
-  useEffect(() => {
     form.setFieldsValue({
       tags_name: tags,
     });
     form.resetFields(["tags_name"]);
   }, [tags, form]);
-
-  const handleTagInput = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const input = e.target as HTMLInputElement;
-      const newTag = input.value.trim();
-      if (newTag && !tags.includes(newTag)) {
-        setTags((prevTags) => [...prevTags, newTag]);
-        form.resetFields(["tags_name"]);
-      }
-    }
-  };
-
-  const handleFormChange = () => {
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout);
-    }
-
-    const newTimeout = setTimeout(() => {
-      onChangeToCreateDraft();
-    }, 3000);
-
-    setDebounceTimeout(newTimeout);
-  };
-
-  const onChangeToCreateDraft = async () => {
-    const formValue = form.getFieldsValue(true);
-    const mediaData: CreateMediaFormData = {
-      ...formValue,
-      mediaOwner_id: tokenPayload.id,
-      media: fileList,
-      tags_name: tags,
-      is_created: false,
-      is_comment: 1,
-    };
-
-    setIsLoadCreateDraft(true);
-    setTextCreateDraft(true);
-
-    try {
-      let response;
-      if (formValue.id) {
-        delete mediaData.media;
-        response = await updateMedia({
-          id: formValue.id,
-          data: mediaData as UpdateMediaFormData,
-        });
-      } else {
-        response = await createMedia(mediaData as CreateMediaFormData);
-      }
-
-      if (response?.media?.id) {
-        setDraftId(response.media.id);
-        form.setFieldValue("id", response.media.id);
-      } else {
-        toast.error("An unexpected error occurred.");
-      }
-    } catch (error: unknown) {
-      toast.error(
-        `Error: ${
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred."
-        }`
-      );
-    } finally {
-      setTextCreateDraft(false);
-    }
-  };
-
-  const handleGenerateClick = async () => {
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout);
-      setDebounceTimeout(null);
-    }
-
-    const formValue = form.getFieldsValue(true);
-    if (!fileList.length && !formValue.id)
-      return toast.error("Please upload an image or media file.");
-
-    const tags_name = tags;
-
-    const mediaData: CreateMediaFormData = {
-      ...formValue,
-      mediaOwner_id: tokenPayload.id,
-      media: fileList,
-      tags_name: tags_name,
-      is_created: true,
-      is_comment: 1,
-    };
-
-    try {
-      setIsLoad(true);
-
-      let response;
-      if (formValue.id) {
-        delete mediaData.media;
-        response = await updateMedia({
-          id: formValue.id,
-          data: mediaData as UpdateMediaFormData,
-        });
-
-        if (response?.media) {
-          showToast(response.media, "update");
-        }
-      } else {
-        response = await createMedia(mediaData as CreateMediaFormData);
-
-        if (response?.media) {
-          showToast(response.media, "create");
-        }
-      }
-
-      setDraftId("");
-      refetchDrafts();
-      resetForm();
-    } catch (error: unknown) {
-      toast.error(
-        `Error: ${
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred."
-        }`
-      );
-    } finally {
-      setIsLoad(false);
-    }
-  };
-
-  const resetForm = () => {
-    form.resetFields();
-    setFileList([]);
-    setTags([]);
-    setImageUrl("");
-    setDrawerVisible(false);
-    setIsLoadCreateDraft(false);
-    setIsFormDisabled(true);
-    setIsSelectedDraft(false);
-    setDraftId("");
-  };
-
-  const handleOpenImageEditor = (index: number = 0) => {
-    let imageSrc = "";
-
-    if (imageUrl && index === 0) {
-      // For draft images, use the existing imageUrl (only for first image)
-      imageSrc = imageUrl;
-    } else if (fileList.length > index) {
-      // For newly uploaded files, create object URL for specific index
-      imageSrc = URL.createObjectURL(fileList[index]);
-    }
-
-    if (imageSrc) {
-      setEditingImageSrc(imageSrc);
-      setEditingImageIndex(index);
-      setIsImageEditorVisible(true);
-    }
-  };
-
-  const handleImageEdited = (editedBlob: Blob) => {
-    // Convert blob to file
-    const editedFile = new File([editedBlob], "edited-image.jpg", {
-      type: "image/jpeg",
-    });
-
-    if (editingImageIndex === 0 && imageUrl) {
-      // If editing the first image and it's a draft image
-      setFileList([editedFile]);
-      setImageUrl("");
-      setIsSelectedDraft(false);
-    } else {
-      // If editing a file from fileList
-      const newFileList = [...fileList];
-      newFileList[editingImageIndex] = editedFile;
-      setFileList(newFileList);
-    }
-
-    // Close editor
-    setIsImageEditorVisible(false);
-    setEditingImageSrc("");
-    setEditingImageIndex(-1);
-  };
-
-  const handleCloseImageEditor = () => {
-    setIsImageEditorVisible(false);
-    setEditingImageSrc("");
-    setEditingImageIndex(-1);
-  };
 
   useEffect(() => {
     const addEditButtons = () => {
@@ -413,7 +254,7 @@ const CreateMedia: React.FC = () => {
             {isLoadCreateDraft && !textCreateDraft && (
               <div className="text-draft-change">Changes saved!</div>
             )}
-            <Button onClick={handleGenerateClick} className="btn-publish-media">
+            <Button onClick={handlePublish} className="btn-publish-media">
               Publish
             </Button>
             <Button
@@ -434,13 +275,12 @@ const CreateMedia: React.FC = () => {
         )}
         <Form
           form={form}
-          disabled={isFormDisabled} // Disable form khi isFormDisabled = true
+          disabled={isFormDisabled}
           className={clsx("form-create-media", {
             "set-opacity": isLoad,
             "!flex-col": fileList.length >= 2,
-            // "!flex-row": fileList.length <= 1
           })}
-          onValuesChange={handleFormChange} // Gọi khi có thay đổi
+          onValuesChange={handleFormChangeWithDebounce}
         >
           <Col
             md={24}
@@ -588,11 +428,10 @@ const CreateMedia: React.FC = () => {
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
         width={500}
-        // closable={false}
       >
         <DraftMedia
-          resetFormAndCloseDrawer={resetForm}
-          onSelectMedia={handleSelectMedia}
+          resetFormAndCloseDrawer={handleResetForm}
+          onSelectMedia={handleSelectMediaWithForm}
           drafts={drafts}
           loadingDrafts={loadingDrafts}
           onDraftDeleted={refetchDrafts}
