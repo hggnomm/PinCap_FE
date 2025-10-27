@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useCallback } from "react";
 
-import "./ViewPinComponent.less";
 import { useInView } from "react-intersection-observer";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+
+// eslint-disable-next-line import/no-unresolved, import/order
+import Masonry from "react-masonry-css";
+
+import "./ViewPinComponent.less";
 
 import Loading from "@/components/loading/Loading";
 import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
@@ -166,15 +170,28 @@ const MediaList: React.FC<MediaListProps> = ({
     });
   }
 
+  const breakpointColumnsObj = {
+    default: 6,
+    1200: 4,
+    768: 3,
+    480: 3,
+  };
+
   const contentWrapper = (
     <div className="pincap-container">
       <motion.div
-        className="media-list-container"
+        className="media-list-wrapper"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
-        {content}
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="masonry-grid"
+          columnClassName="masonry-grid-column"
+        >
+          {content}
+        </Masonry>
         {!propMedias && <div ref={ref} style={{ height: 10 }} />}
       </motion.div>
     </div>
