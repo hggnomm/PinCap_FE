@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { DownOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  CloseCircleFilled,
+  DownOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+
 import {
   Avatar,
   Button,
@@ -31,11 +36,19 @@ const HeaderCommon = () => {
   const dispatch = useDispatch();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSearchDrawerOpen, setIsSearchDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Initialize notifications when user is authenticated
   useInitializeNotifications(isAuthenticated);
+
+  // Clear search query when navigating to home
+  useEffect(() => {
+    if (location.pathname === ROUTES.PINCAP_HOME) {
+      setSearchQuery("");
+    }
+  }, [location.pathname]);
 
   // Toggle chatbot visibility using Redux
   const handleToggleChatbot = () => {
@@ -71,6 +84,10 @@ const HeaderCommon = () => {
       );
       setIsSearchDrawerOpen(false);
     }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
   };
 
   const menuItems = [
@@ -129,12 +146,30 @@ const HeaderCommon = () => {
           <div className="search-bar">
             <Input
               placeholder="Search..."
-              suffix={<SearchOutlined />}
+              suffix={
+                searchQuery ? (
+                  <CloseCircleFilled
+                    onClick={handleClearSearch}
+                    className="cursor-pointer transition-colors"
+                    style={{
+                      fontSize: "18px",
+                      color: "#a25772",
+                    }}
+                  />
+                ) : (
+                  <SearchOutlined
+                    style={{
+                      fontSize: "18px",
+                      color: "#a25772",
+                    }}
+                  />
+                )
+              }
               value={searchQuery}
               onChange={handleHeaderSearchChange}
               onFocus={handleSearchClick}
               onPressEnter={handleSearchEnter}
-              className="cursor-pointer"
+              className="cursor-pointer header-search-input"
             />
           </div>
         </Col>
@@ -210,6 +245,7 @@ const HeaderCommon = () => {
         onClose={handleCloseSearchDrawer}
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
+        onClearSearch={handleClearSearch}
       />
     </Row>
   );

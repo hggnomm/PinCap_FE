@@ -1,20 +1,24 @@
-import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../../constants/routes";
-import { usePopularSearches } from "../../react-query";
+
+import { AnimatePresence, motion } from "framer-motion";
+
+import { ROUTES } from "@/constants/routes";
+import { usePopularSearches } from "@/react-query/useSearchMedia";
 
 interface SearchDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onClearSearch: () => void;
 }
 
 const SearchDrawer = ({
   isOpen,
   onClose,
   searchQuery,
-  onSearchChange,
+  onSearchChange: _onSearchChange,
+  onClearSearch: _onClearSearch,
 }: SearchDrawerProps) => {
   const navigate = useNavigate();
   const { data: popularSearches = [] } = usePopularSearches();
@@ -82,7 +86,7 @@ const SearchDrawer = ({
                         onClick={() => handleSearchResultClick(searchQuery)}
                       >
                         <div className="font-medium">
-                          View all results for "{searchQuery}"
+                          View all results for &quot;{searchQuery}&quot;
                         </div>
                         <p className="text-gray-600 text-sm">
                           Click to see all search results for this query.

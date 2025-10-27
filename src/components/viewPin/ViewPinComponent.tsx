@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 
 import Loading from "@/components/loading/Loading";
 import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
+import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
 
 import { Media } from "type";
 
@@ -35,7 +36,7 @@ import { Media } from "type";
  *
  * Props:
  * - queryKey: Array chứa key cho React Query cache
- * - queryFn: Function để fetch data (nhận pageParam và trả về Promise<Media[]>)
+ * - queryFn: Function để fetch data (nhận pageParam và trả về Promise<PaginatedMediaResponse<Media>>)
  * - medias: Array media có sẵn (optional, nếu có thì không dùng queryFn)
  * - isEditMedia: Boolean cho phép edit media
  * - enabled: Boolean để enable/disable query (default: true)
@@ -49,7 +50,7 @@ const containerVariants = {
 
 interface MediaListProps {
   queryKey?: string[];
-  queryFn?: (pageParam: number) => Promise<Media[]>;
+  queryFn?: (pageParam: number) => Promise<PaginatedMediaResponse<Media>>;
   medias?: Media[];
   isEditMedia?: boolean;
   isSaveMedia?: boolean;
@@ -80,11 +81,22 @@ const MediaList: React.FC<MediaListProps> = ({
     refetch,
   } = useInfiniteQuery({
     queryKey: queryKey || [],
-    queryFn: ({ pageParam }) => queryFn?.(pageParam) || Promise.resolve([]),
+    queryFn: ({ pageParam }) =>
+      queryFn?.(pageParam) ||
+      Promise.resolve({
+        data: [],
+        current_page: 1,
+        last_page: 1,
+        per_page: 15,
+        total: 0,
+      }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      const nextPage = lastPage.length ? allPages.length + 1 : undefined;
-      return nextPage;
+    getNextPageParam: (lastPage) => {
+      // Use pagination metadata from API response
+      if (lastPage.current_page < lastPage.last_page) {
+        return lastPage.current_page + 1;
+      }
+      return undefined;
     },
     enabled: !propMedias && enabled && !!queryKey && !!queryFn,
   });
@@ -100,7 +112,8 @@ const MediaList: React.FC<MediaListProps> = ({
     if (propMedias) {
       return propMedias;
     }
-    return data?.pages.flat() || [];
+    // Extract data array from each page's response
+    return data?.pages.flatMap((page) => page.data) || [];
   }, [propMedias, data]);
 
   // Optimize: Memoize reloadData function để tránh re-create mỗi lần render

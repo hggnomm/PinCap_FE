@@ -31,9 +31,12 @@ const MyMedia = () => {
     queryKey: ["medias", "my-media", "created"],
     queryFn: ({ pageParam }) => getMyMedias({ pageParam, is_created: true }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      const nextPage = lastPage.length ? allPages.length + 1 : undefined;
-      return nextPage;
+    getNextPageParam: (lastPage) => {
+      // Use pagination metadata from API response
+      if (lastPage.current_page < lastPage.last_page) {
+        return lastPage.current_page + 1;
+      }
+      return undefined;
     },
   });
 
@@ -43,7 +46,8 @@ const MyMedia = () => {
     }
   }, [fetchNextPage, inView, hasNextPage]);
 
-  const medias = data?.pages.flat() || [];
+  // Extract data array from each page's response
+  const medias = data?.pages.flatMap((page) => page.data) || [];
 
   return (
     <Loading isLoading={isFetching || isFetchingNextPage}>

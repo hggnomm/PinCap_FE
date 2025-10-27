@@ -3,11 +3,13 @@ import React, { useState, useRef, useEffect } from "react";
 import "./Comment.less";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import { clsx } from "clsx";
 
 import {
   SmileOutlined,
   SendOutlined,
   FileImageOutlined,
+  CloseCircleFilled,
 } from "@ant-design/icons";
 
 import { notification } from "antd";
@@ -56,12 +58,16 @@ const Comment: React.FC<CommentProps> = ({ mediaId, onCommentAdded }) => {
       setSelectedImage(null);
       setShowEmojiPicker(false);
       onCommentAdded?.();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error posting comment:", error);
 
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
+        err?.response?.data?.message ||
+        err?.message ||
         "Failed to post comment";
 
       notification.error({
@@ -79,7 +85,7 @@ const Comment: React.FC<CommentProps> = ({ mediaId, onCommentAdded }) => {
     }
   };
 
-  const handleEmojiSelect = (emoji: any) => {
+  const handleEmojiSelect = (emoji: { native: string }) => {
     setInputValue((prevInput) => prevInput + emoji.native);
   };
 
@@ -107,12 +113,27 @@ const Comment: React.FC<CommentProps> = ({ mediaId, onCommentAdded }) => {
             alt="Selected"
             className="w-auto h-auto max-h-60 object-cover rounded-lg border border-gray-300"
           />
-          <button
+          <div
             onClick={() => setSelectedImage(null)}
-            className="absolute -top-2 -right-2 w-5 h-5 !bg-red-500 hover:!bg-red-600 text-white border-none rounded-full leading-none text-sm cursor-pointer flex items-center justify-center transition-colors duration-200"
+            className={clsx(
+              "absolute -top-2 -right-2",
+              "flex items-center justify-center",
+              "cursor-pointer transition-colors"
+            )}
           >
-            <span className="text-white pb-0.5 ">×</span>
-          </button>
+            <CloseCircleFilled
+              style={{
+                fontSize: "20px",
+                color: "#a25772",
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.color = "#8a4760";
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.color = "#a25772";
+              }}
+            />
+          </div>
         </div>
       )}
 
