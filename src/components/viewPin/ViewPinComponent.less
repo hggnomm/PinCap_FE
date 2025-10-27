@@ -1,12 +1,28 @@
 .pincap-container {
   width: 100%;
-  column-gap: 0.6vw;
-  padding: 0 1rem;
+  padding: 0.75rem;
+
+  .media-list-wrapper {
+    width: 100%;
+  }
+
+  .masonry-grid {
+    display: flex;
+    margin-left: -0.6vw;
+    width: auto;
+  }
+
+  .masonry-grid-column {
+    padding-left: 0.6vw;
+    background-clip: padding-box;
+
+    > .box {
+      margin-bottom: 0.25vw;
+    }
+  }
 
   .box {
     width: 100%;
-    margin-bottom: 0.25vw;
-    break-inside: avoid;
     cursor: pointer;
 
     img,
@@ -31,26 +47,5 @@
   }
 }
 
-@media (min-width: 1200px) {
-  .pincap-container {
-    columns: 6;
-  }
-}
-
-@media (max-width: 1200px) {
-  .pincap-container {
-    columns: 4;
-  }
-}
-
-@media (max-width: 768px) {
-  .pincap-container {
-    columns: 3;
-  }
-}
-
-@media (max-width: 480px) {
-  .pincap-container {
-    columns: 3;
-  }
-}
+// Responsive breakpoints are handled by react-masonry-css breakpointCols
+// No need for media queries here as the library handles column counts

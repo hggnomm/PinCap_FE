@@ -9,7 +9,7 @@ export const useMedia = () => {
   const getMediaList = (page = 1) => {
     return useQuery({
       queryKey: ["medias", "all", page],
-      queryFn: () => media.getAllMedias({ pageParam: page }),
+      queryFn: () => media.getAllMedias({ page }),
       staleTime: 5 * 60 * 1000, // 5 minutes
     });
   };

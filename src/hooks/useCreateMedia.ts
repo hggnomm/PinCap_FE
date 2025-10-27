@@ -41,10 +41,12 @@ export const useCreateMedia = (
   const [fetchedDraftId, setFetchedDraftId] = useState<string>("");
 
   const {
-    data: drafts = [],
+    data: draftsResponse,
     isLoading: loadingDrafts,
     refetch: refetchDrafts,
   } = getMyMedia(1, false, drawerVisible);
+
+  const drafts = draftsResponse?.data || [];
 
   const handleSelectMedia = useCallback(
     (media: Media, shouldUpdateForm = false) => {

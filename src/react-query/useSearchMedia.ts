@@ -1,54 +1,61 @@
 import { useQuery } from "@tanstack/react-query";
-import { searchMedia } from "../api/media";
+
+import { getAllMedias } from "../api/media";
 import { SEARCH_CONSTANTS } from "../constants";
+import {
+  GetAllMediasRequest,
+  MediaTypeValue,
+} from "../types/Media/GetAllMediasRequest";
 
-export interface SearchMediaParams {
-  search?: string;
-  page: number;
-  per_page: number;
-}
-
-export interface SearchMediaResponse {
-  data: {
-    id: string;
-    media_url: string;
-    media_name: string;
-    description: string;
-  }[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-}
+// Re-use GetAllMediasRequest for search params
+export type SearchMediaParams = GetAllMediasRequest & {
+  search?: string; // Alias for query to maintain backward compatibility
+};
 
 export const useSearchMedia = (params: SearchMediaParams) => {
-  const { search, page, per_page } = params;
+  const { search, page, per_page, order_key, order_type, type } = params;
 
   return useQuery({
-    queryKey: ["searchMedia", { search, page, per_page }],
-    queryFn: async (): Promise<SearchMediaResponse> => {
+    queryKey: [
+      "searchMedia",
+      search,
+      { page, per_page, order_key, order_type, type },
+    ],
+    queryFn: async () => {
       console.log("🔍 useSearchMedia - Search params:", {
         search,
         page,
         per_page,
+        order_key,
+        order_type,
+        type,
       });
 
-      const results = await searchMedia({
-        search,
+      // Build GetAllMediasRequest from search params
+      const getAllMediasParams: GetAllMediasRequest = {
+        query: search,
         page,
         per_page,
-      });
+        order_key,
+        order_type,
+        type: type as MediaTypeValue,
+      };
+
+      const results = await getAllMedias(getAllMediasParams);
 
       console.log("📊 useSearchMedia - Search results:", results);
+
       return results;
     },
     enabled:
       !!search?.trim() && search.length >= SEARCH_CONSTANTS.MIN_SEARCH_LENGTH,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: unknown) => {
       // Don't retry on 404 errors (no results found)
-      if (error?.response?.status === 404) {
+      if (
+        (error as { response?: { status?: number } })?.response?.status === 404
+      ) {
         return false;
       }
       // Retry other errors up to 2 times

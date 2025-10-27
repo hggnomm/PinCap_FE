@@ -377,7 +377,7 @@ const DetailMedia = () => {
 
       <MediaList
         queryKey={["medias", "detail-page"]}
-        queryFn={(pageParam) => getAllMedias({ pageParam })}
+        queryFn={(pageParam) => getAllMedias({ page: pageParam })}
       />
 
       <Suspense fallback={<></>}>

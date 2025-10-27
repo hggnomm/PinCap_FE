@@ -1,34 +1,40 @@
+import {
+  GetAllMediasRequest,
+  DEFAULT_GET_ALL_MEDIAS_REQUEST,
+} from "@/types/Media/GetAllMediasRequest";
+import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
 import { CreateMediaFormData } from "@/validation/media";
 
 import { Media } from "type";
 
 import apiClient from "./apiClient";
 
-export const getAllMedias = async ({
-  pageParam,
-}: {
-  pageParam: number;
-}): Promise<Media[]> => {
+export const getAllMedias = async (
+  request: GetAllMediasRequest = {}
+): Promise<PaginatedMediaResponse<Media>> => {
   try {
+    const params = {
+      ...DEFAULT_GET_ALL_MEDIAS_REQUEST,
+      ...request,
+    };
+
     const res = await apiClient.get("/api/medias/all", {
-      params: {
-        per_page: 15,
-        page: pageParam,
-      },
+      params,
     });
-    return res.data.data;
+    return res.data;
   } catch (error) {
     console.log(error);
     throw error;
   }
 };
+
 export const getMyMedias = async ({
   pageParam,
   is_created,
 }: {
   pageParam: number;
   is_created: boolean;
-}): Promise<Media[]> => {
+}): Promise<PaginatedMediaResponse<Media>> => {
   try {
     const res = await apiClient.get("/api/medias/my-media", {
       params: {
@@ -37,7 +43,7 @@ export const getMyMedias = async ({
         is_created: is_created,
       },
     });
-    return res.data.data;
+    return res.data;
   } catch (error) {
     console.log(error);
     throw error;
@@ -57,7 +63,10 @@ export const createMedia = async (request: CreateMediaFormData) => {
   }
 };
 
-export const updatedMedia = async (mediaId: string, request: CreateMediaFormData) => {
+export const updatedMedia = async (
+  mediaId: string,
+  request: CreateMediaFormData
+) => {
   try {
     const res = await apiClient.put(`/api/medias/${mediaId}`, request);
     return res.data;
@@ -121,27 +130,16 @@ export const getMediasByUserId = async (params: {
   }
 };
 
-// Search media
-export const searchMedia = async (params: {
-  search?: string;
-  per_page: number;
-  page: number;
-}) => {
-  try {
-    const res = await apiClient.get("/api/medias/search", { params });
-    return res.data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-
 // Download media files
 export const downloadMedia = async (urls: string[]) => {
   try {
-    const res = await apiClient.post("/api/medias/downloads", { urls }, {
-      responseType: 'blob'
-    });
+    const res = await apiClient.post(
+      "/api/medias/downloads",
+      { urls },
+      {
+        responseType: "blob",
+      }
+    );
     return res.data;
   } catch (error) {
     console.log(error);
@@ -182,7 +180,10 @@ export const getMediaFeelingUsers = async (
   params?: { page?: number; per_page?: number }
 ) => {
   try {
-    const res = await apiClient.get(`/api/medias/${mediaId}/feelings/${feelingId}`, { params });
+    const res = await apiClient.get(
+      `/api/medias/${mediaId}/feelings/${feelingId}`,
+      { params }
+    );
     return res.data;
   } catch (error) {
     console.log(error);
@@ -196,7 +197,9 @@ export const getAllMediaFeelingUsers = async (
   params?: { page?: number; per_page?: number }
 ) => {
   try {
-    const res = await apiClient.get(`/api/medias/${mediaId}/feelings/users`, { params });
+    const res = await apiClient.get(`/api/medias/${mediaId}/feelings/users`, {
+      params,
+    });
     return res.data;
   } catch (error) {
     console.log(error);

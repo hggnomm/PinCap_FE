@@ -7,7 +7,7 @@ const PinCap = () => {
   return (
     <MediaList
       queryKey={["medias", "all"]}
-      queryFn={(pageParam) => getAllMedias({ pageParam })}
+      queryFn={(pageParam) => getAllMedias({ page: pageParam })}
     />
   );
 };
