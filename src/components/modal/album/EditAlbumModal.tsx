@@ -168,9 +168,17 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
               />
             </FieldItem>
 
+            <CheckboxWithDescription
+              title="Keep this album private"
+              description="So only you and collaborator can see it."
+              value={privacy}
+              onChange={(e) => handlePrivacyChange(e.target.checked)}
+              name="privacy"
+            />
+
             {/* Thumbnail Section */}
             <div className="mb-6">
-              <h4 className="text-xl font-semibold text-gray-900 tracking-tight">
+              <h4 className="text-[1.1em] font-semibold text-gray-900 tracking-tight">
                 Album Thumbnail
               </h4>
 
@@ -256,17 +264,8 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
                 </div>
               </div>
             </div>
-
-            <CheckboxWithDescription
-              title="Keep this album private"
-              description="So only you and collaborator can see it."
-              value={privacy}
-              onChange={(e) => handlePrivacyChange(e.target.checked)}
-              name="privacy"
-            />
           </Form>
 
-          {/* Collaborators Section */}
           <CollaboratorsSection
             collaborators={detailAlbum?.allUser ?? []}
             onAddCollaborator={onInviteCollaborators}
@@ -274,10 +273,9 @@ const EditAlbumModal: React.FC<EditAlbumModalProps> = ({
               setCollaboratorsListModalVisible(true)
             }
             className="mt-6"
-            showLearnMore={false}
+            titleClassName="text-[1.1em]"
           />
 
-          {/* Delete Album Section */}
           <div
             className="delete-action cursor-pointer p-1 text-left hover:scale-[0.99] hover:bg-gray-100 transition-transform"
             onClick={onDeleteClick}

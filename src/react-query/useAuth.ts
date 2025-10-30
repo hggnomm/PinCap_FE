@@ -1,19 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import * as auth from '@/api/auth';
-import { ROUTES } from '@/constants/routes';
-import { LoginFormData, RegisterFormData } from '@/validation';
-import { User } from '@/types/type';
+import { useEffect } from "react";
+
+import { useNavigate } from "react-router-dom";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+import * as auth from "@/api/auth";
+import { ROUTES } from "@/constants/routes";
+import { User } from "@/types/type";
+import { LoginFormData, RegisterFormData } from "@/validation";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
-  const { data: user, isLoading: isLoadingUser, error } = useQuery<User>({
-    queryKey: ['user'],
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    error,
+  } = useQuery<User>({
+    queryKey: ["user"],
     queryFn: auth.getCurrentUser,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -21,8 +28,8 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
-    if (error && (error as any)?.status === 401) {
-      localStorage.removeItem('token');
+    if (error && (error as { status?: number })?.status === 401) {
+      localStorage.removeItem("token");
       queryClient.clear();
       navigate(ROUTES.LOGIN);
     }
@@ -30,9 +37,9 @@ export const useAuth = () => {
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginFormData) => auth.login(data),
-    onSuccess: (response: any) => {
-      localStorage.setItem('token', response.token);
-      queryClient.setQueryData(['user'], response.user);
+    onSuccess: (response: { token: string; user: User }) => {
+      localStorage.setItem("token", response.token);
+      queryClient.setQueryData(["user"], response.user);
       // No need to invalidate - we just set the data
       navigate(ROUTES.PINCAP_HOME);
     },
@@ -48,7 +55,7 @@ export const useAuth = () => {
   const logoutMutation = useMutation({
     mutationFn: auth.logout,
     onSuccess: () => {
-      localStorage.removeItem('token');
+      localStorage.removeItem("token");
       queryClient.clear();
       navigate(ROUTES.HOME);
     },

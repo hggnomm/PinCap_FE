@@ -20,6 +20,7 @@ interface ModalComponentProps {
   bodyClassName?: string;
   confirmLoading?: boolean;
   showFooter?: boolean;
+  hideConfirmButton?: boolean;
 }
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
@@ -34,6 +35,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   bodyClassName,
   confirmLoading = false,
   showFooter = true,
+  hideConfirmButton = false,
 }) => {
   return (
     <Modal
@@ -54,16 +56,18 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           >
             {buttonLabels.cancelLabel}
           </button>,
-          <button
-            className={clsx("button-modal confirm", {
-              "opacity-50 cursor-not-allowed": confirmLoading,
-            })}
-            key="confirm"
-            onClick={onConfirm}
-            disabled={confirmLoading}
-          >
-            {buttonLabels.confirmLabel}
-          </button>,
+          !hideConfirmButton && (
+            <button
+              className={clsx("button-modal confirm", {
+                "opacity-50 cursor-not-allowed": confirmLoading,
+              })}
+              key="confirm"
+              onClick={onConfirm}
+              disabled={confirmLoading}
+            >
+              {buttonLabels.confirmLabel}
+            </button>
+          ),
         ]
       }
       width="auto"

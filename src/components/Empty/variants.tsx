@@ -1,5 +1,3 @@
-import React from "react";
-
 // Icon variants for common empty states
 
 export const NoMediaIcon = () => (
@@ -112,13 +110,7 @@ export const NoSearchResultsIcon = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <circle
-      cx="35"
-      cy="35"
-      r="18"
-      stroke="var(--primary)"
-      strokeWidth="2"
-    />
+    <circle cx="35" cy="35" r="18" stroke="var(--primary)" strokeWidth="2" />
     <path
       d="M48 48L60 60"
       stroke="var(--primary)"
@@ -177,4 +169,3 @@ export const NoFollowersIcon = () => (
     />
   </svg>
 );
-

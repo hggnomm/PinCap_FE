@@ -10,6 +10,7 @@ import Masonry from "react-masonry-css";
 
 import "./ViewPinComponent.less";
 
+import Empty, { NoMediaIcon } from "@/components/Empty";
 import Loading from "@/components/loading/Loading";
 import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
 import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
@@ -129,7 +130,9 @@ const MediaList: React.FC<MediaListProps> = ({
   }, [propMedias, refetch]);
 
   let content;
-  if (status === "success" || propMedias) {
+  const isEmpty = (status === "success" || !!propMedias) && medias.length === 0;
+
+  if (!isEmpty && (status === "success" || propMedias)) {
     content = medias.map((media: Media, index: number) => {
       if (medias.length === index + 1 && !propMedias) {
         return (
@@ -146,6 +149,7 @@ const MediaList: React.FC<MediaListProps> = ({
             isEditMedia={isEditMedia}
             isSaveMedia={isSaveMedia}
             albumContext={albumContext}
+            mediaFromAlbum={media}
             onDelete={reloadData}
           />
         );
@@ -164,6 +168,7 @@ const MediaList: React.FC<MediaListProps> = ({
           isEditMedia={isEditMedia}
           isSaveMedia={isSaveMedia}
           albumContext={albumContext}
+          mediaFromAlbum={media}
           onDelete={reloadData}
         />
       );
@@ -185,14 +190,25 @@ const MediaList: React.FC<MediaListProps> = ({
         animate="visible"
         variants={containerVariants}
       >
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className="masonry-grid"
-          columnClassName="masonry-grid-column"
-        >
-          {content}
-        </Masonry>
-        {!propMedias && <div ref={ref} style={{ height: 10 }} />}
+        {isEmpty && (
+          <Empty
+            icon={<NoMediaIcon />}
+            title="No Media Yet"
+            description="There aren't any medias."
+          />
+        )}
+        {!isEmpty && (
+          <>
+            <Masonry
+              breakpointCols={breakpointColumnsObj}
+              className="masonry-grid"
+              columnClassName="masonry-grid-column"
+            >
+              {content}
+            </Masonry>
+            {!propMedias && <div ref={ref} style={{ height: 10 }} />}
+          </>
+        )}
       </motion.div>
     </div>
   );

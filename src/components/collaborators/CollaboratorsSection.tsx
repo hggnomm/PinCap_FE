@@ -24,6 +24,7 @@ interface CollaboratorsSectionProps {
   onViewAllCollaborators?: () => void;
   className?: string;
   isOwner?: boolean;
+  titleClassName?: string;
 }
 
 const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
@@ -34,6 +35,7 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
   onViewAllCollaborators,
   className = "",
   isOwner = true,
+  titleClassName = "",
 }) => {
   const acceptedCollaborators = useMemo(
     () =>
@@ -65,7 +67,12 @@ const CollaboratorsSection: React.FC<CollaboratorsSectionProps> = ({
     <div className={clsx("my-8", className)}>
       <div className="flex items-center justify-between mb-3 gap-2 w-fit">
         <div className="flex items-center gap-3">
-          <h3 className="text-xl font-semibold text-gray-900 tracking-tight">
+          <h3
+            className={clsx(
+              "text-xl font-semibold text-gray-900 tracking-tight",
+              titleClassName
+            )}
+          >
             Collaborators
           </h3>
         </div>

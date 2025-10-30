@@ -1,10 +1,18 @@
-import React, { useEffect, useMemo, useState, Suspense, lazy } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  Suspense,
+  lazy,
+  useCallback,
+  HTMLAttributes,
+} from "react";
 
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { motion } from "framer-motion";
 
 import { EditFilled } from "@ant-design/icons/lib";
@@ -30,7 +38,7 @@ const EditMediaModal = lazy(
 const DeleteMediaModal = lazy(
   () => import("@/components/modal/media/DeleteMediaModal")
 );
-interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
+interface PinMediaProps extends HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
   srcUrl: string;
   data: {
@@ -43,6 +51,7 @@ interface PinMediaProps extends React.HTMLAttributes<HTMLParagraphElement> {
   isSaveMedia?: boolean;
   onDelete?: () => void;
   albumContext?: { inAlbum: boolean; albumId?: string; onRemoved?: () => void };
+  mediaFromAlbum?: Media;
 }
 
 const PinMedia: React.FC<PinMediaProps> = (props) => {
@@ -53,20 +62,17 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     isSaveMedia = true,
     onDelete,
     albumContext,
+    mediaFromAlbum,
   } = props;
-  const { updateMedia, deleteMedia } = useMedia();
-  const [media, setMedia] = useState<Media>();
+  const { deleteMedia } = useMedia();
+  const [media, setMedia] = useState<Media | undefined>(mediaFromAlbum);
   const navigate = useNavigate();
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const [isFirstOpen, setIsFirstOpen] = useState(true);
   const [form] = Form.useForm<Media>();
-  const [privacy, setPrivacy] = useState(false);
-  const [isComment, setIsComment] = useState(false);
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -98,33 +104,30 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     );
   }, [isFlexibleMedia, currentFlexibleMedia]);
 
+  const fetchMediaDetail = useCallback(
+    async (idMedia: string) => {
+      try {
+        const detail: Media = await getDetailMedia(idMedia, true);
+        if (detail) {
+          setMedia(detail);
+          form.setFieldsValue({
+            media_name: detail?.media_name,
+            description: detail?.description,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching details media: " + error);
+      }
+    },
+    [form]
+  );
+
   useEffect(() => {
     if (editModalVisible && isFirstOpen) {
       fetchMediaDetail(data.id);
-      setIsFirstOpen(false); // After fetch media, set false
+      setIsFirstOpen(false);
     }
-  }, [editModalVisible, isFirstOpen]);
-
-  const fetchMediaDetail = async (idMedia: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const detail: Media = await getDetailMedia(idMedia, true);
-      if (detail) {
-        setMedia(detail);
-        form.setFieldsValue({
-          media_name: detail?.media_name,
-          description: detail?.description,
-        });
-        setPrivacy(detail.privacy === "PRIVATE");
-        setIsComment(detail.is_comment);
-      }
-    } catch (error) {
-      setError("Error fetching details media: " + error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [editModalVisible, isFirstOpen, data.id, fetchMediaDetail]);
 
   const handleCancel = () => {
     setEditModalVisible(false);
@@ -248,20 +251,18 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
       </motion.div>
 
       <Suspense fallback={<></>}>
-        {/* Edit Media Modal */}
         <EditMediaModal
           visible={editModalVisible}
-          media={loading ? null : media || null}
+          media={mediaFromAlbum ?? null}
           onCancel={() => {
             setEditModalVisible(false);
-            setIsFirstOpen(true); // Reset for next open
+            setIsFirstOpen(true);
           }}
           onDeleteClick={() => {
             setEditModalVisible(false);
             setDeleteModalVisible(true);
           }}
-          onSuccess={() => {
-            // Refetch media detail to update UI
+          onSuccess={async () => {
             fetchMediaDetail(data.id);
           }}
           inAlbumContext={!!albumContext?.inAlbum}
@@ -271,7 +272,6 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
           }}
         />
 
-        {/* Delete Media Modal */}
         <DeleteMediaModal
           visible={deleteModalVisible}
           media={media || null}
