@@ -14,6 +14,7 @@ import ModalComponent from "@/components/modal/ModalComponent";
 import { PRIVACY } from "@/constants/constants";
 import { useMediaToast } from "@/contexts/MediaToastContext";
 import { useAlbum } from "@/react-query/useAlbum";
+import { useAuth } from "@/react-query/useAuth";
 import { useMedia } from "@/react-query/useMedia";
 import { Media } from "@/types/type";
 import { UpdateMediaFormData } from "@/validation/media";
@@ -46,7 +47,9 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
   const { removeMediasFromAlbum } = useAlbum();
   const { showToast } = useMediaToast();
 
-  // Initialize form when modal opens with media data
+  const { user } = useAuth();
+  const isOwner = media?.media_owner_id === user?.id;
+
   useEffect(() => {
     if (visible && media) {
       form.setFieldsValue({
@@ -111,21 +114,47 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
       title={inAlbumContext ? "Edit Media In Album" : "Edit Your Media"}
       visible={visible}
       onCancel={onCancel}
-      onConfirm={handleConfirm}
-      buttonLabels={{ confirmLabel: "Save", cancelLabel: "Cancel" }}
+      onConfirm={isOwner ? handleConfirm : undefined}
+      buttonLabels={{
+        confirmLabel: isOwner ? "Save" : undefined,
+        cancelLabel: "Cancel",
+      }}
+      hideConfirmButton={!isOwner}
       className="!max-w-[1200px]"
       bodyClassName="!max-h-[75vh] !overflow-hidden"
     >
       <Loading isLoading={visible && !media}>
         <div className="flex flex-col md:flex-row items-start gap-6 h-full">
-          <div className="flex-shrink-0 w-full md:max-w-[400px] max-h-[70vh] overflow-y-auto pr-2">
+          <div className="flex-shrink-0 w-full md:max-w-[400px] max-h-[70vh] overflow-y-auto custom-scroll-bar pr-2">
             <Form form={form} layout="vertical">
+              {media?.added_by_user && (
+                <div className="flex flex-col mb-4">
+                  <p className="flex items-start text-[1.1em] text-[#0c0c0c] mb-2 font-medium">
+                    Added by
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={media.added_by_user.avatar}
+                      alt={media.added_by_user.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-gray-900 font-medium truncate">
+                        {media.added_by_user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {media.added_by_user.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <FieldItem
                 label="Title"
                 name="media_name"
                 placeholder="Add a title"
               >
-                <Input />
+                <Input disabled={!isOwner} />
               </FieldItem>
 
               <FieldItem
@@ -133,24 +162,26 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
                 name="description"
                 placeholder="Tell everyone what your Media is about"
               >
-                <Input.TextArea rows={4} />
+                <Input.TextArea rows={4} disabled={!isOwner} />
               </FieldItem>
 
-              <CheckboxWithDescription
-                title="Keep this media private"
-                description="So only you can see it."
-                value={privacy}
-                onChange={handlePrivacyChange}
-                name="privacy"
-              />
+              <div className={!isOwner ? "opacity-50 pointer-events-none" : ""}>
+                <CheckboxWithDescription
+                  title="Keep this media private"
+                  description="So only you can see it."
+                  value={privacy}
+                  onChange={handlePrivacyChange}
+                  name="privacy"
+                />
 
-              <CheckboxWithDescription
-                title="Allow comments"
-                description="Let people comment on your media."
-                value={isComment}
-                onChange={handleCommentChange}
-                name="is_comment"
-              />
+                <CheckboxWithDescription
+                  title="Allow comments"
+                  description="Let people comment on your media."
+                  value={isComment}
+                  onChange={handleCommentChange}
+                  name="is_comment"
+                />
+              </div>
             </Form>
 
             <div

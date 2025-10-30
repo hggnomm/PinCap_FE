@@ -2,16 +2,18 @@ import { ALBUM_ROLES, ALBUM_INVITATION_STATUS } from "@/constants/constants";
 
 export type User = {
   id: string;
+  added_by_user_id?: string;
   first_name: string;
   last_name: string;
+  name: string;
   email: string;
   avatar: string;
-  background: string;
-  phone: string | null;
-  bio: string | null;
-  role: string;
-  followers_count: number;
-  followees_count: number;
+  background?: string;
+  phone?: string | null;
+  bio?: string | null;
+  role?: string;
+  followers_count?: number;
+  followees_count?: number;
   medias_count?: number;
   reaction_media_count?: number;
   isFollowing?: boolean;
@@ -67,6 +69,8 @@ export type Media = {
   commentCount: number;
   created_at?: string;
   updated_at?: string;
+  added_by_user?: User;
+  media_owner_id?: string;
 };
 
 export type Album = {

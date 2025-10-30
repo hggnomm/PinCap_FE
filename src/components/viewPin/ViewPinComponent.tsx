@@ -149,6 +149,7 @@ const MediaList: React.FC<MediaListProps> = ({
             isEditMedia={isEditMedia}
             isSaveMedia={isSaveMedia}
             albumContext={albumContext}
+            mediaFromAlbum={media}
             onDelete={reloadData}
           />
         );
@@ -167,6 +168,7 @@ const MediaList: React.FC<MediaListProps> = ({
           isEditMedia={isEditMedia}
           isSaveMedia={isSaveMedia}
           albumContext={albumContext}
+          mediaFromAlbum={media}
           onDelete={reloadData}
         />
       );
