@@ -307,7 +307,7 @@ const DetailMedia = () => {
 
               <div className="main-view custom-scroll-bar">
                 {media?.media_name && (
-                  <div className="media_name">
+                  <div className="media_name ">
                     <span>{media.media_name}</span>
                   </div>
                 )}
