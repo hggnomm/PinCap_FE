@@ -77,6 +77,8 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
+  const [flexibleImageError, setFlexibleImageError] = useState(false);
 
   const isFlexibleMedia =
     data?.type === MEDIA_TYPES.FLEXIBLE ||
@@ -87,6 +89,10 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     : [];
   const currentFlexibleMedia =
     flexibleMediaUrls.length > 0 ? flexibleMediaUrls[currentMediaIndex] : null;
+
+  useEffect(() => {
+    setFlexibleImageError(false);
+  }, [currentMediaIndex]);
 
   const isFlexibleVideo = useMemo(() => {
     return (
@@ -180,6 +186,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             alt="Media content"
             effect="blur"
             threshold={100}
+            onError={() => setImageError(true)}
+            className={clsx(
+              imageError &&
+                "min-h-[200px] min-w-[200px] bg-gray-100 flex items-center justify-center"
+            )}
           />
         )}
         {isFlexibleVideo && (
@@ -193,6 +204,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             alt="Media content"
             effect="blur"
             threshold={100}
+            onError={() => setFlexibleImageError(true)}
+            className={clsx(
+              flexibleImageError &&
+                "min-h-[200px] min-w-[200px] bg-gray-100 flex items-center justify-center"
+            )}
           />
         )}
 

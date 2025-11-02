@@ -13,4 +13,6 @@ export const ENV = {
 
   ACCESS_TOKEN_KEY: getEnvVar("VITE_ACCESS_TOKEN_KEY") || "",
   REFRESH_TOKEN_KEY: getEnvVar("VITE_REFRESH_TOKEN_KEY") || "",
+
+  FACEBOOK_APP_ID: getEnvVar("VITE_FACEBOOK_APP_ID") || "",
 } as const;
