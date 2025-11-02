@@ -18,6 +18,7 @@ import { Menu } from "antd";
 
 import "./index.less";
 import iconAI from "@/assets/img/PinCap/ai-technology-img.png";
+import iconPinBot from "@/assets/img/PinCap/chatbot.png";
 import { toggleChatbot } from "@/store/chatSlice";
 import { TokenPayload } from "@/types/Auth";
 
@@ -53,6 +54,8 @@ const AIToolBtn = styled(Menu.Item)`
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
+  position: relative;
+  z-index: 0;
 
   &:hover {
     background: linear-gradient(#fff, #fff) padding-box,
@@ -135,25 +138,6 @@ const SiderCommon = () => {
           <Link to="/album">My Album</Link>
         </Menu.Item>
 
-        {/* Dashboard Submenu */}
-        {tokenPayload.role === "ADMIN" && (
-          <Menu.SubMenu
-            key="dashboard"
-            icon={<DashboardOutlined />}
-            title="Dashboard"
-          >
-            <Menu.Item key="dashHome">
-              <Link to="/dashboard">Home</Link>
-            </Menu.Item>
-            <Menu.Item key="dashAlbum">
-              <Link to="/dashboard/album">Album</Link>
-            </Menu.Item>
-            <Menu.Item key="dashMediaReport">
-              <Link to="/dashboard/mediaReport">Media Report</Link>
-            </Menu.Item>
-          </Menu.SubMenu>
-        )}
-
         {/* AI Tool Button */}
 
         <AIToolBtn
@@ -173,7 +157,7 @@ const SiderCommon = () => {
           key="PinBot"
           icon={
             <img
-              src={iconAI}
+              src={iconPinBot}
               alt="PinBot"
               style={{ width: "16px", height: "16px" }}
             />
@@ -182,6 +166,25 @@ const SiderCommon = () => {
         >
           <span style={{ cursor: "pointer" }}>PinBot</span>
         </AIToolBtn>
+
+        {/* Dashboard Submenu */}
+        {/* {tokenPayload.role === "ADMIN" && ( */}
+        <Menu.SubMenu
+          key="dashboard"
+          icon={<DashboardOutlined />}
+          title="Dashboard"
+        >
+          <Menu.Item key="dashHome">
+            <Link to="/dashboard">Home</Link>
+          </Menu.Item>
+          <Menu.Item key="dashAlbum">
+            <Link to="/dashboard/album">Album</Link>
+          </Menu.Item>
+          <Menu.Item key="dashMediaReport">
+            <Link to="/dashboard/mediaReport">Media Report</Link>
+          </Menu.Item>
+        </Menu.SubMenu>
+        {/* )} */}
       </Menu>
       <Outlet />
     </Sider>
