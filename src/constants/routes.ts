@@ -18,6 +18,8 @@ export const ROUTES = {
   EDIT_PROFILE: "/profile/edit",
   USER_PROFILE: "/profiles/:id",
   SEARCH: "/search",
+  INSTAGRAM_ABOUT: "/instagram/about",
+  INSTAGRAM_SYNC: "/instagram/sync",
 } as const;
 
 export const PUBLIC_ROUTES = [
@@ -40,6 +42,8 @@ export const PROTECTED_ROUTES = [
   ROUTES.EDIT_PROFILE,
   ROUTES.USER_PROFILE,
   ROUTES.SEARCH,
+  ROUTES.INSTAGRAM_ABOUT,
+  ROUTES.INSTAGRAM_SYNC,
 ] as const;
 
 export type RouteType = (typeof ROUTES)[keyof typeof ROUTES];

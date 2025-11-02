@@ -7,6 +7,7 @@ import { styled } from "styled-components";
 
 import {
   DashboardOutlined,
+  InstagramOutlined,
   PlusOutlined,
   ProductOutlined,
   SignatureOutlined,
@@ -80,6 +81,7 @@ const SiderCommon = () => {
     if (pathname === "/my-media") return ["my-media"];
 
     if (pathname === "/ai") return ["ai-tool"];
+    if (pathname.startsWith("/instagram")) return ["instagram"];
     if (pathname.startsWith("/dashboard")) {
       if (pathname === "/dashboard") return ["dashHome"];
       if (pathname === "/dashboard/album") return ["dashAlbum"];
@@ -136,6 +138,11 @@ const SiderCommon = () => {
         {/* Album Menu Item */}
         <Menu.Item key="album" icon={<SignatureOutlined />}>
           <Link to="/album">My Album</Link>
+        </Menu.Item>
+
+        {/* Instagram Menu Item */}
+        <Menu.Item key="instagram" icon={<InstagramOutlined />}>
+          <Link to="/instagram/about">Instagram</Link>
         </Menu.Item>
 
         {/* AI Tool Button */}

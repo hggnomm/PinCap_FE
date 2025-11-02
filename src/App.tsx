@@ -29,6 +29,8 @@ import {
   Profile,
   Search,
   UserProfile,
+  InstagramAbout,
+  InstagramSync,
 } from "./pages/PinCap";
 import { useAuth } from "./react-query";
 
@@ -125,6 +127,14 @@ const App = () => {
                             element={<UserProfile />}
                           />
                           <Route path={ROUTES.SEARCH} element={<Search />} />
+                          <Route
+                            path={ROUTES.INSTAGRAM_ABOUT}
+                            element={<InstagramAbout />}
+                          />
+                          <Route
+                            path={ROUTES.INSTAGRAM_SYNC}
+                            element={<InstagramSync />}
+                          />
 
                           {/* Catch all - redirect to 404 */}
                           <Route
