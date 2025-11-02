@@ -22,9 +22,15 @@ import { Form } from "antd";
 import { getDetailMedia } from "@/api/media";
 import AlbumDropdown from "@/components/AlbumDropdown";
 import DotsPagination from "@/components/DotsPagination/DotsPagination";
+import MediaErrorThumbnail from "@/components/MediaErrorThumbnail";
 import { MEDIA_TYPES } from "@/constants/constants";
+import { useMediaError } from "@/hooks";
 import { useMedia } from "@/react-query/useMedia";
-import { ParsedMediaUrl, parseMediaUrl } from "@/utils/utils";
+import {
+  ParsedMediaUrl,
+  parseMediaUrl,
+  getRandomAspectRatio,
+} from "@/utils/utils";
 
 import "react-lazy-load-image-component/src/effects/blur.css";
 import "react-medium-image-zoom/dist/styles.css";
@@ -77,8 +83,20 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const [imageError, setImageError] = useState(false);
-  const [flexibleImageError, setFlexibleImageError] = useState(false);
+
+  const {
+    imageError,
+    videoError,
+    flexibleMediaErrors,
+    handleImageError,
+    handleVideoError,
+    handleFlexibleImageError,
+    handleFlexibleVideoError,
+    resetFlexibleMediaErrors,
+  } = useMediaError({
+    mediaId: data?.id,
+    resetOnMediaChange: true,
+  });
 
   const isFlexibleMedia =
     data?.type === MEDIA_TYPES.FLEXIBLE ||
@@ -91,8 +109,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     flexibleMediaUrls.length > 0 ? flexibleMediaUrls[currentMediaIndex] : null;
 
   useEffect(() => {
-    setFlexibleImageError(false);
-  }, [currentMediaIndex]);
+    resetFlexibleMediaErrors();
+  }, [currentMediaIndex, resetFlexibleMediaErrors]);
+
+  // Tạo aspect ratio ổn định cho media để tạo hiệu ứng Pinterest
+  const aspectRatio = useMemo(() => getRandomAspectRatio(data?.id), [data?.id]);
 
   const isFlexibleVideo = useMemo(() => {
     return (
@@ -175,40 +196,86 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
       >
-        {data?.type === MEDIA_TYPES.VIDEO && (
-          <video autoPlay loop muted className="mb-[0.25vw]">
+        {data?.type === MEDIA_TYPES.VIDEO && videoError && (
+          <MediaErrorThumbnail
+            className="mb-[0.25vw] w-full"
+            width="100%"
+            height="auto"
+            alt="Video error"
+            style={{ aspectRatio }}
+          />
+        )}
+        {data?.type === MEDIA_TYPES.VIDEO && !videoError && (
+          <video
+            autoPlay
+            loop
+            muted
+            className="mb-[0.25vw] w-full"
+            style={{ aspectRatio }}
+            onError={handleVideoError}
+          >
             <source src={srcUrl} />
           </video>
         )}
-        {data?.type === MEDIA_TYPES.IMAGE && (
+        {data?.type === MEDIA_TYPES.IMAGE && imageError && (
+          <MediaErrorThumbnail
+            className="mb-[0.25vw] w-full"
+            width="100%"
+            height="auto"
+            alt="Image error"
+            style={{ aspectRatio }}
+          />
+        )}
+        {data?.type === MEDIA_TYPES.IMAGE && !imageError && (
           <LazyLoadImage
             src={srcUrl}
             alt="Media content"
             effect="blur"
             threshold={100}
-            onError={() => setImageError(true)}
-            className={clsx(
-              imageError &&
-                "min-h-[200px] min-w-[200px] bg-gray-100 flex items-center justify-center"
-            )}
+            onError={handleImageError}
+            className="mb-[0.25vw] w-full"
+            style={{ aspectRatio }}
           />
         )}
-        {isFlexibleVideo && (
-          <video autoPlay loop muted className="mb-[0.25vw]">
+        {isFlexibleVideo && flexibleMediaErrors[currentMediaIndex] && (
+          <MediaErrorThumbnail
+            className="mb-[0.25vw] w-full"
+            width="100%"
+            height="auto"
+            alt="Video error"
+            style={{ aspectRatio }}
+          />
+        )}
+        {isFlexibleVideo && !flexibleMediaErrors[currentMediaIndex] && (
+          <video
+            autoPlay
+            loop
+            muted
+            className="mb-[0.25vw] w-full"
+            style={{ aspectRatio }}
+            onError={() => handleFlexibleVideoError(currentMediaIndex)}
+          >
             <source src={currentFlexibleMedia!.url} />
           </video>
         )}
-        {isFlexibleImage && (
+        {isFlexibleImage && flexibleMediaErrors[currentMediaIndex] && (
+          <MediaErrorThumbnail
+            className="mb-[0.25vw] w-full"
+            width="100%"
+            height="auto"
+            alt="Image error"
+            style={{ aspectRatio }}
+          />
+        )}
+        {isFlexibleImage && !flexibleMediaErrors[currentMediaIndex] && (
           <LazyLoadImage
             src={currentFlexibleMedia!.url}
             alt="Media content"
             effect="blur"
             threshold={100}
-            onError={() => setFlexibleImageError(true)}
-            className={clsx(
-              flexibleImageError &&
-                "min-h-[200px] min-w-[200px] bg-gray-100 flex items-center justify-center"
-            )}
+            onError={() => handleFlexibleImageError(currentMediaIndex)}
+            className="mb-[0.25vw] w-full"
+            style={{ aspectRatio }}
           />
         )}
 

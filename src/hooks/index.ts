@@ -2,3 +2,4 @@
 export * from "./useFormValidation";
 export * from "./useInitializeNotifications";
 export * from "./useCreateMedia";
+export * from "./useMediaError";

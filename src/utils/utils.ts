@@ -246,6 +246,46 @@ export const isAlbumOwner = (album: Album, currentUserId: string): boolean => {
   return currentUserInAlbum?.album_role === ALBUM_ROLES.OWNER;
 };
 
+/**
+ * Tạo aspect ratio ngẫu nhiên nhưng ổn định dựa trên media ID
+ * Đảm bảo mỗi media có aspect ratio cố định, tạo hiệu ứng Pinterest
+ *
+ * @param mediaId - ID của media để tạo hash
+ * @param minRatio - Tỷ lệ tối thiểu (default: 0.75 - portrait)
+ * @param maxRatio - Tỷ lệ tối đa (default: 1.5 - landscape)
+ * @returns Aspect ratio (width/height)
+ *
+ * @example
+ * const aspectRatio = getRandomAspectRatio(media.id); // 0.85
+ * <img style={{ aspectRatio: aspectRatio }} />
+ */
+export const getRandomAspectRatio = (
+  mediaId: string | undefined,
+  minRatio: number = 0.75,
+  maxRatio: number = 1.5
+): number => {
+  if (!mediaId) {
+    // Nếu không có ID, return ratio trung bình
+    return 1.0;
+  }
+
+  // Tạo hash từ ID để có giá trị ổn định
+  let hash = 0;
+  for (let i = 0; i < mediaId.length; i++) {
+    const char = mediaId.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+
+  // Normalize hash to 0-1 range
+  const normalized = Math.abs(hash) / 2147483647;
+
+  // Map to desired ratio range
+  const ratio = minRatio + normalized * (maxRatio - minRatio);
+
+  return Math.round(ratio * 100) / 100; // Round to 2 decimal places
+};
+
 export const convertBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
