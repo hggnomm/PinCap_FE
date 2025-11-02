@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { clsx } from "clsx";
 import { ExternalLink } from "lucide-react";
 
-import { CustomTooltip } from "@/components/tooltip";
+import { CustomTooltip } from "@/components/Tooltip";
 import { ALBUM_INVITATION_STATUS } from "@/constants/constants";
 
 interface Collaborator {

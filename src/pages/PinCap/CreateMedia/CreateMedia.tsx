@@ -20,8 +20,8 @@ import Title from "antd/es/typography/Title";
 
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 
-import ImageEditor from "@/components/imageEditor";
-import MediaViewer from "@/components/mediaViewer/MediaViewer";
+import ImageEditor from "@/components/ImageEditor";
+import MediaViewer from "@/components/MediaViewer/MediaViewer";
 import { PRIVACY } from "@/constants/constants";
 import { useCreateMedia } from "@/hooks";
 import { Media } from "@/types/type";

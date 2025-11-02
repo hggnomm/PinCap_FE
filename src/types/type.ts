@@ -20,9 +20,10 @@ export type User = {
 };
 
 export type AlbumUser = User & {
+  name: string;
   album_role: keyof typeof ALBUM_ROLES;
   status: keyof typeof ALBUM_INVITATION_STATUS;
-  name: string;
+  invitation_status: keyof typeof ALBUM_INVITATION_STATUS;
 };
 
 export type Feeling = {

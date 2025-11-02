@@ -12,8 +12,10 @@ import { clsx } from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-medium-image-zoom/dist/styles.css";
 
-import DotsPagination from "@/components/dotsPagination/DotsPagination";
+import DotsPagination from "@/components/DotsPagination/DotsPagination";
+import MediaErrorThumbnail from "@/components/MediaErrorThumbnail";
 import { MEDIA_TYPES } from "@/constants/constants";
+import { useMediaError } from "@/hooks";
 import { Media } from "@/types/type";
 import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";
 import "./MediaViewer.less";
@@ -39,6 +41,19 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
   const imgRef = useRef<HTMLImageElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [didInitialShow, setDidInitialShow] = useState<boolean>(false);
+
+  const {
+    imageError,
+    videoError,
+    flexibleMediaErrors,
+    handleImageError,
+    handleVideoError,
+    handleFlexibleImageError,
+    handleFlexibleVideoError,
+  } = useMediaError({
+    mediaId: media?.id,
+    resetOnMediaChange: true,
+  });
 
   const isFlexibleMedia = useMemo(() => {
     const isFlexible = media?.type === null;
@@ -204,40 +219,63 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
             }}
             className="media-content relative rounded-[28px] overflow-hidden"
           >
-            {currentMedia.type === MEDIA_TYPES.VIDEO ? (
-              <video
-                ref={videoRef}
-                src={currentMedia.url}
-                controls
-                autoPlay
-                muted
-                className={clsx("media-element", mediaClassName)}
-                onLoadStart={() => setIsImageLoaded(false)}
-                onLoadedData={() => {
-                  setIsImageLoaded(true);
-                  updateContainerSizeFromVideo();
-                  setDidInitialShow(true);
-                }}
-              />
-            ) : (
-              <Zoom>
-                <img
-                  ref={imgRef}
+            {currentMedia.type === MEDIA_TYPES.VIDEO &&
+              flexibleMediaErrors[currentMediaIndex] && (
+                <MediaErrorThumbnail
+                  className={clsx("media-element", mediaClassName)}
+                  width={containerMinWidth > 0 ? containerMinWidth : "100%"}
+                  height={containerMinHeight > 0 ? containerMinHeight : "auto"}
+                  alt="Video error"
+                />
+              )}
+            {currentMedia.type === MEDIA_TYPES.VIDEO &&
+              !flexibleMediaErrors[currentMediaIndex] && (
+                <video
+                  ref={videoRef}
                   src={currentMedia.url}
-                  alt={media?.media_name}
-                  className={clsx(
-                    "media-element",
-                    mediaClassName,
-                    isImageLoaded ? "opacity-100" : "opacity-0"
-                  )}
-                  onLoad={() => {
+                  controls
+                  autoPlay
+                  muted
+                  className={clsx("media-element", mediaClassName)}
+                  onLoadStart={() => setIsImageLoaded(false)}
+                  onLoadedData={() => {
                     setIsImageLoaded(true);
-                    updateContainerSizeFromImage();
+                    updateContainerSizeFromVideo();
                     setDidInitialShow(true);
                   }}
+                  onError={() => handleFlexibleVideoError(currentMediaIndex)}
                 />
-              </Zoom>
-            )}
+              )}
+            {currentMedia.type !== MEDIA_TYPES.VIDEO &&
+              flexibleMediaErrors[currentMediaIndex] && (
+                <MediaErrorThumbnail
+                  className={clsx("media-element", mediaClassName)}
+                  width={containerMinWidth > 0 ? containerMinWidth : "100%"}
+                  height={containerMinHeight > 0 ? containerMinHeight : "auto"}
+                  alt="Image error"
+                />
+              )}
+            {currentMedia.type !== MEDIA_TYPES.VIDEO &&
+              !flexibleMediaErrors[currentMediaIndex] && (
+                <Zoom>
+                  <img
+                    ref={imgRef}
+                    src={currentMedia.url}
+                    alt={media?.media_name}
+                    className={clsx(
+                      "media-element",
+                      mediaClassName,
+                      isImageLoaded ? "opacity-100" : "opacity-0"
+                    )}
+                    onLoad={() => {
+                      setIsImageLoaded(true);
+                      updateContainerSizeFromImage();
+                      setDidInitialShow(true);
+                    }}
+                    onError={() => handleFlexibleImageError(currentMediaIndex)}
+                  />
+                </Zoom>
+              )}
 
             <DotsPagination
               total={flexibleMediaUrls.length}
@@ -323,15 +361,26 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
               `min-w-[${containerMinWidth}px] min-h-[${containerMinHeight}px]`
           )}
         >
-          <Zoom>
-            <img
-              ref={imgRef}
-              src={media.media_url}
-              alt={media.media_name}
+          {imageError && (
+            <MediaErrorThumbnail
               className={clsx("media-element", mediaClassName)}
-              onLoad={updateContainerSizeFromImage}
+              width={containerMinWidth > 0 ? containerMinWidth : "100%"}
+              height={containerMinHeight > 0 ? containerMinHeight : "auto"}
+              alt="Image error"
             />
-          </Zoom>
+          )}
+          {!imageError && (
+            <Zoom>
+              <img
+                ref={imgRef}
+                src={media.media_url}
+                alt={media.media_name}
+                className={clsx("media-element", mediaClassName)}
+                onLoad={updateContainerSizeFromImage}
+                onError={handleImageError}
+              />
+            </Zoom>
+          )}
         </div>
       );
     }
@@ -345,15 +394,26 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
             `min-w-[${containerMinWidth}px] min-h-[${containerMinHeight}px]`
         )}
       >
-        <video
-          ref={videoRef}
-          src={media.media_url}
-          controls
-          autoPlay
-          muted
-          className={clsx("media-element", mediaClassName)}
-          onLoadedData={updateContainerSizeFromVideo}
-        />
+        {videoError && (
+          <MediaErrorThumbnail
+            className={clsx("media-element", mediaClassName)}
+            width={containerMinWidth > 0 ? containerMinWidth : "100%"}
+            height={containerMinHeight > 0 ? containerMinHeight : "auto"}
+            alt="Video error"
+          />
+        )}
+        {!videoError && (
+          <video
+            ref={videoRef}
+            src={media.media_url}
+            controls
+            autoPlay
+            muted
+            className={clsx("media-element", mediaClassName)}
+            onLoadedData={updateContainerSizeFromVideo}
+            onError={handleVideoError}
+          />
+        )}
       </div>
     );
   };

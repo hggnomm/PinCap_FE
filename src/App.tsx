@@ -8,11 +8,11 @@ import Layout, { Content } from "antd/es/layout/layout";
 
 import { ConfigProvider } from "antd";
 
-import ChatbotProvider from "./components/chatbot/ChatbotProvider";
-import HeaderCommon from "./components/header/HeaderCommon";
+import ChatbotProvider from "./components/Chatbot/ChatbotProvider";
+import HeaderCommon from "./components/Header/HeaderCommon";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-import SiderCommon from "./components/sider/SiderCommon";
+import SiderCommon from "./components/Sider/SiderCommon";
 import { ROUTES } from "./constants/routes";
 import { MediaToastProvider } from "./contexts/MediaToastContext";
 import { ImageAi } from "./pages/AITools";
@@ -29,6 +29,8 @@ import {
   Profile,
   Search,
   UserProfile,
+  InstagramAbout,
+  InstagramSync,
 } from "./pages/PinCap";
 import { useAuth } from "./react-query";
 
@@ -125,6 +127,14 @@ const App = () => {
                             element={<UserProfile />}
                           />
                           <Route path={ROUTES.SEARCH} element={<Search />} />
+                          <Route
+                            path={ROUTES.INSTAGRAM_ABOUT}
+                            element={<InstagramAbout />}
+                          />
+                          <Route
+                            path={ROUTES.INSTAGRAM_SYNC}
+                            element={<InstagramSync />}
+                          />
 
                           {/* Catch all - redirect to 404 */}
                           <Route

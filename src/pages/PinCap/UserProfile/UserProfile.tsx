@@ -7,11 +7,11 @@ import { Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";
 
 import { MoreOutlined } from "@ant-design/icons/lib";
 
-import BackButton from "@/components/backButton/BackButton";
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
+import BackButton from "@/components/BackButton/BackButton";
+import ButtonCircle from "@/components/ButtonCircle/ButtonCircle";
 import FollowButton from "@/components/FollowButton";
-import Loading from "@/components/loading/Loading";
-import ReportUserModal from "@/components/modal/user/ReportUserModal";
+import Loading from "@/components/Loading/Loading";
+import ReportUserModal from "@/components/Modal/user/ReportUserModal";
 import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query/useAuth";
 import { useUser } from "@/react-query/useUser";

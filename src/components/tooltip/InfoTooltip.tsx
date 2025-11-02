@@ -6,7 +6,7 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 
 import { Tooltip } from "antd";
 
-import "@/components/tooltip/InfoTooltip.less";
+import "@/components/Tooltip/InfoTooltip.less";
 
 interface InfoTooltipProps {
   title: string;

@@ -55,23 +55,39 @@
     }
 
     /* Tùy chỉnh submenu */
-    .ant-menu-submenu-title {
-      color: #000;
-      gap: 14px;
-      font-weight: 500;
-      font-size: 14px;
-      margin-bottom: 1rem;
+    .ant-menu-submenu {
+      position: relative !important;
+      z-index: 1;
 
-      .ant-menu-submenu-arrow {
-        color: #b0b0b0;
+      .ant-menu-submenu-title {
+        color: #000;
+        gap: 14px;
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 1rem;
+
+        .ant-menu-submenu-arrow {
+          color: #b0b0b0;
+        }
+        .anticon {
+          font-size: 16px;
+        }
       }
-      .anticon {
-        font-size: 16px;
+
+      .ant-menu-sub {
+        background-color: @background-color;
+        position: relative !important;
+        z-index: 2 !important;
+        padding-left: 18px !important;
+        max-width: 100%;
+        box-sizing: border-box;
       }
     }
 
     /* Tùy chỉnh khi SubMenu mở */
     .ant-menu-submenu-open {
+      z-index: 10 !important;
+
       .ant-menu-sub {
         background-color: @background-color;
       }

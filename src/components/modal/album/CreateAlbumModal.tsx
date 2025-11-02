@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+
 import { Form, Input, notification } from "antd";
-import ModalComponent from "@/components/modal/ModalComponent";
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
-import { createAlbumSchema } from "@/validation/album";
+
+import CheckboxWithDescription from "@/components/Form/checkbox/CheckBoxComponent";
+import FieldItem from "@/components/Form/fieldItem/FieldItem";
+import ModalComponent from "@/components/Modal/ModalComponent";
+import { PRIVACY } from "@/constants/constants";
 import { useFormValidation } from "@/hooks";
+import { createAlbumSchema } from "@/validation/album";
 
 interface CreateAlbumModalProps {
   visible: boolean;
@@ -21,17 +24,18 @@ const CreateAlbumModal: React.FC<CreateAlbumModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [privacy, setPrivacy] = useState(false);
-  const { validate, validateField, getFieldError } = useFormValidation(createAlbumSchema);
+  const { validate, validateField, getFieldError } =
+    useFormValidation(createAlbumSchema);
 
   const handleConfirm = async () => {
     if (loading) return; // Prevent multiple submissions
-    
+
     try {
       const formValues = await form.validateFields();
-      
+
       const data = {
         album_name: formValues.album_name,
-        privacy: privacy && "0" || "1", // 0 = private, 1 = public
+        privacy: (privacy && PRIVACY.PRIVATE) || PRIVACY.PUBLIC,
       };
 
       // Validate with Zod before submitting
@@ -42,9 +46,9 @@ const CreateAlbumModal: React.FC<CreateAlbumModalProps> = ({
         });
         return;
       }
-      
+
       await onConfirm(data);
-      
+
       // Reset form after successful creation
       form.resetFields();
       setPrivacy(false);
@@ -69,9 +73,9 @@ const CreateAlbumModal: React.FC<CreateAlbumModalProps> = ({
       visible={visible}
       onCancel={handleCancel}
       onConfirm={handleConfirm}
-      buttonLabels={{ 
-        confirmLabel: "Create", 
-        cancelLabel: "Cancel" 
+      buttonLabels={{
+        confirmLabel: "Create",
+        cancelLabel: "Cancel",
       }}
       className="!w-[700px]"
     >
@@ -80,19 +84,18 @@ const CreateAlbumModal: React.FC<CreateAlbumModalProps> = ({
           <FieldItem
             label="Name"
             name="album_name"
-            validateStatus={getFieldError('album_name') ? 'error' : ''}
-            help={getFieldError('album_name')}
+            validateStatus={getFieldError("album_name") ? "error" : ""}
+            help={getFieldError("album_name")}
             rules={[
               { required: true, message: "Please input the album title!" },
             ]}
             placeholder="Like 'Places to Go' or 'Recipes to Make'"
           >
-            <Input 
-              onChange={(e) => validateField('album_name', e.target.value)}
-              onBlur={(e) => validateField('album_name', e.target.value)}
+            <Input
+              onChange={(e) => validateField("album_name", e.target.value)}
+              onBlur={(e) => validateField("album_name", e.target.value)}
             />
           </FieldItem>
-
 
           <CheckboxWithDescription
             title="Keep this album private"

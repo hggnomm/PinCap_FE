@@ -6,11 +6,11 @@ import { CheckboxChangeEvent } from "antd/es/checkbox";
 
 import { Form, Input } from "antd";
 
-import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import Loading from "@/components/loading/Loading";
-import MediaViewer from "@/components/mediaViewer/MediaViewer";
-import ModalComponent from "@/components/modal/ModalComponent";
+import CheckboxWithDescription from "@/components/Form/checkbox/CheckBoxComponent";
+import FieldItem from "@/components/Form/fieldItem/FieldItem";
+import Loading from "@/components/Loading/Loading";
+import MediaViewer from "@/components/MediaViewer/MediaViewer";
+import ModalComponent from "@/components/Modal/ModalComponent";
 import { PRIVACY } from "@/constants/constants";
 import { useMediaToast } from "@/contexts/MediaToastContext";
 import { useAlbum } from "@/react-query/useAlbum";

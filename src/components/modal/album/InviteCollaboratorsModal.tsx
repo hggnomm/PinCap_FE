@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
+
+import { clsx } from "clsx";
 import { Search, User, Loader2 } from "lucide-react";
-import clsx from "clsx";
-import ModalComponent from "@/components/modal/ModalComponent";
-import { useUser } from "@/react-query/useUser";
-import { useAlbum } from "@/react-query/useAlbum";
+
+import ModalComponent from "@/components/Modal/ModalComponent";
 import { ALBUM_INVITATION_STATUS } from "@/constants/constants";
+import { useAlbum } from "@/react-query/useAlbum";
+import { useUser } from "@/react-query/useUser";
+import { AlbumUser } from "@/types/type";
 
 const useDebounce = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -64,9 +67,9 @@ const InviteCollaboratorsModal: React.FC<InviteCollaboratorsModalProps> = ({
     }
   };
 
-  const getButtonStatus = (user: any) => {
+  const getButtonStatus = (user: AlbumUser) => {
     const status = user.invitation_status || user.status;
-    
+
     if (invitedUsers.has(user.id)) {
       return { text: "Invited", status: ALBUM_INVITATION_STATUS.INVITED };
     }
@@ -77,7 +80,10 @@ const InviteCollaboratorsModal: React.FC<InviteCollaboratorsModalProps> = ({
       case ALBUM_INVITATION_STATUS.ACCEPTED:
         return { text: "Accepted", status: ALBUM_INVITATION_STATUS.ACCEPTED };
       case ALBUM_INVITATION_STATUS.REJECTED:
-        return { text: "Invite Again", status: ALBUM_INVITATION_STATUS.REJECTED };
+        return {
+          text: "Invite Again",
+          status: ALBUM_INVITATION_STATUS.REJECTED,
+        };
       default:
         return { text: "Invite", status: null };
     }
@@ -127,10 +133,12 @@ const InviteCollaboratorsModal: React.FC<InviteCollaboratorsModalProps> = ({
 
           {users.length > 0 && (
             <div className="space-y-2">
-              {users.map((user: any) => {
+              {users.map((user: AlbumUser) => {
                 const { text, status } = getButtonStatus(user);
-                const isDisabled = status !== null && status !== ALBUM_INVITATION_STATUS.REJECTED;
-                
+                const isDisabled =
+                  status !== null &&
+                  status !== ALBUM_INVITATION_STATUS.REJECTED;
+
                 return (
                   <div
                     key={user.id}
@@ -160,16 +168,16 @@ const InviteCollaboratorsModal: React.FC<InviteCollaboratorsModalProps> = ({
                       className={clsx(
                         "!absolute right-3 !px-4 !py-2 rounded-lg text-sm font-medium transition-colors",
                         {
-                          "!bg-amber-100 text-amber-700 cursor-not-allowed": 
+                          "!bg-amber-100 text-amber-700 cursor-not-allowed":
                             status === ALBUM_INVITATION_STATUS.INVITED,
-                          
-                          "!bg-green-100 text-green-700 cursor-not-allowed": 
+
+                          "!bg-green-100 text-green-700 cursor-not-allowed":
                             status === ALBUM_INVITATION_STATUS.ACCEPTED,
-                          
-                          "!bg-gray-100 text-gray-700 hover:!bg-gray-200": 
+
+                          "!bg-gray-100 text-gray-700 hover:!bg-gray-200":
                             status === ALBUM_INVITATION_STATUS.REJECTED,
-                          
-                          "!bg-rose-600 text-white hover:!bg-rose-700": 
+
+                          "!bg-rose-600 text-white hover:!bg-rose-700":
                             status === null,
                         }
                       )}

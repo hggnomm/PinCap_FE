@@ -7,14 +7,14 @@ import { EllipsisOutlined } from "@ant-design/icons/lib";
 import { Divider } from "antd/es";
 
 import { getDetailMedia } from "@/api/media";
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import Loading from "@/components/loading/Loading";
+import ButtonCircle from "@/components/ButtonCircle/ButtonCircle";
+import Loading from "@/components/Loading/Loading";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { useMedia } from "@/react-query/useMedia";
 import { Media } from "@/types/type";
 import { getMediaPreviewUrl, isMediaVideo } from "@/utils/utils";
 
-const ModalComponent = lazy(() => import("@/components/modal/ModalComponent"));
+const ModalComponent = lazy(() => import("@/components/Modal/ModalComponent"));
 
 interface DraftMediaProps {
   resetFormAndCloseDrawer: () => void;

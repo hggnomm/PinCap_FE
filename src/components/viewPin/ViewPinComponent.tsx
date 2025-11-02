@@ -11,7 +11,7 @@ import Masonry from "react-masonry-css";
 import "./ViewPinComponent.less";
 
 import Empty, { NoMediaIcon } from "@/components/Empty";
-import Loading from "@/components/loading/Loading";
+import Loading from "@/components/Loading/Loading";
 import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
 import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
 

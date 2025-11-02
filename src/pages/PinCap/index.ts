@@ -8,3 +8,4 @@ export { default as MyMedia } from "./MyMedia/MyMedia";
 export { default as Profile } from "./Profile/Profile";
 export { default as Search } from "./Search/Search";
 export { default as UserProfile } from "./UserProfile/UserProfile";
+export { InstagramAbout, InstagramSync } from "./Instagram";

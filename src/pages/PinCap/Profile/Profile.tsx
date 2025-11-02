@@ -1,10 +1,13 @@
 import React from "react";
-import { useAuth } from "@/react-query/useAuth";
+
 import { useNavigate } from "react-router-dom";
-import Loading from "@/components/loading/Loading";
+
 import { Edit, Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";
+
+import BackButton from "@/components/BackButton/BackButton";
+import Loading from "@/components/Loading/Loading";
 import { ROUTES } from "@/constants/routes";
-import BackButton from "@/components/backButton/BackButton";
+import { useAuth } from "@/react-query/useAuth";
 
 // Reusable StatCard component
 interface StatCardProps {
@@ -71,7 +74,7 @@ const Profile = () => {
   };
 
   return (
-    <Loading isLoading={isLoadingUser} error={null}>
+    <Loading isLoading={isLoadingUser}>
       <div className="min-h-screen p-4 md:p-8">
         <div className="max-w-4xl mx-auto relative">
           <BackButton />

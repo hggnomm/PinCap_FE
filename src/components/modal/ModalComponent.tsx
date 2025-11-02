@@ -3,7 +3,7 @@ import React from "react";
 import { clsx } from "clsx";
 
 import { Modal } from "antd";
-import "@/components/modal/ModalComponent.less";
+import "@/components/Modal/ModalComponent.less";
 
 interface ModalComponentProps {
   titleDefault?: string;

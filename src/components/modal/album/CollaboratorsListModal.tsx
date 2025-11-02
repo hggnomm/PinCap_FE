@@ -8,10 +8,10 @@ import { User, Crown, Edit, Eye, ChevronsUpDown, Trash2 } from "lucide-react";
 
 import type { MenuProps } from "antd";
 
-import { Dropdown } from "@/components/dropdown";
+import { Dropdown } from "@/components/Dropdown";
 import Empty from "@/components/Empty";
-import Loading from "@/components/loading/Loading";
-import ModalComponent from "@/components/modal/ModalComponent";
+import Loading from "@/components/Loading/Loading";
+import ModalComponent from "@/components/Modal/ModalComponent";
 import { ALBUM_ROLES, ALBUM_INVITATION_STATUS } from "@/constants/constants";
 import { useAlbum } from "@/react-query/useAlbum";
 import { TokenPayload } from "@/types/Auth";

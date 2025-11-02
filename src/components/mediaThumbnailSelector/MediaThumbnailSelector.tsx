@@ -8,7 +8,7 @@ import { MEDIA_TYPES } from "@/constants/constants";
 import type { Media } from "@/types/type";
 import { getFirstImageUrl } from "@/utils/utils";
 
-const ModalComponent = lazy(() => import("@/components/modal/ModalComponent"));
+const ModalComponent = lazy(() => import("@/components/Modal/ModalComponent"));
 
 interface MediaThumbnailSelectorProps {
   visible: boolean;

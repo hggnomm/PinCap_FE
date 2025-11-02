@@ -1,5 +1,7 @@
 import React from "react";
-import ModalComponent from "@/components/modal/ModalComponent";
+
+import ModalComponent from "@/components/Modal/ModalComponent";
+
 import { Album } from "type";
 
 interface DeleteAlbumModalProps {
@@ -7,7 +9,6 @@ interface DeleteAlbumModalProps {
   album: Album | null;
   onCancel: () => void;
   onConfirm: () => Promise<void>;
-  loading?: boolean;
 }
 
 const DeleteAlbumModal: React.FC<DeleteAlbumModalProps> = ({
@@ -15,7 +16,6 @@ const DeleteAlbumModal: React.FC<DeleteAlbumModalProps> = ({
   album,
   onCancel,
   onConfirm,
-  loading = false,
 }) => {
   return (
     <ModalComponent
@@ -27,9 +27,7 @@ const DeleteAlbumModal: React.FC<DeleteAlbumModalProps> = ({
     >
       <div className="mb-5 mt-5">
         Are you sure you want to delete this album
-        <p className="font-medium text-lg inline !mx-1">
-          {album?.album_name}?
-        </p>
+        <p className="font-medium text-lg inline !mx-1">{album?.album_name}?</p>
         This action cannot be undone.
       </div>
     </ModalComponent>

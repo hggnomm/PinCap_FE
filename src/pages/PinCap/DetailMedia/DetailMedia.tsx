@@ -11,13 +11,13 @@ import { motion } from "framer-motion";
 import { getAllMedias } from "@/api/media";
 import download from "@/assets/img/PinCap/download.png";
 import more from "@/assets/img/PinCap/more.png";
-import AlbumDropdown from "@/components/albumDropdown";
-import BackButton from "@/components/backButton/BackButton";
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
+import AlbumDropdown from "@/components/AlbumDropdown";
+import BackButton from "@/components/BackButton/BackButton";
+import ButtonCircle from "@/components/ButtonCircle/ButtonCircle";
 import FollowButton from "@/components/FollowButton";
-import Loading from "@/components/loading/Loading";
-import MediaViewer from "@/components/mediaViewer/MediaViewer";
-import MediaList from "@/components/viewPin/ViewPinComponent";
+import Loading from "@/components/Loading/Loading";
+import MediaViewer from "@/components/MediaViewer/MediaViewer";
+import MediaList from "@/components/ViewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 import { useMedia } from "@/react-query/useMedia";
 import { TokenPayload } from "@/types/Auth";
@@ -30,10 +30,10 @@ import ListComments from "./ListComments/ListComments";
 import "./index.less";
 
 const EditMediaModal = lazy(
-  () => import("@/components/modal/media/EditMediaModal")
+  () => import("@/components/Modal/media/EditMediaModal")
 );
 const DeleteMediaModal = lazy(
-  () => import("@/components/modal/media/DeleteMediaModal")
+  () => import("@/components/Modal/media/DeleteMediaModal")
 );
 
 const DetailMedia = () => {
@@ -54,7 +54,6 @@ const DetailMedia = () => {
   } = useMedia().getMediaById(id, true);
 
   const [media, setMedia] = useState<Media | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [shouldOpenComments, setShouldOpenComments] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -85,9 +84,6 @@ const DetailMedia = () => {
   useEffect(() => {
     if (mediaData) {
       setMedia(mediaData);
-    }
-    if (queryError) {
-      setError("Lỗi khi lấy chi tiết media: " + queryError.message);
     }
   }, [mediaData, queryError]);
 
@@ -140,7 +136,6 @@ const DetailMedia = () => {
       }
     } catch (error: unknown) {
       console.error("Error when reacting to a media:", error);
-      setError("Error when reacting to a media!");
     }
   };
 
