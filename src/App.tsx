@@ -8,16 +8,17 @@ import Layout, { Content } from "antd/es/layout/layout";
 
 import { ConfigProvider } from "antd";
 
-import ChatbotProvider from "./components/Chatbot/ChatbotProvider";
-import HeaderCommon from "./components/Header/HeaderCommon";
-import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
-import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-import SiderCommon from "./components/Sider/SiderCommon";
-import { ROUTES } from "./constants/routes";
-import { MediaToastProvider } from "./contexts/MediaToastContext";
-import { ImageAi } from "./pages/AITools";
-import { Login, Register } from "./pages/Auth";
-import { Home, NotFound, Forbidden } from "./pages/Common";
+import ChatbotProvider from "@/components/Chatbot/ChatbotProvider";
+import HeaderCommon from "@/components/Header/HeaderCommon";
+import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
+import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
+import SiderCommon from "@/components/Sider/SiderCommon";
+import { ROUTES } from "@/constants/routes";
+import { MediaToastProvider } from "@/contexts/MediaToastContext";
+import { ImageAi } from "@/pages/AITools";
+import { Login, Register } from "@/pages/Auth";
+import { Home, NotFound, Forbidden } from "@/pages/Common";
+
 import {
   PinCap,
   CreateMedia,
