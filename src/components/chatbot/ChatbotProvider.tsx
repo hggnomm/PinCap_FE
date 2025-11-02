@@ -1,8 +1,10 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/store/store';
-import { toggleChatbot } from '@/store/chatSlice';
-import Chatbot from './index';
+import React from "react";
+
+import { useSelector, useDispatch } from "react-redux";
+
+import Chatbot from "@/components/Chatbot/index";
+import { toggleChatbot } from "@/store/chatSlice";
+import { RootState } from "@/store/store";
 
 const ChatbotProvider: React.FC = () => {
   const dispatch = useDispatch();
@@ -15,10 +17,7 @@ const ChatbotProvider: React.FC = () => {
   return (
     <>
       {isOpen && (
-        <Chatbot 
-          toggleChatbot={handleToggleChatbot} 
-          isOpen={isOpen} 
-        />
+        <Chatbot toggleChatbot={handleToggleChatbot} isOpen={isOpen} />
       )}
     </>
   );
