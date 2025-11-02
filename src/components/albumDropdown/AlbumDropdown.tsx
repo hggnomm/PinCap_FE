@@ -7,15 +7,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { clsx } from "clsx";
 
 import { addMediasToAlbum } from "@/api/album";
-import { BaseTabs } from "@/components/baseTabs";
+import { BaseTabs } from "@/components/BaseTabs";
 import Empty from "@/components/Empty/Empty";
-import Loading from "@/components/loading/Loading";
+import Loading from "@/components/Loading/Loading";
 import { ALBUM_TABS } from "@/constants/constants";
 import { useAlbum } from "@/react-query/useAlbum";
 import { CreateAlbumFormData } from "@/validation";
 
 const CreateAlbumModal = lazy(
-  () => import("@/components/modal/album/CreateAlbumModal")
+  () => import("@/components/Modal/album/CreateAlbumModal")
 );
 
 let currentOpenDropdown: string | null = null;

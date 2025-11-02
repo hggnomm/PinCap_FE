@@ -7,17 +7,17 @@ import { toast } from "react-toastify";
 
 import { LockFilled, MoreOutlined } from "@ant-design/icons/lib";
 
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
+import ButtonCircle from "@/components/ButtonCircle/ButtonCircle";
+import CollaboratorsSection from "@/components/Collaborators/CollaboratorsSection";
 import Empty, { NoMediaIcon } from "@/components/Empty";
-import Loading from "@/components/loading/Loading";
+import Loading from "@/components/Loading/Loading";
 import {
   EditAlbumModal,
   DeleteAlbumModal,
   InviteCollaboratorsModal,
   CollaboratorsListModal,
-} from "@/components/modal/album";
-import MediaList from "@/components/viewPin/ViewPinComponent";
+} from "@/components/Modal/album";
+import MediaList from "@/components/ViewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 import { useAlbum } from "@/react-query/useAlbum";
 import { TokenPayload } from "@/types/Auth";
@@ -39,11 +39,7 @@ const DetailAlbum = () => {
 
   // Use React Query hooks
   const { getAlbumById, updateAlbum, deleteAlbum } = useAlbum();
-  const {
-    data: albumData,
-    isLoading: loading,
-    error: queryError,
-  } = getAlbumById(albumId);
+  const { data: albumData, isLoading: loading } = getAlbumById(albumId);
 
   useEffect(() => {
     if (!albumId) {

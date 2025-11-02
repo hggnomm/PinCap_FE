@@ -4,13 +4,13 @@ import React, { useEffect, useState } from "react";
 
 import { Form, Input } from "antd";
 
-import CollaboratorsSection from "@/components/collaborators/CollaboratorsSection";
-import CheckboxWithDescription from "@/components/form/checkbox/CheckBoxComponent";
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import Loading from "@/components/loading/Loading";
-import MediaThumbnailSelector from "@/components/mediaThumbnailSelector/MediaThumbnailSelector";
-import { CollaboratorsListModal } from "@/components/modal/album";
-import ModalComponent from "@/components/modal/ModalComponent";
+import CollaboratorsSection from "@/components/Collaborators/CollaboratorsSection";
+import CheckboxWithDescription from "@/components/Form/checkbox/CheckBoxComponent";
+import FieldItem from "@/components/Form/fieldItem/FieldItem";
+import Loading from "@/components/Loading/Loading";
+import MediaThumbnailSelector from "@/components/MediaThumbnailSelector/MediaThumbnailSelector";
+import { CollaboratorsListModal } from "@/components/Modal/album";
+import ModalComponent from "@/components/Modal/ModalComponent";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { useFormValidation } from "@/hooks";
 import { useAlbum } from "@/react-query/useAlbum";

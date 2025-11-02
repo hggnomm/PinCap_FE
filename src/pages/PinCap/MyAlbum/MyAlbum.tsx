@@ -9,9 +9,9 @@ import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
 
 import { Col, Row } from "antd";
 
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import Loading from "@/components/loading/Loading";
-import { InfoTooltip } from "@/components/tooltip";
+import ButtonCircle from "@/components/ButtonCircle/ButtonCircle";
+import Loading from "@/components/Loading/Loading";
+import { InfoTooltip } from "@/components/Tooltip";
 import { ROUTES } from "@/constants/routes";
 import { useAlbum } from "@/react-query/useAlbum";
 import { TokenPayload } from "@/types/Auth";
@@ -21,7 +21,7 @@ import { Album } from "type";
 import AlbumCard from "./AlbumCard/AlbumCard";
 
 const CreateAlbumModal = lazy(
-  () => import("@/components/modal/album/CreateAlbumModal")
+  () => import("@/components/Modal/album/CreateAlbumModal")
 );
 const MyAlbum = () => {
   const navigate = useNavigate();

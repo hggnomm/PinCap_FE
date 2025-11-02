@@ -8,9 +8,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons/lib";
 
 import { getMyMedias } from "@/api/media";
-import ButtonCircle from "@/components/buttonCircle/ButtonCircle";
-import Loading from "@/components/loading/Loading";
-import MediaList from "@/components/viewPin/ViewPinComponent";
+import ButtonCircle from "@/components/ButtonCircle/ButtonCircle";
+import Loading from "@/components/Loading/Loading";
+import MediaList from "@/components/ViewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 
 import "./MyMedia.less";

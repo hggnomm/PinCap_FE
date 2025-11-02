@@ -1,7 +1,11 @@
+import { useEffect, useState } from "react";
+
+import { motion } from "framer-motion";
+import { Autoplay, FreeMode, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+
 import {
   Button,
-  Col,
-  Divider,
   Form,
   FormProps,
   Input,
@@ -10,19 +14,17 @@ import {
   Dropdown,
   Menu,
 } from "antd";
-import React, { useEffect, useState } from "react";
+
 import "./index.less";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, FreeMode, Pagination } from "swiper/modules";
+
+import { createAIImage } from "@/api/ai";
 import Image1 from "@/assets/img/ImagesAI/img1.png";
 import Image2 from "@/assets/img/ImagesAI/img2.png";
 import Image3 from "@/assets/img/ImagesAI/img3.png";
 import Image4 from "@/assets/img/ImagesAI/img4.png";
 import Image5 from "@/assets/img/ImagesAI/img5.png";
-import { motion } from "framer-motion";
+import Loading from "@/components/Loading/Loading";
 import { options, sizeOptions } from "@/utils/options";
-import { createAIImage } from "@/api/ai";
-import Loading from "@/components/loading/Loading";
 
 interface IRequest {
   textInput: string;
@@ -46,11 +48,15 @@ interface IRequestCreateAIImage {
 
 const ImageAi = () => {
   const [form] = Form.useForm();
-  const [selectedOptions, setSelectedOptions] = useState<any>(null);
-  const [selectedStyle, setSelectedStyle] = useState<any>(null);
+  const [selectedOptions, setSelectedOptions] = useState<
+    (typeof sizeOptions)[number] | null
+  >(null);
+  const [selectedStyle, setSelectedStyle] = useState<
+    (typeof options)[number] | null
+  >(null);
   const [isDoneGenerate, setIsDoneGenerate] = useState<boolean>(false);
   const [isGenerate, setIsGenerate] = useState<boolean>(false);
-  const [urlImageAi, setUrlImageAI] = useState<any>(null);
+  const [urlImageAi, setUrlImageAI] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,8 +73,8 @@ const ImageAi = () => {
       const updatedRequest: IRequestCreateAIImage = {
         prompt: values.textInput,
         style_preset: selectedStyle?.value || "",
-        width: selectedOptions?.value.width,
-        height: selectedOptions?.value.height,
+        width: selectedOptions?.value.width ?? 0,
+        height: selectedOptions?.value.height ?? 0,
         imageUrl: localStorage.getItem("generatedImageUrl") || null,
       };
 
@@ -82,9 +88,16 @@ const ImageAi = () => {
       } else {
         throw new Error("Failed to generate image. Please try again.");
       }
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "An error occurred while generating the image.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err);
+        setError(
+          err.message || "An error occurred while generating the image."
+        );
+      } else {
+        console.error(err);
+        setError("An error occurred while generating the image.");
+      }
     } finally {
       setLoading(false);
     }
@@ -131,8 +144,7 @@ const ImageAi = () => {
     </Menu>
   );
 
-  // Xử lý khi người dùng chọn item từ dropdown
-  const handleMenuClick = (option: any) => {
+  const handleMenuClick = (option: (typeof options)[number]) => {
     setSelectedStyle(option);
     form.setFieldsValue({ style_preset: option.label });
   };
@@ -264,8 +276,8 @@ const ImageAi = () => {
           <Row className="image-ai-container">
             {isDoneGenerate || isGenerate ? (
               <div>
-                <Loading isLoading={loading} error={error}>
-                  <img src={urlImageAi} className="image-ai" />
+                <Loading isLoading={loading}>
+                  <img src={urlImageAi ?? ""} className="image-ai" />
                 </Loading>
               </div>
             ) : (

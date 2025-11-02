@@ -20,8 +20,8 @@ import { EditFilled } from "@ant-design/icons/lib";
 import { Form } from "antd";
 
 import { getDetailMedia } from "@/api/media";
-import AlbumDropdown from "@/components/albumDropdown";
-import DotsPagination from "@/components/dotsPagination/DotsPagination";
+import AlbumDropdown from "@/components/AlbumDropdown";
+import DotsPagination from "@/components/DotsPagination/DotsPagination";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { useMedia } from "@/react-query/useMedia";
 import { ParsedMediaUrl, parseMediaUrl } from "@/utils/utils";
@@ -33,10 +33,10 @@ import { Media } from "type";
 import "./index.less";
 
 const EditMediaModal = lazy(
-  () => import("@/components/modal/media/EditMediaModal")
+  () => import("@/components/Modal/media/EditMediaModal")
 );
 const DeleteMediaModal = lazy(
-  () => import("@/components/modal/media/DeleteMediaModal")
+  () => import("@/components/Modal/media/DeleteMediaModal")
 );
 interface PinMediaProps extends HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;

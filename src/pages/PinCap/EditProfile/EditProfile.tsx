@@ -7,8 +7,8 @@ import { ArrowLeft, Save, Upload, X } from "lucide-react";
 
 import { Form, Input } from "antd";
 
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import Loading from "@/components/loading/Loading";
+import FieldItem from "@/components/Form/fieldItem/FieldItem";
+import Loading from "@/components/Loading/Loading";
 import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query/useAuth";
 import { useUser } from "@/react-query/useUser";

@@ -12,7 +12,7 @@ import { clsx } from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-medium-image-zoom/dist/styles.css";
 
-import DotsPagination from "@/components/dotsPagination/DotsPagination";
+import DotsPagination from "@/components/DotsPagination/DotsPagination";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { Media } from "@/types/type";
 import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";

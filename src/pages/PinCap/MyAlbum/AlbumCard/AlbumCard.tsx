@@ -10,7 +10,7 @@ import {
   EditAlbumModal,
   DeleteAlbumModal,
   InviteCollaboratorsModal,
-} from "@/components/modal/album";
+} from "@/components/Modal/album";
 import { ROUTES } from "@/constants/routes";
 import { useAlbum } from "@/react-query/useAlbum";
 import { Album } from "@/types/type";

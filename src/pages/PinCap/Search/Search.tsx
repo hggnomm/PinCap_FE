@@ -3,7 +3,7 @@ import React from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { getAllMedias } from "@/api/media";
-import MediaList from "@/components/viewPin/ViewPinComponent";
+import MediaList from "@/components/ViewPin/ViewPinComponent";
 import { SEARCH_PARAMS } from "@/constants";
 
 const Search: React.FC = () => {

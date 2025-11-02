@@ -1,12 +1,12 @@
 import React from "react";
 
-import "@/components/form/checkbox/CheckBoxComponent.less";
+import "@/components/Form/checkbox/CheckBoxComponent.less";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import type { Rule } from "antd/es/form";
 
 import { Checkbox, Form } from "antd";
 
-import InfoTooltip from "@/components/tooltip/InfoTooltip";
+import InfoTooltip from "@/components/Tooltip/InfoTooltip";
 
 interface CheckboxWithDescriptionProps {
   title: string;

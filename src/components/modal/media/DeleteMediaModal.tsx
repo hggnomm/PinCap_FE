@@ -1,6 +1,6 @@
 import React from "react";
 
-import ModalComponent from "@/components/modal/ModalComponent";
+import ModalComponent from "@/components/Modal/ModalComponent";
 import { Media } from "@/types/type";
 
 interface DeleteMediaModalProps {

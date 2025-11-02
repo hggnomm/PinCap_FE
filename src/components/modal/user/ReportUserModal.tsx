@@ -9,8 +9,8 @@ import { Input } from "antd";
 
 const { TextArea } = Input;
 
-import FieldItem from "@/components/form/fieldItem/FieldItem";
-import ModalComponent from "@/components/modal/ModalComponent";
+import FieldItem from "@/components/Form/fieldItem/FieldItem";
+import ModalComponent from "@/components/Modal/ModalComponent";
 import { ReportReason } from "@/types/type";
 
 interface ReportUserModalProps {
