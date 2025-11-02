@@ -4716,6 +4716,11 @@ react-dom@^18.2.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.2"
 
+react-facebook-login@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.npmjs.org/react-facebook-login/-/react-facebook-login-4.1.1.tgz"
+  integrity sha512-COnHEHlYGTKipz4963safFAK9PaNTcCiXfPXMS/yxo8El+/AJL5ye8kMJf23lKSSGGPgqFQuInskIHVqGqTvSw==
+
 react-filepond@^7.1.2:
   version "7.1.2"
   resolved "https://registry.npmjs.org/react-filepond/-/react-filepond-7.1.2.tgz"

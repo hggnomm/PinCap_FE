@@ -2,18 +2,15 @@ import jwtdecode from "jwt-decode";
 
 import { UploadFile } from "antd";
 
-
-
 import angry from "@/assets/img/PinCap/angry.png";
 import black_heart from "@/assets/img/PinCap/black-heart.png";
 import haha from "@/assets/img/PinCap/haha.png";
 import heart from "@/assets/img/PinCap/heart.png";
 import sad from "@/assets/img/PinCap/sad.png";
 import wow from "@/assets/img/PinCap/wow.png";
-import { ALBUM_ROLES , MEDIA_TYPES } from "@/constants/constants";
+import { ALBUM_ROLES, MEDIA_TYPES } from "@/constants/constants";
 import { TokenPayload } from "@/types/Auth";
 import { Album, AlbumUser } from "@/types/type";
-
 
 export enum FeelingType {
   HEART = "9bd68a9e-da0e-4889-8656-520818a8dadf",
@@ -119,7 +116,9 @@ export interface ParsedMediaUrl {
   type: typeof MEDIA_TYPES.IMAGE | typeof MEDIA_TYPES.VIDEO;
 }
 
-export const parseMediaUrl = (mediaUrl: string | null | undefined): ParsedMediaUrl[] => {
+export const parseMediaUrl = (
+  mediaUrl: string | null | undefined
+): ParsedMediaUrl[] => {
   if (!mediaUrl) {
     return [];
   }
@@ -143,10 +142,12 @@ export const parseMediaUrl = (mediaUrl: string | null | undefined): ParsedMediaU
   return urls.reduce<ParsedMediaUrl[]>((acc, url) => {
     const parts = url.split(".");
     const extension = parts[parts.length - 1].toLowerCase();
-    
+
     const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm", "flv"];
-    const type = videoExtensions.includes(extension) ? MEDIA_TYPES.VIDEO : MEDIA_TYPES.IMAGE;
-    
+    const type = videoExtensions.includes(extension)
+      ? MEDIA_TYPES.VIDEO
+      : MEDIA_TYPES.IMAGE;
+
     acc.push({ url, type });
     return acc;
   }, []);
@@ -157,7 +158,9 @@ export const parseMediaUrl = (mediaUrl: string | null | undefined): ParsedMediaU
  * @param mediaUrl - URL string có thể là JSON array hoặc single URL
  * @returns URL ảnh đầu tiên hoặc null nếu không tìm thấy
  */
-export const getFirstImageUrl = (mediaUrl: string | null | undefined): string | null => {
+export const getFirstImageUrl = (
+  mediaUrl: string | null | undefined
+): string | null => {
   if (!mediaUrl) {
     return null;
   }
@@ -167,10 +170,10 @@ export const getFirstImageUrl = (mediaUrl: string | null | undefined): string | 
     const parsed = JSON.parse(mediaUrl);
     if (Array.isArray(parsed) && parsed.length > 0) {
       const firstUrl = parsed[0];
-      
+
       // Check if URL has escaped characters and decode them
-      const decodedUrl = firstUrl.replace(/\\/g, '');
-      
+      const decodedUrl = firstUrl.replace(/\\/g, "");
+
       return decodedUrl;
     }
     return String(parsed);
@@ -187,7 +190,7 @@ export const getFirstImageUrl = (mediaUrl: string | null | undefined): string | 
  * @returns URL phù hợp để preview
  */
 export const getMediaPreviewUrl = (
-  mediaUrl: string | null | undefined, 
+  mediaUrl: string | null | undefined,
   type: string | null
 ): string | null => {
   if (!mediaUrl) {
@@ -215,28 +218,31 @@ export const getMediaPreviewUrl = (
  * @param type - Type của media
  * @returns true nếu là video
  */
-export const isMediaVideo = (mediaUrl: string | null | undefined, type: string | null): boolean => {
+export const isMediaVideo = (
+  mediaUrl: string | null | undefined,
+  type: string | null
+): boolean => {
   if (type === MEDIA_TYPES.VIDEO) {
     return true;
   }
-  
+
   // Handle null type as FLEXIBLE
   if ((type === null || type === MEDIA_TYPES.FLEXIBLE) && mediaUrl) {
     const firstUrl = getFirstImageUrl(mediaUrl);
     return firstUrl ? isVideo(firstUrl) : false;
   }
-  
+
   return false;
 };
 
 // Check if current user is the owner of an album
 export const isAlbumOwner = (album: Album, currentUserId: string): boolean => {
   if (!album.allUser || !currentUserId) return false;
-  
+
   const currentUserInAlbum = album.allUser.find(
     (user: AlbumUser) => user.id === currentUserId
   );
-  
+
   return currentUserInAlbum?.album_role === ALBUM_ROLES.OWNER;
 };
 
