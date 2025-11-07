@@ -1,12 +1,15 @@
 import axios from "axios";
-import apiClient from "./apiClient";
-import type { User } from "@/types/type";
+
 import { ENV } from "@/constants/env";
+import type { User } from "@/types/type";
+import { LoginFormData, RegisterFormData } from "@/validation/auth";
+
+import apiClient from "./apiClient";
 
 const baseUrl = ENV.BASE_API;
 
-export const login = async (data: any) => {
-  var config = {
+export const login = async (data: LoginFormData) => {
+  const config = {
     method: "post",
     url: `${baseUrl}/api/auth/login`,
     headers: {
@@ -23,7 +26,7 @@ export const login = async (data: any) => {
   }
 };
 
-export const register = async (data: any) => {
+export const register = async (data: RegisterFormData) => {
   const config = {
     method: "POST",
     headers: {
@@ -60,6 +63,7 @@ export const getCurrentUser = async (): Promise<User> => {
     const response = await apiClient.get("/api/users/my-profile");
     return response.data;
   } catch (error) {
+    console.error("Failed to fetch current user", error);
     throw error;
   }
 };
@@ -69,6 +73,7 @@ export const logout = async () => {
     const response = await apiClient.post("/api/auth/logout");
     return response.data;
   } catch (error) {
+    console.error("Failed to logout", error);
     throw error;
   }
 };
@@ -79,6 +84,7 @@ export const verifyEmail = async (token: string) => {
     const response = await apiClient.get(`/api/auth/verify-email/${token}`);
     return response.data;
   } catch (error) {
+    console.error("Failed to verify email", error);
     throw error;
   }
 };
@@ -91,6 +97,7 @@ export const resendVerifyEmail = async (email: string) => {
     });
     return response.data;
   } catch (error) {
+    console.error("Failed to resend verification email", error);
     throw error;
   }
 };
@@ -103,6 +110,7 @@ export const forgotPassword = async (email: string) => {
     });
     return response.data;
   } catch (error) {
+    console.error("Failed to request password reset", error);
     throw error;
   }
 };
@@ -116,6 +124,7 @@ export const resetPassword = async (data: {
     const response = await apiClient.post("/api/auth/reset-password", data);
     return response.data;
   } catch (error) {
+    console.error("Failed to reset password", error);
     throw error;
   }
 };
@@ -126,6 +135,7 @@ export const getGoogleOAuthUrl = async () => {
     const response = await apiClient.get("/api/auth/google/url");
     return response.data;
   } catch (error) {
+    console.error("Failed to fetch Google OAuth URL", error);
     throw error;
   }
 };
@@ -136,6 +146,7 @@ export const healthCheck = async () => {
     const response = await apiClient.get("/api/health-check");
     return response.data;
   } catch (error) {
+    console.error("Health check failed", error);
     throw error;
   }
 };
