@@ -22,12 +22,11 @@ import {
 
 import { LogoIcon, TextIcon } from "@/assets/img";
 import iconChatbot from "@/assets/img/PinCap/chatbot.png";
+import Notification from "@/components/Notification";
 import { ROUTES } from "@/constants/routes";
 import { useInitializeNotifications } from "@/hooks/useInitializeNotifications";
 import { useAuth } from "@/react-query/useAuth";
 import { toggleChatbot } from "@/store/chatSlice";
-
-import Notification from "../notification";
 
 import SearchDrawer from "./SearchDrawer";
 import "./index.less";
