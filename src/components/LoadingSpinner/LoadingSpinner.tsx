@@ -2,7 +2,7 @@ import React, { useEffect, ReactNode } from "react";
 
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import styles
+import "react-toastify/dist/ReactToastify.css";
 
 interface LoadingSpinnerProps {
   isLoading: boolean;

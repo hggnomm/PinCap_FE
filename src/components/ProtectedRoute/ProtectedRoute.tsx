@@ -1,7 +1,9 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { ROUTES } from '@/constants/routes';
-import { useAuth } from '@/react-query';
+import React from "react";
+
+import { Navigate, useLocation } from "react-router-dom";
+
+import { ROUTES } from "@/constants/routes";
+import { useAuth } from "@/react-query";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,7 +14,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, isLoadingUser } = useAuth();
 
   if (isLoadingUser) {
-    return null; 
+    return null;
   }
 
   if (!user) {
