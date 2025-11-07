@@ -8,7 +8,7 @@ import Layout, { Content } from "antd/es/layout/layout";
 
 import { ConfigProvider } from "antd";
 
-import ChatbotProvider from "@/components/chatbot/ChatbotProvider";
+import ChatbotProvider from "@/components/Chatbot/ChatbotProvider";
 import HeaderCommon from "@/components/Header/HeaderCommon";
 import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";

@@ -2,7 +2,7 @@ import React from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 
-import Chatbot from "@/components/chatbot/index";
+import Chatbot from "@/components/Chatbot/index";
 import { toggleChatbot } from "@/store/chatSlice";
 import { RootState } from "@/store/store";
 
