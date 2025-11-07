@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 import { CheckboxChangeEvent } from "antd/es/checkbox";
@@ -14,8 +15,8 @@ import ModalComponent from "@/components/Modal/ModalComponent";
 import { PRIVACY } from "@/constants/constants";
 import { useMediaToast } from "@/contexts/MediaToastContext";
 import { useAlbum } from "@/react-query/useAlbum";
-import { useAuth } from "@/react-query/useAuth";
 import { useMedia } from "@/react-query/useMedia";
+import { TokenPayload } from "@/types/Auth";
 import { Media } from "@/types/type";
 import { UpdateMediaFormData } from "@/validation/media";
 
@@ -47,8 +48,10 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
   const { removeMediasFromAlbum } = useAlbum();
   const { showToast } = useMediaToast();
 
-  const { user } = useAuth();
-  const isOwner = media?.media_owner_id === user?.id;
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
+  const isOwner = media?.ownerUser?.id === tokenPayload.id;
 
   useEffect(() => {
     if (visible && media) {
