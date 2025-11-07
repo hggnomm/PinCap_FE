@@ -1,0 +1,104 @@
+@blue-main: #9eb8d9;
+@dirt-pink: #a25772;
+@background-color: #f9fbfd;
+
+.siderbar {
+  background-color: @background-color;
+  border-right: 3px solid @blue-main;
+
+  &-collapsed {
+    .ant-menu-item .anticon {
+      display: flex;
+    }
+
+    .ant-menu-item {
+      text-align: center; /* Canh giữa icon */
+      padding: 0; /* Loại bỏ padding để tránh cắt xén */
+    }
+
+    /* Đảm bảo menu không hiển thị text khi sider collapse */
+    .ant-menu-item .ant-menu-item-only-child {
+      display: none;
+    }
+  }
+
+  /* Tùy chỉnh menu bên trong sider */
+  .ant-menu-inline-collapsed {
+    width: 5rem !important;
+  }
+  .ant-menu {
+    padding: 0.5rem;
+    width: 15rem;
+    position: fixed;
+    background-color: transparent;
+
+    .ant-menu-item {
+      text-align: left;
+      margin-bottom: 1.2rem;
+      gap: 14px;
+      display: flex;
+      font-weight: 500;
+      font-size: 14px;
+
+      /* Tùy chỉnh khi được chọn */
+      &.ant-menu-item-selected {
+        background-color: @blue-main;
+        color: #000;
+      }
+
+      /* Tùy chỉnh icon */
+      .anticon {
+        display: flex;
+        justify-content: center;
+        font-size: 16px; /* Kích thước icon ban đầu */
+      }
+    }
+
+    /* Tùy chỉnh submenu */
+    .ant-menu-submenu {
+      position: relative !important;
+      z-index: 1;
+
+      .ant-menu-submenu-title {
+        color: #000;
+        gap: 14px;
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 1rem;
+
+        .ant-menu-submenu-arrow {
+          color: #b0b0b0;
+        }
+        .anticon {
+          font-size: 16px;
+        }
+      }
+
+      .ant-menu-sub {
+        background-color: @background-color;
+        position: relative !important;
+        z-index: 2 !important;
+        padding-left: 18px !important;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+    }
+
+    /* Tùy chỉnh khi SubMenu mở */
+    .ant-menu-submenu-open {
+      z-index: 10 !important;
+
+      .ant-menu-sub {
+        background-color: @background-color;
+      }
+    }
+
+    /* Khi SubMenu đóng */
+    .ant-menu-submenu:not(.ant-menu-submenu-open) {
+      .ant-menu-item {
+        background-color: @background-color; /* Đặt lại màu nền về mặc định */
+        color: #000; /* Đặt lại màu chữ về mặc định */
+      }
+    }
+  }
+}
