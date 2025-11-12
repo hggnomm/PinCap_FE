@@ -27,6 +27,7 @@ module.exports = {
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       },
     },
+    "import/case-sensitive": false,
   },
   plugins: ["react-refresh", "@typescript-eslint", "import", "unused-imports"],
   rules: {
@@ -114,7 +115,7 @@ module.exports = {
     ],
 
     // Import validation
-    "import/no-unresolved": "error",
+    "import/no-unresolved": ["error", { caseSensitive: false }],
     "import/no-duplicates": "error",
     "import/no-unused-modules": "warn",
 
