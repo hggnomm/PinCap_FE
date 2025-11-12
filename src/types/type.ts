@@ -1,5 +1,14 @@
 import { ALBUM_ROLES, ALBUM_INVITATION_STATUS } from "@/constants/constants";
 
+export type SocialInstagram = {
+  id: string;
+  user_id: string;
+  name: string;
+  avatar: string;
+  permalink: string;
+  social_id: string;
+};
+
 export type User = {
   id: string;
   added_by_user_id?: string;
@@ -17,6 +26,7 @@ export type User = {
   medias_count?: number;
   reaction_media_count?: number;
   isFollowing?: boolean;
+  social_instagram?: SocialInstagram;
 };
 
 export type AlbumUser = User & {

@@ -122,6 +122,16 @@ export const findUsers = async (target: string, albumId?: string | null) => {
   }
 };
 
+export const getFacebookOAuthUrl = async () => {
+  try {
+    const response = await apiClient.get("/api/users/facebook/url");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch Facebook OAuth URL", error);
+    throw error;
+  }
+};
+
 export const getReportReasons = async () => {
   try {
     const response = await apiClient.get("/api/users/report-reasons");

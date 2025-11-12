@@ -23,6 +23,9 @@ export const useAuth = () => {
     queryKey: ["user"],
     queryFn: auth.getCurrentUser,
     retry: false,
+    refetchOnMount: false,
+    retryOnMount: false,
+    refetchOnReconnect: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!token, // Only run query if token exists
   });

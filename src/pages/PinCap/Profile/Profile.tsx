@@ -97,7 +97,7 @@ const Profile = () => {
                 {/* Profile Avatar with enhanced styling */}
                 <div className="absolute -bottom-16 left-8">
                   <div className="relative">
-                    <div className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500">
+                    <div className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden">
                       {user.avatar ? (
                         <img
                           src={user.avatar || "/placeholder.svg"}

@@ -7,7 +7,7 @@ import { ROUTES } from "@/constants/routes";
 interface AuthenticationSectionProps {
   isConnected: boolean;
   connectedAccount: string | null;
-  onConnect: () => void;
+  onConnect: () => void | Promise<void>;
   onDisconnect: () => void;
 }
 

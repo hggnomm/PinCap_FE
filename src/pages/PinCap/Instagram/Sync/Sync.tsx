@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 
+import { getFacebookOAuthUrl } from "@/api/users";
 import CarouselHeader, {
   CarouselBanner,
 } from "@/components/CarouselHeader/CarouselHeader";
+import { showErrorToast } from "@/utils/apiErrorHandler";
 
 import AuthenticationSection from "./AuthenticationSection";
 import PostsList, { InstagramPost } from "./PostsList";
@@ -72,9 +74,25 @@ const Sync: React.FC = () => {
     []
   );
 
-  const handleConnect = () => {
-    setIsConnected(true);
-    setConnectedAccount("your_instagram_account");
+  const handleConnect = async () => {
+    try {
+      const response = await getFacebookOAuthUrl();
+      const redirectUrl = response?.url;
+
+      if (typeof redirectUrl === "string" && redirectUrl.length > 0) {
+        // Redirect directly to Facebook OAuth URL (no popup)
+        window.location.href = redirectUrl;
+        return;
+      }
+
+      throw new Error("Missing Facebook OAuth redirect URL");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to start Facebook authentication";
+      showErrorToast(error, message);
+    }
   };
 
   const handleDisconnect = () => {
@@ -86,10 +104,7 @@ const Sync: React.FC = () => {
     <main className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="mx-auto max-w-screen-xl space-y-8">
-          <CarouselHeader
-            banners={banners}
-            itemClassName="rounded-2xl aspect-[24/7]"
-          />
+          <CarouselHeader banners={banners} />
 
           <AuthenticationSection
             isConnected={isConnected}
