@@ -1,33 +1,73 @@
-.back-container {
-  .back-button {
-    position: absolute;
-    top: 10px;
-    left: -60px;
-    background: transparent;
-    border: none;
-    padding: 2px;
-    cursor: pointer;
-    z-index: 10;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.back-button {
+  position: absolute;
+  top: 10px;
+  left: -60px;
+  background: transparent;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  z-index: 10;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease;
 
-    :hover {
-      transform: scale(1.07);
+  &:hover {
+    transform: scale(1.07);
+  }
+
+  &__icon {
+    height: 18px;
+    object-fit: cover;
+  }
+
+  &__text {
+    margin-left: 12px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: inherit;
+    white-space: nowrap;
+  }
+
+  &--with-text {
+    position: static;
+    top: auto;
+    left: auto;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border-radius: 999px;
+    transform: none;
+    background: transparent;
+    justify-content: flex-start;
+    color: #475569;
+    transition: color 0.2s ease;
+
+    &:hover {
+      transform: none;
+      color: #0f172a;
     }
 
-    img {
-      height: 18px;
-      object-fit: cover;
+    .back-button__icon {
+      margin-right: 12px;
+      height: 16px;
+    }
+
+    .back-button__text {
+      color: inherit;
     }
   }
 }
 
 @media (max-width: 768px) {
-  .back-container {
+  .back-button {
     display: none;
+  }
+
+  .back-button.back-button--with-text {
+    display: inline-flex;
   }
 }

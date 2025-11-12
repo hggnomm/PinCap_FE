@@ -20,6 +20,7 @@ import { Menu } from "antd";
 import "./index.less";
 import iconAI from "@/assets/img/PinCap/ai-technology-img.png";
 import iconPinBot from "@/assets/img/PinCap/chatbot.png";
+import { ROUTES } from "@/constants/routes";
 import { toggleChatbot } from "@/store/chatSlice";
 import { TokenPayload } from "@/types/Auth";
 
@@ -76,12 +77,16 @@ const SiderCommon = () => {
   const getSelectedKeys = () => {
     const pathname = location.pathname;
 
-    if (pathname === "/create-media") return ["create-media"];
-    if (pathname === "/album") return ["album"];
-    if (pathname === "/my-media") return ["my-media"];
+    if (pathname === ROUTES.CREATE_MEDIA) return ["create-media"];
+    if (pathname === ROUTES.MY_ALBUM) return ["album"];
+    if (pathname === ROUTES.MY_MEDIA) return ["my-media"];
 
-    if (pathname === "/ai") return ["ai-tool"];
-    if (pathname.startsWith("/instagram")) return ["instagram"];
+    if (pathname === ROUTES.AI_TOOLS) return ["ai-tool"];
+    if (
+      pathname === ROUTES.INSTAGRAM_SYNC ||
+      pathname === ROUTES.INSTAGRAM_ABOUT
+    )
+      return ["instagram"];
     if (pathname.startsWith("/dashboard")) {
       if (pathname === "/dashboard") return ["dashHome"];
       if (pathname === "/dashboard/album") return ["dashAlbum"];
@@ -126,23 +131,23 @@ const SiderCommon = () => {
       <Menu selectedKeys={getSelectedKeys()} mode="inline">
         {/* Create Media Button */}
         <CreateMediaBtn key="create-media" icon={<PlusOutlined />}>
-          <Link to="/create-media">Create Media</Link>
+          <Link to={ROUTES.CREATE_MEDIA}>Create Media</Link>
         </CreateMediaBtn>
 
         {/* My Media Menu Item */}
 
         <Menu.Item key="my-media" icon={<ProductOutlined />}>
-          <Link to="/my-media">My Media</Link>
+          <Link to={ROUTES.MY_MEDIA}>My Media</Link>
         </Menu.Item>
 
         {/* Album Menu Item */}
         <Menu.Item key="album" icon={<SignatureOutlined />}>
-          <Link to="/album">My Album</Link>
+          <Link to={ROUTES.MY_ALBUM}>My Album</Link>
         </Menu.Item>
 
         {/* Instagram Menu Item */}
         <Menu.Item key="instagram" icon={<InstagramOutlined />}>
-          <Link to="/instagram/about">Instagram</Link>
+          <Link to={ROUTES.INSTAGRAM_SYNC}>Instagram</Link>
         </Menu.Item>
 
         {/* AI Tool Button */}
@@ -157,7 +162,7 @@ const SiderCommon = () => {
             />
           }
         >
-          <Link to="/ai">AI Tool</Link>
+          <Link to={ROUTES.AI_TOOLS}>AI Tool</Link>
         </AIToolBtn>
 
         <AIToolBtn
