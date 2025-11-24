@@ -78,6 +78,8 @@ export type Media = {
   reaction: Reaction;
   feelings: Feeling[];
   commentCount: number;
+  safe_search_data?: Record<string, unknown> | null;
+  is_policy_violation?: boolean;
   created_at?: string;
   updated_at?: string;
   added_by_user?: User;

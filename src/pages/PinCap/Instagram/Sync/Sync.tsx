@@ -76,16 +76,23 @@ const Sync: React.FC = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       <div className="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-screen-xl space-y-8">
+        <div className="mx-auto lg:max-w-screen-xl xl:max-w-screen-2xl space-y-8">
           <CarouselHeader banners={banners} />
 
-          <AuthenticationSection
-            isConnected={isConnected}
-            account={account}
-            onConnect={handleConnect}
-          />
-
-          {isConnected && <PostsList />}
+          {isConnected && (
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
+              <div className="flex-1">
+                <PostsList />
+              </div>
+              <div className="lg:w-[320px] flex-shrink-0">
+                <AuthenticationSection
+                  isConnected={isConnected}
+                  account={account}
+                  onConnect={handleConnect}
+                />
+              </div>
+            </div>
+          )}
 
           {!isConnected && (
             <div className="rounded-2xl border border-gray-200 bg-white p-8 sm:p-12 text-center shadow-sm">
@@ -111,6 +118,13 @@ const Sync: React.FC = () => {
                 Connect your Instagram account to start viewing your posts
                 {isProfileLoading && " ..."}
               </p>
+              <div className="mt-8">
+                <AuthenticationSection
+                  isConnected={isConnected}
+                  account={account}
+                  onConnect={handleConnect}
+                />
+              </div>
             </div>
           )}
         </div>

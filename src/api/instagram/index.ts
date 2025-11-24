@@ -31,3 +31,15 @@ export const getInstagramMedias = async (
 };
 
 export type InstagramMediaItem = InstagramMedia;
+
+export const syncInstagramMedias = async (ids: string[]) => {
+  try {
+    const response = await apiClient.post("/api/instagram/medias/sync", {
+      ids,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to sync Instagram medias", error);
+    throw error;
+  }
+};
