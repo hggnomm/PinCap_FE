@@ -286,11 +286,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
 
         <motion.div
           className={clsx(
-            "overlay absolute top-0 bottom-2.5 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]"
+            "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
+            data?.type === MEDIA_TYPES.VIDEO || isFlexibleVideo
+              ? "bottom-1.25"
+              : "bottom-2.5"
           )}
-          // className={clsx(
-          //   "overlay absolute top-0 bottom-1.5 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]"
-          // )}
           whileHover={{ opacity: 1 }}
         >
           {isEditMedia && (
