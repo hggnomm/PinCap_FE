@@ -2,19 +2,10 @@ import React from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import {
-  Edit,
-  Mail,
-  Phone,
-  User,
-  MapPin,
-  Calendar,
-  Star,
-  Instagram,
-  ArrowRight,
-} from "lucide-react";
+import { Edit, Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";
 
 import BackButton from "@/components/BackButton/BackButton";
+import InstagramAccountCard from "@/components/ConnectedAccounts/InstagramAccountCard";
 import Loading from "@/components/Loading/Loading";
 import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query/useAuth";
@@ -191,40 +182,21 @@ const Profile = () => {
                   ))}
                 </div>
 
-                {/* Connected Accounts Section */}
                 {user.social_instagram && (
-                  <div className="mb-8">
-                    <h3 className="text-xl font-semibold text-foreground mb-4">
-                      Connected Accounts
-                    </h3>
-                    <a
-                      href={user.social_instagram.permalink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 hover:border-pink-300 dark:hover:border-pink-700 transition-all group"
-                    >
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-md ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-pink-400 dark:group-hover:ring-pink-600 transition-all">
-                        <img
-                          src={user.social_instagram.avatar}
-                          alt={user.social_instagram.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                          <Instagram className="w-4 h-4" />
-                          Instagram
-                        </div>
-                        <div className="font-semibold text-foreground group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                          @{user.social_instagram.name}
-                        </div>
-                      </div>
-                      <div className="text-gray-400 dark:text-gray-600 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                        <ArrowRight className="w-5 h-5" />
-                      </div>
-                    </a>
-                  </div>
+                  <InstagramAccountCard account={user.social_instagram} />
                 )}
+
+                {/* About Section */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
+                    About
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Passionate developer and designer creating beautiful digital
+                    experiences. Love working with modern technologies and
+                    building user-friendly applications.
+                  </p>
+                </div>
 
                 {/* Contact Information */}
                 <div className="grid md:grid-cols-2 gap-8">
@@ -283,18 +255,6 @@ const Profile = () => {
                       ].map((item, index) => (
                         <InfoItem key={index} {...item} />
                       ))}
-                    </div>
-
-                    {/* Bio Section */}
-                    <div className="mt-6">
-                      <h4 className="text-lg font-medium text-foreground mb-3">
-                        About
-                      </h4>
-                      <p className="text-muted-foreground leading-relaxed">
-                        Passionate developer and designer creating beautiful
-                        digital experiences. Love working with modern
-                        technologies and building user-friendly applications.
-                      </p>
                     </div>
                   </div>
                 </div>

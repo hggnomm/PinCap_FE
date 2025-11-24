@@ -2,23 +2,25 @@
 
 import { Link } from "react-router-dom";
 
+import InstagramAccountCard from "@/components/ConnectedAccounts/InstagramAccountCard";
 import { ROUTES } from "@/constants/routes";
+import { SocialInstagram } from "@/types/type";
 
 interface AuthenticationSectionProps {
   isConnected: boolean;
-  connectedAccount: string | null;
+  account?: SocialInstagram | null;
   onConnect: () => void | Promise<void>;
-  onDisconnect: () => void;
+  onDisconnect?: () => void;
 }
 
 export default function AuthenticationSection({
   isConnected,
-  connectedAccount,
+  account,
   onConnect,
-  onDisconnect,
+  onDisconnect: _onDisconnect,
 }: AuthenticationSectionProps) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-8 sm:p-10 lg:p-12 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white px-8 py-6 sm:px-10 sm:py-7 lg:px-12 lg:py-8 shadow-sm">
       <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
         <div className="flex items-center gap-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -47,56 +49,41 @@ export default function AuthenticationSection({
       </div>
 
       {!isConnected && (
-        <div className="space-y-6">
-          <div className="flex flex-col items-center ">
-            <button
-              onClick={onConnect}
-              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-3 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:from-purple-600 hover:to-pink-600 active:scale-95"
-            >
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-              </svg>
-              Connect Instagram
-            </button>
-          </div>
+        <div className="flex flex-col items-center ">
+          <button
+            onClick={onConnect}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-3 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:from-purple-600 hover:to-pink-600 active:scale-95"
+          >
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+            Connect Instagram
+          </button>
         </div>
       )}
 
       {isConnected && (
-        <div className="space-y-6">
+        <div>
           {/* Connected State */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              {/* Account Avatar */}
-              <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 via-pink-400 to-rose-400">
-                <svg
-                  className="h-7 w-7 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
-                </svg>
-              </div>
-
-              {/* Account Info */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">
-                  {connectedAccount || "Instagram Account"}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Account connected successfully
-                </p>
-              </div>
-            </div>
-
             {/* Disconnect Button */}
             <button
-              onClick={onDisconnect}
-              className="rounded-lg border border-red-300 bg-white px-6 py-2 font-medium text-red-600 transition-all hover:bg-red-50 active:scale-95"
+              type="button"
+              disabled
+              className="rounded-lg border border-red-200 bg-white px-6 py-2 font-medium text-red-400 transition-all disabled:cursor-not-allowed disabled:opacity-60"
+              title="Disconnect support coming soon"
             >
-              Disconnect
+              Disconnect (coming soon)
             </button>
           </div>
+
+          {account && (
+            <InstagramAccountCard
+              account={account}
+              showTitle={false}
+              className="mt-4"
+            />
+          )}
         </div>
       )}
     </div>

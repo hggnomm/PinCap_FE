@@ -1,58 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 
-import { getFacebookOAuthUrl } from "@/api/users";
+import { useQuery } from "@tanstack/react-query";
+
+import { getFacebookOAuthUrl, getMyProfile } from "@/api/users";
 import CarouselHeader, {
   CarouselBanner,
 } from "@/components/CarouselHeader/CarouselHeader";
 import { showErrorToast } from "@/utils/apiErrorHandler";
 
 import AuthenticationSection from "./AuthenticationSection";
-import PostsList, { InstagramPost } from "./PostsList";
-
-const instagramSamplePosts: InstagramPost[] = [
-  {
-    id: "1",
-    imageUrl: "/instagram/banner-1.jpg",
-    caption: "Beautiful sunset view from my recent trip! 🌅",
-    timestamp: "2 hours ago",
-    likes: 124,
-    comments: 12,
-    permalink: "https://instagram.com/p/sample1",
-  },
-  {
-    id: "2",
-    imageUrl: "/instagram/banner-2.jpg",
-    caption: "Coffee and coding ☕💻",
-    timestamp: "5 hours ago",
-    likes: 89,
-    comments: 5,
-    permalink: "https://instagram.com/p/sample2",
-  },
-  {
-    id: "3",
-    imageUrl: "/instagram/banner-3.jpg",
-    caption: "New workspace setup! 🎨",
-    timestamp: "1 day ago",
-    likes: 256,
-    comments: 23,
-    permalink: "https://instagram.com/p/sample3",
-  },
-  {
-    id: "4",
-    imageUrl: "/instagram/banner-1.jpg",
-    caption: "Weekend vibes 🌈",
-    timestamp: "2 days ago",
-    likes: 342,
-    comments: 45,
-    permalink: "https://instagram.com/p/sample4",
-  },
-];
+import PostsList from "./elements/PostsList";
 
 const Sync: React.FC = () => {
-  const [isConnected, setIsConnected] = useState(false);
-  const [connectedAccount, setConnectedAccount] = useState<string | null>(null);
-
-  const instagramPosts = useMemo(() => instagramSamplePosts, []);
   const banners = useMemo<CarouselBanner[]>(
     () => [
       {
@@ -73,6 +32,25 @@ const Sync: React.FC = () => {
     ],
     []
   );
+
+  const {
+    data: user,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useQuery({
+    queryKey: ["user"],
+    queryFn: getMyProfile,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const account = user?.social_instagram ?? null;
+  const isConnected = Boolean(account);
+
+  useEffect(() => {
+    if (profileError) {
+      showErrorToast(profileError, "Unable to load your profile information");
+    }
+  }, [profileError]);
 
   const handleConnect = async () => {
     try {
@@ -95,25 +73,19 @@ const Sync: React.FC = () => {
     }
   };
 
-  const handleDisconnect = () => {
-    setIsConnected(false);
-    setConnectedAccount(null);
-  };
-
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-blue-50">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="mx-auto max-w-screen-xl space-y-8">
           <CarouselHeader banners={banners} />
 
           <AuthenticationSection
             isConnected={isConnected}
-            connectedAccount={connectedAccount}
+            account={account}
             onConnect={handleConnect}
-            onDisconnect={handleDisconnect}
           />
 
-          {isConnected && <PostsList posts={instagramPosts} />}
+          {isConnected && <PostsList />}
 
           {!isConnected && (
             <div className="rounded-2xl border border-gray-200 bg-white p-8 sm:p-12 text-center shadow-sm">
@@ -137,6 +109,7 @@ const Sync: React.FC = () => {
               </h3>
               <p className="text-gray-600">
                 Connect your Instagram account to start viewing your posts
+                {isProfileLoading && " ..."}
               </p>
             </div>
           )}
