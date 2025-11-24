@@ -2,7 +2,17 @@ import React from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { Edit, Mail, Phone, User, MapPin, Calendar, Star } from "lucide-react";
+import {
+  Edit,
+  Mail,
+  Phone,
+  User,
+  MapPin,
+  Calendar,
+  Star,
+  Instagram,
+  ArrowRight,
+} from "lucide-react";
 
 import BackButton from "@/components/BackButton/BackButton";
 import Loading from "@/components/Loading/Loading";
@@ -82,7 +92,7 @@ const Profile = () => {
             <div className="bg-card rounded-3xl shadow-2xl overflow-hidden">
               {/* Cover Photo with improved gradient */}
               <div
-                className="h-56 md:h-64 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 relative"
+                className="h-56 md:h-64 bg-gradient-to-r from-rose-400 to-pink-500 relative"
                 style={{
                   backgroundImage: user.background
                     ? `url(${user.background})`
@@ -147,39 +157,74 @@ const Profile = () => {
                       value: user.followers_count?.toLocaleString() || 0,
                       label: "Followers",
                       gradientColors:
-                        "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
-                      borderColor: "border-blue-200 dark:border-blue-800",
-                      textColor: "text-blue-600 dark:text-blue-400",
+                        "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20",
+                      borderColor: "border-gray-200 dark:border-gray-800",
+                      textColor: "text-gray-700 dark:text-gray-300",
                     },
                     {
                       value: user.followees_count?.toLocaleString() || 0,
                       label: "Following",
                       gradientColors:
-                        "bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20",
-                      borderColor: "border-purple-200 dark:border-purple-800",
-                      textColor: "text-purple-600 dark:text-purple-400",
+                        "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20",
+                      borderColor: "border-gray-200 dark:border-gray-800",
+                      textColor: "text-gray-700 dark:text-gray-300",
                     },
                     {
                       value: user.reaction_media_count?.toLocaleString() || 0,
                       label: "Reaction",
                       icon: <Star className="w-3 h-3 fill-current" />,
                       gradientColors:
-                        "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
-                      borderColor: "border-green-200 dark:border-green-800",
-                      textColor: "text-green-600 dark:text-green-400",
+                        "bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20",
+                      borderColor: "border-pink-200 dark:border-pink-800",
+                      textColor: "text-pink-600 dark:text-pink-400",
                     },
                     {
                       value: user.medias_count?.toLocaleString() || 0,
                       label: "Pin",
                       gradientColors:
-                        "bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20",
-                      borderColor: "border-orange-200 dark:border-orange-800",
-                      textColor: "text-orange-600 dark:text-orange-400",
+                        "bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/20",
+                      borderColor: "border-rose-200 dark:border-rose-800",
+                      textColor: "text-rose-600 dark:text-rose-400",
                     },
                   ].map((stat, index) => (
                     <StatCard key={index} {...stat} />
                   ))}
                 </div>
+
+                {/* Connected Accounts Section */}
+                {user.social_instagram && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-semibold text-foreground mb-4">
+                      Connected Accounts
+                    </h3>
+                    <a
+                      href={user.social_instagram.permalink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 hover:border-pink-300 dark:hover:border-pink-700 transition-all group"
+                    >
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-md ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-pink-400 dark:group-hover:ring-pink-600 transition-all">
+                        <img
+                          src={user.social_instagram.avatar}
+                          alt={user.social_instagram.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                          <Instagram className="w-4 h-4" />
+                          Instagram
+                        </div>
+                        <div className="font-semibold text-foreground group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                          @{user.social_instagram.name}
+                        </div>
+                      </div>
+                      <div className="text-gray-400 dark:text-gray-600 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                        <ArrowRight className="w-5 h-5" />
+                      </div>
+                    </a>
+                  </div>
+                )}
 
                 {/* Contact Information */}
                 <div className="grid md:grid-cols-2 gap-8">
@@ -194,8 +239,8 @@ const Profile = () => {
                           icon: <Mail className="w-5 h-5" />,
                           label: "Email",
                           value: user.email,
-                          bgColor: "bg-blue-100 dark:bg-blue-900/30",
-                          iconColor: "text-blue-600 dark:text-blue-400",
+                          bgColor: "bg-gray-100 dark:bg-gray-800/50",
+                          iconColor: "text-gray-600 dark:text-gray-400",
                         },
                         ...(user.phone
                           ? [
@@ -203,18 +248,11 @@ const Profile = () => {
                                 icon: <Phone className="w-5 h-5" />,
                                 label: "Phone",
                                 value: user.phone,
-                                bgColor: "bg-green-100 dark:bg-green-900/30",
-                                iconColor: "text-green-600 dark:text-green-400",
+                                bgColor: "bg-gray-100 dark:bg-gray-800/50",
+                                iconColor: "text-gray-600 dark:text-gray-400",
                               },
                             ]
                           : []),
-                        {
-                          icon: <User className="w-5 h-5" />,
-                          label: "Role",
-                          value: user.role?.toLowerCase() || "",
-                          bgColor: "bg-purple-100 dark:bg-purple-900/30",
-                          iconColor: "text-purple-600 dark:text-purple-400",
-                        },
                       ].map((item, index) => (
                         <InfoItem key={index} {...item} />
                       ))}
@@ -232,15 +270,15 @@ const Profile = () => {
                           icon: <MapPin className="w-5 h-5" />,
                           label: "Location",
                           value: "San Francisco, CA",
-                          bgColor: "bg-orange-100 dark:bg-orange-900/30",
-                          iconColor: "text-orange-600 dark:text-orange-400",
+                          bgColor: "bg-gray-100 dark:bg-gray-800/50",
+                          iconColor: "text-gray-600 dark:text-gray-400",
                         },
                         {
                           icon: <Calendar className="w-5 h-5" />,
                           label: "Joined",
                           value: "March 2023",
-                          bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
-                          iconColor: "text-indigo-600 dark:text-indigo-400",
+                          bgColor: "bg-gray-100 dark:bg-gray-800/50",
+                          iconColor: "text-gray-600 dark:text-gray-400",
                         },
                       ].map((item, index) => (
                         <InfoItem key={index} {...item} />
