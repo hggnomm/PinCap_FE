@@ -30,6 +30,7 @@ import {
   ParsedMediaUrl,
   parseMediaUrl,
   getRandomAspectRatio,
+  normalizeMediaUrl,
 } from "@/utils/utils";
 
 import "react-lazy-load-image-component/src/effects/blur.css";
@@ -46,11 +47,11 @@ const DeleteMediaModal = lazy(
 );
 interface PinMediaProps extends HTMLAttributes<HTMLParagraphElement> {
   innerRef?: React.Ref<HTMLParagraphElement>;
-  srcUrl: string;
+  srcUrl: string | string[] | null;
   data: {
     id: string;
     media_name: string;
-    media_url: string;
+    media_url: string | string[] | null;
     type: string;
   };
   isEditMedia?: boolean;
@@ -107,6 +108,10 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     : [];
   const currentFlexibleMedia =
     flexibleMediaUrls.length > 0 ? flexibleMediaUrls[currentMediaIndex] : null;
+
+  // Normalize once - no more Array.isArray checks!
+  const normalizedUrls = useMemo(() => normalizeMediaUrl(srcUrl), [srcUrl]);
+  const displayUrl = normalizedUrls[0] || "";
 
   useEffect(() => {
     resetFlexibleMediaErrors();
@@ -214,7 +219,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             style={{ aspectRatio }}
             onError={handleVideoError}
           >
-            <source src={srcUrl} />
+            <source src={displayUrl} />
           </video>
         )}
         {data?.type === MEDIA_TYPES.IMAGE && imageError && (
@@ -228,7 +233,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         )}
         {data?.type === MEDIA_TYPES.IMAGE && !imageError && (
           <LazyLoadImage
-            src={srcUrl}
+            src={displayUrl}
             alt="Media content"
             effect="blur"
             threshold={100}

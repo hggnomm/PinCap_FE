@@ -17,7 +17,11 @@ import MediaErrorThumbnail from "@/components/MediaErrorThumbnail";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { useMediaError } from "@/hooks";
 import { Media } from "@/types/type";
-import { parseMediaUrl, ParsedMediaUrl } from "@/utils/utils";
+import {
+  parseMediaUrl,
+  ParsedMediaUrl,
+  normalizeMediaUrl,
+} from "@/utils/utils";
 import "./MediaViewer.less";
 
 interface MediaViewerProps {
@@ -63,7 +67,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
   const flexibleMediaUrls: ParsedMediaUrl[] = useMemo(() => {
     const urls = isFlexibleMedia ? parseMediaUrl(media?.media_url) : [];
     return urls;
-  }, [isFlexibleMedia, media?.media_url, media?.type]);
+  }, [isFlexibleMedia, media?.media_url]);
 
   const hasMultipleMedia = flexibleMediaUrls.length > 1;
   const isFirstMedia = currentMediaIndex === 0;
@@ -351,6 +355,9 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
   const renderSingleMedia = () => {
     if (!media) return null;
 
+    const normalizedUrls = normalizeMediaUrl(media.media_url);
+    const mediaUrl = normalizedUrls[0] || "";
+
     if (media.type === MEDIA_TYPES.IMAGE) {
       return (
         <div
@@ -373,7 +380,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
             <Zoom>
               <img
                 ref={imgRef}
-                src={media.media_url}
+                src={mediaUrl}
                 alt={media.media_name}
                 className={clsx("media-element", mediaClassName)}
                 onLoad={updateContainerSizeFromImage}
@@ -405,7 +412,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
         {!videoError && (
           <video
             ref={videoRef}
-            src={media.media_url}
+            src={mediaUrl}
             controls
             autoPlay
             muted

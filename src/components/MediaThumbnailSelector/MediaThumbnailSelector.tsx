@@ -6,7 +6,7 @@ import { clsx } from "clsx";
 
 import { MEDIA_TYPES } from "@/constants/constants";
 import type { Media } from "@/types/type";
-import { getFirstImageUrl } from "@/utils/utils";
+import { normalizeMediaUrl } from "@/utils/utils";
 
 const ModalComponent = lazy(() => import("@/components/Modal/ModalComponent"));
 
@@ -45,8 +45,10 @@ const MediaThumbnailSelector: React.FC<MediaThumbnailSelectorProps> = ({
     onCancel(); // Close modal
   };
 
-  const handleMediaClick = (mediaUrl: string) => {
-    setTempSelectedUrl(mediaUrl);
+  const handleMediaClick = (mediaUrl: string | string[] | null) => {
+    // Normalize once - convert to consistent format for comparison
+    const normalized = normalizeMediaUrl(mediaUrl);
+    setTempSelectedUrl(JSON.stringify(normalized));
   };
 
   // Filter image medias and flexible medias (for thumbnail selection)
@@ -129,20 +131,11 @@ const MediaThumbnailSelector: React.FC<MediaThumbnailSelectorProps> = ({
                 }}
               >
                 {imageMedias.map((media) => {
-                  // Get the appropriate image URL based on media type
-                  const getImageUrl = () => {
-                    if (media.type === MEDIA_TYPES.IMAGE) {
-                      return media.media_url;
-                    } else if (media.type === MEDIA_TYPES.FLEXIBLE) {
-                      return getFirstImageUrl(media.media_url);
-                    }
-                    return media.media_url;
-                  };
-
-                  const imageUrl = getImageUrl();
-                  // For FLEXIBLE type, we need to compare with the original media_url (JSON array)
-                  // For IMAGE type, we compare with the media_url directly
-                  const isSelected = tempSelectedUrl === media.media_url;
+                  // Normalize once - no more Array.isArray checks!
+                  const normalized = normalizeMediaUrl(media.media_url);
+                  const imageUrl = normalized[0] || null;
+                  const normalizedMediaUrl = JSON.stringify(normalized);
+                  const isSelected = tempSelectedUrl === normalizedMediaUrl;
 
                   return (
                     <div

@@ -116,41 +116,57 @@ export interface ParsedMediaUrl {
   type: typeof MEDIA_TYPES.IMAGE | typeof MEDIA_TYPES.VIDEO;
 }
 
-export const parseMediaUrl = (
-  mediaUrl: string | null | undefined
-): ParsedMediaUrl[] => {
-  if (!mediaUrl) {
-    return [];
-  }
+/**
+ * Normalize media_url to always be a string array
+ * Converts string/null to array format for consistent handling
+ * @param mediaUrl - Can be string, array, or null from API
+ * @returns Always returns string[] (can be empty)
+ */
+export const normalizeMediaUrl = (
+  mediaUrl: string | string[] | null | undefined
+): string[] => {
+  if (!mediaUrl) return [];
+  if (Array.isArray(mediaUrl)) return mediaUrl;
 
-  let urls: string[] = [];
-
-  try {
-    const parsed = JSON.parse(mediaUrl);
-    if (Array.isArray(parsed)) {
-      urls = parsed;
-    } else {
-      urls = [String(parsed)];
+  // If string, try to parse as JSON array first
+  if (typeof mediaUrl === "string") {
+    try {
+      const parsed = JSON.parse(mediaUrl);
+      if (Array.isArray(parsed)) return parsed;
+      return [String(parsed)];
+    } catch {
+      // If not JSON, check if comma-separated
+      if (mediaUrl.includes(",")) {
+        return mediaUrl
+          .split(",")
+          .map((url) => url.trim())
+          .filter(Boolean);
+      }
+      // Single URL
+      return [mediaUrl];
     }
-  } catch {
-    urls = mediaUrl
-      .split(",")
-      .map((url) => url.trim())
-      .filter((url) => url.length > 0);
   }
 
-  return urls.reduce<ParsedMediaUrl[]>((acc, url) => {
-    const parts = url.split(".");
-    const extension = parts[parts.length - 1].toLowerCase();
+  return [];
+};
 
+export const parseMediaUrl = (
+  mediaUrl: string | string[] | null | undefined
+): ParsedMediaUrl[] => {
+  // Normalize once - no more Array.isArray checks!
+  const urls = normalizeMediaUrl(mediaUrl);
+
+  return urls.map((url) => {
+    const extension = url.split(".").pop()?.toLowerCase() || "";
     const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm", "flv"];
-    const type = videoExtensions.includes(extension)
-      ? MEDIA_TYPES.VIDEO
-      : MEDIA_TYPES.IMAGE;
 
-    acc.push({ url, type });
-    return acc;
-  }, []);
+    return {
+      url,
+      type: videoExtensions.includes(extension)
+        ? MEDIA_TYPES.VIDEO
+        : MEDIA_TYPES.IMAGE,
+    };
+  });
 };
 
 /**
@@ -159,28 +175,11 @@ export const parseMediaUrl = (
  * @returns URL ảnh đầu tiên hoặc null nếu không tìm thấy
  */
 export const getFirstImageUrl = (
-  mediaUrl: string | null | undefined
+  mediaUrl: string | string[] | null | undefined
 ): string | null => {
-  if (!mediaUrl) {
-    return null;
-  }
-
-  try {
-    // Parse JSON array
-    const parsed = JSON.parse(mediaUrl);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      const firstUrl = parsed[0];
-
-      // Check if URL has escaped characters and decode them
-      const decodedUrl = firstUrl.replace(/\\/g, "");
-
-      return decodedUrl;
-    }
-    return String(parsed);
-  } catch {
-    // Nếu không parse được JSON, coi như single URL
-    return mediaUrl;
-  }
+  // Normalize once - no more Array.isArray checks!
+  const urls = normalizeMediaUrl(mediaUrl);
+  return urls.length > 0 ? urls[0] : null;
 };
 
 /**
@@ -190,26 +189,11 @@ export const getFirstImageUrl = (
  * @returns URL phù hợp để preview
  */
 export const getMediaPreviewUrl = (
-  mediaUrl: string | null | undefined,
+  mediaUrl: string | string[] | null | undefined,
   type: string | null
 ): string | null => {
-  if (!mediaUrl) {
-    return null;
-  }
-
-  // Handle null type as FLEXIBLE
-  if (type === null || type === MEDIA_TYPES.FLEXIBLE) {
-    return getFirstImageUrl(mediaUrl);
-  }
-
-  switch (type) {
-    case MEDIA_TYPES.IMAGE:
-      return mediaUrl;
-    case MEDIA_TYPES.VIDEO:
-      return mediaUrl;
-    default:
-      return mediaUrl;
-  }
+  // Always return first URL - simple!
+  return getFirstImageUrl(mediaUrl);
 };
 
 /**
@@ -219,15 +203,15 @@ export const getMediaPreviewUrl = (
  * @returns true nếu là video
  */
 export const isMediaVideo = (
-  mediaUrl: string | null | undefined,
+  mediaUrl: string | string[] | null | undefined,
   type: string | null
 ): boolean => {
   if (type === MEDIA_TYPES.VIDEO) {
     return true;
   }
 
-  // Handle null type as FLEXIBLE
-  if ((type === null || type === MEDIA_TYPES.FLEXIBLE) && mediaUrl) {
+  // For FLEXIBLE/null type, check first URL
+  if (type === null || type === MEDIA_TYPES.FLEXIBLE) {
     const firstUrl = getFirstImageUrl(mediaUrl);
     return firstUrl ? isVideo(firstUrl) : false;
   }

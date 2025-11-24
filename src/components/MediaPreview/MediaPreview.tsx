@@ -18,8 +18,8 @@ const MediaPreview: React.FC<MediaPreviewProps> = ({
   alt,
   onError,
 }) => {
-  const mediaUrl = getMediaPreviewUrl(media.media_url ?? "", media.type ?? "");
-  const isVideo = isMediaVideo(media.media_url ?? "", media.type ?? "");
+  const mediaUrl = getMediaPreviewUrl(media.media_url, media.type ?? "");
+  const isVideo = isMediaVideo(media.media_url, media.type ?? "");
 
   const handleError = (
     e: React.SyntheticEvent<HTMLImageElement | HTMLVideoElement, Event>

@@ -22,7 +22,11 @@ import { ROUTES } from "@/constants/routes";
 import { useMedia } from "@/react-query/useMedia";
 import { TokenPayload } from "@/types/Auth";
 import { Media } from "@/types/type";
-import { FeelingType, getImageReactionWithId } from "@/utils/utils";
+import {
+  FeelingType,
+  getImageReactionWithId,
+  normalizeMediaUrl,
+} from "@/utils/utils";
 
 import Comment from "./Comment/Comment";
 import ListComments from "./ListComments/ListComments";
@@ -141,7 +145,11 @@ const DetailMedia = () => {
 
   const handleDownload = () => {
     if (media?.media_url) {
-      saveAs(media.media_url, media.media_name || "downloaded-file");
+      // Normalize once - no more Array.isArray checks!
+      const urls = normalizeMediaUrl(media.media_url);
+      if (urls[0]) {
+        saveAs(urls[0], media.media_name || "downloaded-file");
+      }
     }
   };
 

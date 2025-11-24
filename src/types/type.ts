@@ -66,7 +66,7 @@ export type Media = {
   is_comment: boolean;
   is_created: boolean;
   media_name: string;
-  media_url: string;
+  media_url: string | string[] | null;
   description: string;
   numberUserFollowers: number;
   ownerUser: User;
