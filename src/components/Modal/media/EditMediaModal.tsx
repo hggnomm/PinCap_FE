@@ -51,7 +51,8 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
   const tokenPayload = useSelector(
     (state: { auth: TokenPayload }) => state.auth
   );
-  const isOwner = media?.ownerUser?.id === tokenPayload.id;
+  const ownerId = media?.ownerUser?.id ?? media?.media_owner_id;
+  const isOwner = ownerId === tokenPayload.id;
 
   useEffect(() => {
     if (visible && media) {

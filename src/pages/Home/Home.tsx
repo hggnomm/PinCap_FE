@@ -1,9 +1,12 @@
-import videoPinCapAI from "@/assets/videos/VideoPinCapAI.mp4";
-import { ROUTES } from "@/constants/routes";
+import { useRef } from "react";
+
+import { useNavigate } from "react-router-dom";
+
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ImageIcon, Sparkles, Video, Zap } from "lucide-react";
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+
+import videoPinCapAI from "@/assets/videos/VideoPinCapAI.mp4";
+import { ROUTES } from "@/constants/routes";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -318,7 +321,10 @@ export default function Home() {
               ngày
             </motion.p>
             <motion.div variants={fadeInUp}>
-              <button className="!bg-white !text-rose-600 hover:!bg-white/90 !px-12 !py-4 !text-lg !rounded-full !transition-all !duration-300 hover:!scale-105 hover:!shadow-xl !inline-flex !items-center">
+              <button
+                onClick={() => navigate(ROUTES.LOGIN)}
+                className="!bg-white !text-rose-600 hover:!bg-white/90 !px-12 !py-4 !text-lg !rounded-full !transition-all !duration-300 hover:!scale-105 hover:!shadow-xl !inline-flex !items-center"
+              >
                 Bắt đầu miễn phí
                 <ArrowRight className="ml-2 w-5 h-5" />
               </button>

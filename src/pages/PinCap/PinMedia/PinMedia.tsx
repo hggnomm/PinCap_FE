@@ -289,7 +289,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
             data?.type === MEDIA_TYPES.VIDEO || isFlexibleVideo
               ? "bottom-1.25"
-              : "bottom-2.5"
+              : "bottom-2.25"
           )}
           whileHover={{ opacity: 1 }}
         >

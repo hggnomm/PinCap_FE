@@ -129,7 +129,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         currentOpenDropdown = null;
       }
     };
-  }, [componentId]);
+  }, [componentId, onClose]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -177,7 +177,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
     return () => {
       document.removeEventListener("click", handleClickOutside, true);
     };
-  }, [showDropdown, componentId]);
+  }, [showDropdown, componentId, onClose]);
 
   // Handle scroll events to reposition dropdown
   useEffect(() => {
@@ -240,6 +240,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         window.removeEventListener("resize", handleResize);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     showDropdown,
     componentId,
@@ -256,16 +257,19 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
       });
 
       if (response) {
-        toast.success(`Media saved to "${albumName}" successfully!`);
-
         queryClient.invalidateQueries({ queryKey: ["albums", mediaId] });
-        queryClient.invalidateQueries({ queryKey: ["album-members", mediaId] });
+        queryClient.invalidateQueries({ queryKey: ["albums"] });
+        queryClient.invalidateQueries({
+          queryKey: ["album-members", mediaId],
+        });
+        queryClient.invalidateQueries({ queryKey: ["album-members"] });
         queryClient.invalidateQueries({ queryKey: ["album", albumId] });
 
         onSuccess?.();
       } else {
         toast.error("Failed to save media to album");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error saving media to album:", error);
 

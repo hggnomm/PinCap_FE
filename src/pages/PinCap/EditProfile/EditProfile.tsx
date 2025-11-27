@@ -1,12 +1,13 @@
 import React, { useRef, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { ArrowLeft, Save, Upload, X } from "lucide-react";
 
 import { Form, Input } from "antd";
 
+import InstagramAccountCard from "@/components/ConnectedAccounts/InstagramAccountCard";
 import FieldItem from "@/components/Form/fieldItem/FieldItem";
 import Loading from "@/components/Loading/Loading";
 import { ROUTES } from "@/constants/routes";
@@ -101,14 +102,15 @@ const EditProfile = () => {
   // Use user data from auth
   const userData = user;
   const isLoading = isLoadingUser;
+  const instagramAccount = userData?.social_instagram ?? null;
 
   return (
     <Loading isLoading={isLoading}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-8">
+      <div className="min-h-screen bg-slate-50 p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
           {userData && (
             <div className="bg-white rounded-2xl shadow-xl border border-slate-200/60 overflow-hidden backdrop-blur-sm">
-              <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500/80 p-8 relative overflow-hidden">
+              <div className="bg-indigo-600 p-8 relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="relative flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -169,7 +171,7 @@ const EditProfile = () => {
                       className="relative group cursor-pointer"
                       onClick={() => avatarInputRef.current?.click()}
                     >
-                      <div className="w-36 h-36 rounded-full overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 border-4 border-white shadow-xl">
+                      <div className="w-36 h-36 rounded-full overflow-hidden bg-indigo-600 border-4 border-white shadow-xl">
                         {(avatarPreview || userData.avatar) && (
                           <img
                             src={
@@ -351,6 +353,81 @@ const EditProfile = () => {
                   </FieldItem>
                 </div>
 
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-2">
+                    <h3 className="text-lg font-semibold text-slate-800">
+                      Connected Accounts
+                    </h3>
+                    <Link
+                      to={ROUTES.INSTAGRAM_SYNC}
+                      className="inline-flex items-center justify-center gap-2 bg-purple-50 py-2 text-xs font-medium text-purple-600 transition-colors hover:bg-purple-100 hover:text-purple-700 sm:text-sm"
+                    >
+                      Manage Instagram Sync
+                      <svg
+                        className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </Link>
+                  </div>
+
+                  {instagramAccount && (
+                    <InstagramAccountCard
+                      account={instagramAccount}
+                      showTitle={false}
+                      className="!mb-4"
+                    />
+                  )}
+
+                  {!instagramAccount && (
+                    <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white/60 p-6 text-center">
+                      <div className="mx-auto mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                        <svg
+                          className="h-6 w-6"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={1.6}
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16 8a6 6 0 11-8 0M12 14v6m0 0H9m3 0h3"
+                          />
+                        </svg>
+                      </div>
+                      <p className="text-base font-medium text-slate-700">
+                        No Instagram account connected yet
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        Connect to sync your Instagram posts and showcase them
+                        on your profile.
+                      </p>
+                      <Link
+                        to={ROUTES.INSTAGRAM_SYNC}
+                        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-3 text-base font-semibold !text-white shadow-lg transition-all hover:shadow-xl hover:bg-purple-700 active:scale-95 sm:w-1/2"
+                      >
+                        <svg
+                          className="h-5 w-5"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                        </svg>
+                        Connect Instagram
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200">
                   <button
                     type="button"
@@ -363,7 +440,7 @@ const EditProfile = () => {
                   <button
                     type="submit"
                     disabled={updateMyProfileLoading}
-                    className="flex items-center justify-center gap-2 !px-8 !py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:!from-indigo-700 hover:!to-purple-700 disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                    className="flex items-center justify-center gap-2 !px-8 !py-4 bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                   >
                     <Save className="w-4 h-4" />
                     {updateMyProfileLoading

@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { ArrowRight, Instagram } from "lucide-react";
 
 import { SocialInstagram } from "@/types/type";
@@ -37,9 +37,9 @@ const InstagramAccountCard = ({
           />
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-600 transition-colors group-hover:text-pink-600 dark:text-gray-400 dark:group-hover:text-pink-400">
+          <div className="flex items-center gap-1 text-center text-sm font-medium text-gray-600 transition-colors group-hover:text-pink-600 dark:text-gray-400 dark:group-hover:text-pink-400">
             <Instagram className="h-4 w-4" />
-            Instagram
+            <span className="text-center mb-0.5">INSTAGRAM</span>
           </div>
           <div className="font-semibold text-foreground transition-colors group-hover:text-pink-600 dark:group-hover:text-pink-400">
             @{account.name}

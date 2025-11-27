@@ -183,7 +183,10 @@ const Profile = () => {
                 </div>
 
                 {user.social_instagram && (
-                  <InstagramAccountCard account={user.social_instagram} />
+                  <InstagramAccountCard
+                    account={user.social_instagram}
+                    showTitle={false}
+                  />
                 )}
 
                 {/* About Section */}

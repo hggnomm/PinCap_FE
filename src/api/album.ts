@@ -1,5 +1,7 @@
-import apiClient from "./apiClient"; // Đường dẫn tới tệp apiClient
 import { ALBUM_ROLES } from "@/constants/constants";
+import { CreateAlbumFormData } from "@/validation/album";
+
+import apiClient from "./apiClient"; // Đường dẫn tới tệp apiClient
 
 export const getMyAlbumData = async (params?: {
   per_page?: number;
@@ -27,7 +29,7 @@ export const getDetailAlbum = async (albumId: string) => {
   }
 };
 
-export const createMyAlbum = async (request: any) => {
+export const createMyAlbum = async (request: CreateAlbumFormData) => {
   try {
     const res = await apiClient.post("/api/albums", request);
     return res.data;
@@ -36,7 +38,10 @@ export const createMyAlbum = async (request: any) => {
   }
 };
 
-export const updateMyAlbum = async (albumId: string, request: any) => {
+export const updateMyAlbum = async (
+  albumId: string,
+  request: CreateAlbumFormData
+) => {
   try {
     const res = await apiClient.put(`/api/albums/${albumId}`, request);
     return res.data;
@@ -145,7 +150,9 @@ export const inviteUserToAlbum = async (albumId: string, userId: string) => {
 // Accept album invitation
 export const acceptAlbumInvitation = async (albumId: string) => {
   try {
-    const res = await apiClient.post(`/api/albums/${albumId}/accept-invitation`);
+    const res = await apiClient.post(
+      `/api/albums/${albumId}/accept-invitation`
+    );
     return res.data;
   } catch (error) {
     console.log(error);
@@ -156,7 +163,9 @@ export const acceptAlbumInvitation = async (albumId: string) => {
 // Reject album invitation
 export const rejectAlbumInvitation = async (albumId: string) => {
   try {
-    const res = await apiClient.post(`/api/albums/${albumId}/reject-invitation`);
+    const res = await apiClient.post(
+      `/api/albums/${albumId}/reject-invitation`
+    );
     return res.data;
   } catch (error) {
     console.log(error);
@@ -165,13 +174,16 @@ export const rejectAlbumInvitation = async (albumId: string) => {
 };
 
 // Get users in an album
-export const getUsersInAlbum = async (albumId: string, params?: {
-  query?: string;
-  order_key?: string;
-  order_type?: string;
-  per_page?: number;
-  page?: number;
-}) => {
+export const getUsersInAlbum = async (
+  albumId: string,
+  params?: {
+    query?: string;
+    order_key?: string;
+    order_type?: string;
+    per_page?: number;
+    page?: number;
+  }
+) => {
   try {
     const res = await apiClient.get(`/api/albums/${albumId}/users`, { params });
     return res.data;
@@ -182,11 +194,18 @@ export const getUsersInAlbum = async (albumId: string, params?: {
 };
 
 // Update member role in album
-export const updateMemberRole = async (albumId: string, userId: string, data: {
-  role: typeof ALBUM_ROLES.VIEW | typeof ALBUM_ROLES.EDIT;
-}) => {
+export const updateMemberRole = async (
+  albumId: string,
+  userId: string,
+  data: {
+    role: typeof ALBUM_ROLES.VIEW | typeof ALBUM_ROLES.EDIT;
+  }
+) => {
   try {
-    const res = await apiClient.put(`/api/albums/${albumId}/members/${userId}`, data);
+    const res = await apiClient.put(
+      `/api/albums/${albumId}/members/${userId}`,
+      data
+    );
     return res.data;
   } catch (error) {
     console.log(error);
@@ -195,9 +214,14 @@ export const updateMemberRole = async (albumId: string, userId: string, data: {
 };
 
 // Remove member from album
-export const removeMemberFromAlbum = async (albumId: string, userId: string) => {
+export const removeMemberFromAlbum = async (
+  albumId: string,
+  userId: string
+) => {
   try {
-    const res = await apiClient.delete(`/api/albums/${albumId}/members/${userId}`);
+    const res = await apiClient.delete(
+      `/api/albums/${albumId}/members/${userId}`
+    );
     return res.data;
   } catch (error) {
     console.log(error);
