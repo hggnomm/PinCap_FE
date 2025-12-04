@@ -226,7 +226,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             autoPlay
             loop
             muted
-            className="mb-1 w-full h-auto rounded-2xl block"
+            className="mb-2 w-full h-auto rounded-2xl block"
             onError={handleMediaError}
           >
             <source src={currentMediaUrl} />
@@ -246,8 +246,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
 
         <motion.div
           className={clsx(
-            "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
-            isVideo ? "bottom-1.25" : "bottom-2.25"
+            "overlay bottom-2.25 absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]"
           )}
           whileHover={{ opacity: 1 }}
         >
@@ -264,7 +263,6 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
           )}
         </motion.div>
 
-        {/* AlbumDropdown positioned outside overlay to avoid opacity issues */}
         {isSaveMedia && (
           <AlbumDropdown
             mediaId={data.id}

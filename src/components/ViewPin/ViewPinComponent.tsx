@@ -120,7 +120,6 @@ const MediaList: React.FC<MediaListProps> = ({
     }
   }, [fetchNextPage, inView, hasNextPage]);
 
-  // Optimize: Dùng useMemo thay vì useState + useEffect
   const medias = useMemo(() => {
     if (propMedias) {
       return propMedias;
