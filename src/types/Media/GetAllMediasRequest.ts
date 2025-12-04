@@ -3,11 +3,11 @@ import { MEDIA_TYPE_VALUES } from "@/constants/constants";
 export interface GetAllMediasRequest {
   per_page?: number;
   page?: number;
-  /** Search keyword to filter media by user_name, title, description, or tag name */
   query?: string;
   order_key?: string;
   order_type?: string;
   type?: MediaTypeValue;
+  media_id?: string;
 }
 
 export type MediaTypeValue =
