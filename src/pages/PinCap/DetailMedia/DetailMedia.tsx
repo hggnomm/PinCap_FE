@@ -9,8 +9,9 @@ import { saveAs } from "file-saver";
 import { motion } from "framer-motion";
 
 import { getAllMedias } from "@/api/media";
-import download from "@/assets/img/PinCap/download.png";
-import more from "@/assets/img/PinCap/more.png";
+import INSTAGRAM_ICON from "@/assets/icons/instagram-2.svg";
+import DOWNLOAD from "@/assets/img/PinCap/download.png";
+import MORE from "@/assets/img/PinCap/more.png";
 import AlbumDropdown from "@/components/AlbumDropdown";
 import BackButton from "@/components/BackButton/BackButton";
 import ButtonCircle from "@/components/ButtonCircle/ButtonCircle";
@@ -250,10 +251,10 @@ const DetailMedia = () => {
                     </div>
 
                     <button onClick={handleDownload}>
-                      <img src={download} alt="download" />
+                      <img src={DOWNLOAD} alt="download" />
                     </button>
                     <ButtonCircle
-                      icon={<img src={more} alt="more" />}
+                      icon={<img src={MORE} alt="more" />}
                       dropdownMenu={[
                         ...(media?.ownerUser?.id === tokenPayload.id
                           ? [
@@ -312,6 +313,26 @@ const DetailMedia = () => {
                 {media?.media_name && (
                   <div className="media_name ">
                     <span>{media.media_name}</span>
+                  </div>
+                )}
+
+                {media?.permalink && (
+                  <div className="px-5 pt-3 max-w-full overflow-hidden">
+                    <a
+                      href={media.permalink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex items-center gap-2 transition-colors min-w-0 max-w-full"
+                    >
+                      <img
+                        src={INSTAGRAM_ICON}
+                        alt="Instagram"
+                        className="h-4 w-4 shrink-0 transition-opacity group-hover:opacity-80"
+                      />
+                      <span className="text-sm font-medium text-gray-700 truncate min-w-0 transition-colors group-hover:text-pink-700 dark:text-gray-300 dark:group-hover:text-pink-300">
+                        {media.permalink}
+                      </span>
+                    </a>
                   </div>
                 )}
 

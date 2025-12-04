@@ -84,6 +84,7 @@ export type Media = {
   updated_at?: string;
   added_by_user?: User;
   media_owner_id?: string;
+  permalink?: string;
 };
 
 export type Album = {
