@@ -1,44 +1,3 @@
-.pincap-container {
-  width: 100%;
-  padding: 0.75rem;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-
-  .media-list-wrapper {
-    width: 100%;
-  }
-
-  .masonry-grid {
-    display: flex;
-    margin-left: -0.6vw;
-    width: auto;
-  }
-
-  .masonry-grid-column {
-    padding-left: 0.6vw;
-    background-clip: padding-box;
-
-    > .box {
-      margin-bottom: 0.25vw;
-    }
-  }
-
-  .box {
-    width: 100%;
-    cursor: pointer;
-
-    img,
-    video {
-      max-width: 100%;
-      border-radius: 15px;
-      object-fit: cover;
-      display: block;
-    }
-  }
-}
-
 .no-pins-message {
   width: 100%;
   height: 100%;
@@ -52,6 +11,3 @@
     display: block;
   }
 }
-
-// Responsive breakpoints are handled by react-masonry-css breakpointCols
-// No need for media queries here as the library handles column counts

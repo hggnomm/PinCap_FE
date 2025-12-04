@@ -3,12 +3,14 @@ import React, { useEffect, useMemo, useCallback } from "react";
 import { useInView } from "react-intersection-observer";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { clsx } from "clsx";
 
 // eslint-disable-next-line import/no-unresolved, import/order
 import Masonry from "react-masonry-css";
 
 import "./ViewPinComponent.less";
+
+import { motion } from "framer-motion";
 
 import Empty, { NoMediaIcon } from "@/components/Empty";
 import Loading from "@/components/Loading/Loading";
@@ -17,6 +19,14 @@ import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
 import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
 
 import { Media } from "type";
+
+const breakpointColumnsObj = {
+  default: 6,
+  1536: 5,
+  1280: 4,
+  1024: 3,
+  768: 2,
+};
 
 /**
  * MediaList Component - Hiển thị danh sách media với infinite scroll
@@ -121,40 +131,20 @@ const MediaList: React.FC<MediaListProps> = ({
 
   // Optimize: Memoize reloadData function để tránh re-create mỗi lần render
   const reloadData = useCallback(() => {
-    if (propMedias) {
-      return;
-    }
+    if (propMedias) return;
     refetch();
   }, [propMedias, refetch]);
 
-  let content;
   const isEmpty = (status === "success" || !!propMedias) && medias.length === 0;
 
+  let content;
   if (!isEmpty && (status === "success" || propMedias)) {
     content = medias.map((media: Media, index: number) => {
-      if (medias.length === index + 1 && !propMedias) {
-        return (
-          <PinMedia
-            innerRef={ref}
-            key={media.id}
-            srcUrl={media.media_url}
-            data={{
-              id: media.id,
-              media_name: media.media_name,
-              media_url: media.media_url,
-              type: media.type || "",
-            }}
-            isEditMedia={isEditMedia}
-            isSaveMedia={isSaveMedia}
-            albumContext={albumContext}
-            mediaFromAlbum={media}
-            onDelete={reloadData}
-          />
-        );
-      }
+      const isLastItem = medias.length === index + 1 && !propMedias;
 
       return (
         <PinMedia
+          innerRef={isLastItem ? ref : undefined}
           key={media.id}
           srcUrl={media.media_url}
           data={{
@@ -173,42 +163,36 @@ const MediaList: React.FC<MediaListProps> = ({
     });
   }
 
-  const breakpointColumnsObj = {
-    default: 6,
-    1200: 4,
-    768: 3,
-    480: 3,
-  };
-
   const contentWrapper = (
-    <div className="pincap-container">
-      <motion.div
-        className="media-list-wrapper"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        {isEmpty && (
-          <Empty
-            icon={<NoMediaIcon />}
-            title="No Media Yet"
-            description="There aren't any medias."
-          />
-        )}
-        {!isEmpty && (
-          <>
-            <Masonry
-              breakpointCols={breakpointColumnsObj}
-              className="masonry-grid"
-              columnClassName="masonry-grid-column"
-            >
-              {content}
-            </Masonry>
-            {!propMedias && <div ref={ref} style={{ height: 10 }} />}
-          </>
-        )}
-      </motion.div>
-    </div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className={clsx(
+        "w-full max-w-full px-3 box-border overflow-x-hidden",
+        "select-none touch-callout-none"
+      )}
+    >
+      {isEmpty && (
+        <Empty
+          icon={<NoMediaIcon />}
+          title="No Media Yet"
+          description="There aren't any medias."
+        />
+      )}
+      {!isEmpty && (
+        <>
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="flex -ml-2 w-auto"
+            columnClassName="pl-2 bg-clip-padding"
+          >
+            {content}
+          </Masonry>
+          {!propMedias && <div ref={ref} className="h-2.5" />}
+        </>
+      )}
+    </motion.div>
   );
 
   if (withoutLoadingWrapper) {

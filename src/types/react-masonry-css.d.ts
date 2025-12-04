@@ -12,7 +12,7 @@ declare module "react-masonry-css" {
     columnClassName?: string;
     columnAttrs?: {
       className?: string;
-      [key: string]: string | number | boolean;
+      [key: string]: string | number | boolean | undefined;
     };
     children?: React.ReactNode;
   }

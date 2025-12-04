@@ -29,7 +29,6 @@ import { useMedia } from "@/react-query/useMedia";
 import {
   ParsedMediaUrl,
   parseMediaUrl,
-  getRandomAspectRatio,
   normalizeMediaUrl,
 } from "@/utils/utils";
 
@@ -117,24 +116,36 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     resetFlexibleMediaErrors();
   }, [currentMediaIndex, resetFlexibleMediaErrors]);
 
-  // Tạo aspect ratio ổn định cho media để tạo hiệu ứng Pinterest
-  const aspectRatio = useMemo(() => getRandomAspectRatio(data?.id), [data?.id]);
+  // Determine media type for rendering
+  const mediaType = useMemo(() => {
+    if (isFlexibleMedia && currentFlexibleMedia) {
+      return currentFlexibleMedia.type;
+    }
+    return data?.type;
+  }, [isFlexibleMedia, currentFlexibleMedia, data?.type]);
 
-  const isFlexibleVideo = useMemo(() => {
-    return (
-      isFlexibleMedia &&
-      currentFlexibleMedia &&
-      currentFlexibleMedia.type === MEDIA_TYPES.VIDEO
-    );
-  }, [isFlexibleMedia, currentFlexibleMedia]);
+  const isVideo = mediaType === MEDIA_TYPES.VIDEO;
+  const isImage = mediaType === MEDIA_TYPES.IMAGE;
 
-  const isFlexibleImage = useMemo(() => {
-    return (
-      isFlexibleMedia &&
-      currentFlexibleMedia &&
-      currentFlexibleMedia.type === MEDIA_TYPES.IMAGE
-    );
-  }, [isFlexibleMedia, currentFlexibleMedia]);
+  // Get current media URL and error state
+  const currentMediaUrl =
+    isFlexibleMedia && currentFlexibleMedia
+      ? currentFlexibleMedia.url
+      : displayUrl;
+
+  const hasError = isFlexibleMedia
+    ? flexibleMediaErrors[currentMediaIndex]
+    : isVideo
+    ? videoError
+    : imageError;
+
+  const handleMediaError = isFlexibleMedia
+    ? isVideo
+      ? () => handleFlexibleVideoError(currentMediaIndex)
+      : () => handleFlexibleImageError(currentMediaIndex)
+    : isVideo
+    ? handleVideoError
+    : handleImageError;
 
   const fetchMediaDetail = useCallback(
     async (idMedia: string) => {
@@ -201,101 +212,48 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
       >
-        {data?.type === MEDIA_TYPES.VIDEO && videoError && (
+        {hasError && (
           <MediaErrorThumbnail
-            className="mb-[0.25vw] w-full"
+            className="mb-1 w-full rounded-2xl block"
             width="100%"
             height="auto"
-            alt="Video error"
-            style={{ aspectRatio }}
+            alt={`${isVideo ? "Video" : "Image"} error`}
           />
         )}
-        {data?.type === MEDIA_TYPES.VIDEO && !videoError && (
+
+        {!hasError && isVideo && (
           <video
             autoPlay
             loop
             muted
-            className="mb-[0.25vw] w-full"
-            style={{ aspectRatio }}
-            onError={handleVideoError}
+            className="mb-1 w-full h-auto rounded-2xl block"
+            onError={handleMediaError}
           >
-            <source src={displayUrl} />
+            <source src={currentMediaUrl} />
           </video>
         )}
-        {data?.type === MEDIA_TYPES.IMAGE && imageError && (
-          <MediaErrorThumbnail
-            className="mb-[0.25vw] w-full"
-            width="100%"
-            height="auto"
-            alt="Image error"
-            style={{ aspectRatio }}
-          />
-        )}
-        {data?.type === MEDIA_TYPES.IMAGE && !imageError && (
+
+        {!hasError && isImage && (
           <LazyLoadImage
-            src={displayUrl}
+            src={currentMediaUrl}
             alt="Media content"
             effect="blur"
             threshold={100}
-            onError={handleImageError}
-            className="mb-[0.25vw] w-full"
-            style={{ aspectRatio }}
-          />
-        )}
-        {isFlexibleVideo && flexibleMediaErrors[currentMediaIndex] && (
-          <MediaErrorThumbnail
-            className="mb-[0.25vw] w-full"
-            width="100%"
-            height="auto"
-            alt="Video error"
-            style={{ aspectRatio }}
-          />
-        )}
-        {isFlexibleVideo && !flexibleMediaErrors[currentMediaIndex] && (
-          <video
-            autoPlay
-            loop
-            muted
-            className="mb-[0.25vw] w-full"
-            style={{ aspectRatio }}
-            onError={() => handleFlexibleVideoError(currentMediaIndex)}
-          >
-            <source src={currentFlexibleMedia!.url} />
-          </video>
-        )}
-        {isFlexibleImage && flexibleMediaErrors[currentMediaIndex] && (
-          <MediaErrorThumbnail
-            className="mb-[0.25vw] w-full"
-            width="100%"
-            height="auto"
-            alt="Image error"
-            style={{ aspectRatio }}
-          />
-        )}
-        {isFlexibleImage && !flexibleMediaErrors[currentMediaIndex] && (
-          <LazyLoadImage
-            src={currentFlexibleMedia!.url}
-            alt="Media content"
-            effect="blur"
-            threshold={100}
-            onError={() => handleFlexibleImageError(currentMediaIndex)}
-            className="mb-[0.25vw] w-full"
-            style={{ aspectRatio }}
+            onError={handleMediaError}
+            className="mb-1 w-full h-auto rounded-2xl block"
           />
         )}
 
         <motion.div
           className={clsx(
             "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
-            data?.type === MEDIA_TYPES.VIDEO || isFlexibleVideo
-              ? "bottom-1.25"
-              : "bottom-2.25"
+            isVideo ? "bottom-1.25" : "bottom-2.25"
           )}
           whileHover={{ opacity: 1 }}
         >
           {isEditMedia && (
             <div
-              className="right-bottom circle-button"
+              className="absolute bottom-2.5 right-2.5 w-10 h-10 bg-white rounded-full flex justify-center items-center shadow-md transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
               onClick={(e) => {
                 setEditModalVisible(true);
                 e.stopPropagation();
@@ -320,11 +278,13 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             trigger={
               <div
                 className={clsx(
-                  "save-button right-top transition-opacity duration-300",
+                  "w-12 h-7 bg-pink-600 rounded-2xl flex justify-center items-center shadow-md transition-all duration-200 hover:scale-105 active:scale-95 active:bg-rose-800 cursor-pointer",
                   isHovered || dropdownOpen ? "opacity-100" : "opacity-0"
                 )}
               >
-                <p>Save</p>
+                <p className="text-white font-medium text-base select-none">
+                  Save
+                </p>
               </div>
             }
           />
