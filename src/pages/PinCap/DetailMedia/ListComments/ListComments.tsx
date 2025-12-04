@@ -121,11 +121,11 @@ const ListComments: React.FC<ListCommentsProps> = ({
               return (
                 <div
                   key={comment?.id ?? index}
-                  className="comment !py-2 first:!pt-0 last:!pb-0"
+                  className="comment !py-2 first:!pt-0 last:!pb-0 !items-start"
                   ref={isLastComment ? ref : undefined}
                 >
                   <div
-                    className="avatar cursor-pointer hover:opacity-80 transition-opacity"
+                    className="avatar cursor-pointer hover:opacity-80 transition-opacity mt-1"
                     onClick={() =>
                       handleNavigateToProfile(comment?.user_id ?? "")
                     }
