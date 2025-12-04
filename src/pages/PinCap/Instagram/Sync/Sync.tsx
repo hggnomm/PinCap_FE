@@ -85,11 +85,11 @@ const Sync: React.FC = () => {
           <CarouselHeader banners={banners} />
 
           {isConnected && (
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
+            <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
               <div className="flex-1">
                 <PostsList />
               </div>
-              <div className="lg:w-[320px] flex-shrink-0">
+              <div className="xl:w-[320px] flex-shrink-0">
                 <AuthenticationSection
                   isConnected={isConnected}
                   account={account}

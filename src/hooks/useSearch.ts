@@ -31,6 +31,9 @@ export const useSearch = (): UseSearchReturn => {
     const stateQuery = (location.state as { searchQuery?: string })
       ?.searchQuery;
 
+    const searchParams = new URLSearchParams(location.search);
+    const urlQuery = searchParams.get("search") || "";
+
     if (stateImage) {
       setImageFile(stateImage);
       setQuery("");
@@ -39,14 +42,17 @@ export const useSearch = (): UseSearchReturn => {
       setImageFile(null);
     }
 
+    // Priority: stateQuery > urlQuery > empty
     if (stateQuery) {
       setQuery(stateQuery);
       window.history.replaceState({}, document.title);
+    } else if (urlQuery) {
+      setQuery(urlQuery);
     } else {
       setQuery("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.key]);
+  }, [location.key, location.search]);
 
   const searchImagePreview = useMemo(() => {
     if (!imageFile) return null;

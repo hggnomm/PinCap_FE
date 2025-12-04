@@ -1,5 +1,6 @@
 "use client";
 
+import { clsx } from "clsx";
 import { ExternalLink } from "lucide-react";
 
 import { INSTAGRAM_MEDIA_TYPES, InstagramMedia } from "@/types/instagram";
@@ -56,8 +57,13 @@ const MediaPost = ({ post, onSyncClick }: MediaPostProps) => {
           </a>
         </div>
 
-        <p className="line-clamp-2 mb-0 text-sm text-gray-700">
-          {post.caption || "No caption provided"}
+        <p
+          className={clsx(
+            "line-clamp-2 mb-0 text-sm",
+            post.caption ? "text-gray-700" : "italic text-gray-400"
+          )}
+        >
+          {post.caption || "No caption"}
         </p>
 
         {!post.is_synced && (
