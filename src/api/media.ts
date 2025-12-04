@@ -206,3 +206,26 @@ export const getAllMediaFeelingUsers = async (
     throw error;
   }
 };
+
+export const searchMediaByImage = async (params: {
+  image: File;
+  page?: number;
+  per_page?: number;
+}): Promise<PaginatedMediaResponse<Media>> => {
+  try {
+    const formData = new FormData();
+    formData.append("image", params.image);
+    formData.append("page", (params.page || "").toString());
+    formData.append("per_page", (params.per_page || "").toString());
+
+    const res = await apiClient.post("/api/medias/search-by-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

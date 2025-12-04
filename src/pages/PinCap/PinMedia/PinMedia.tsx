@@ -336,7 +336,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
             total={flexibleMediaUrls.length}
             current={currentMediaIndex}
             onDotClick={setCurrentMediaIndex}
-            className="absolute bottom-[0.83vw] left-1/2 -translate-x-1/2 [&>div]:w-1 [&>div]:h-1"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 [&>div]:w-1 [&>div]:h-1"
           />
         )}
       </motion.div>

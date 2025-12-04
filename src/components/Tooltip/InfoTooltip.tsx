@@ -4,23 +4,18 @@ import { clsx } from "clsx";
 
 import { QuestionCircleOutlined } from "@ant-design/icons";
 
+import type { TooltipPlacement } from "antd/es/tooltip";
+
 import { Tooltip } from "antd";
 
 import "@/components/Tooltip/InfoTooltip.less";
 
 interface InfoTooltipProps {
   title: string;
-  placement?:
-    | "top"
-    | "bottom"
-    | "left"
-    | "right"
-    | "topLeft"
-    | "topRight"
-    | "bottomLeft"
-    | "bottomRight";
+  placement?: TooltipPlacement;
   className?: string;
   iconClassName?: string;
+  children?: React.ReactNode;
 }
 
 const InfoTooltip: React.FC<InfoTooltipProps> = ({
@@ -28,13 +23,16 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({
   placement = "top",
   className,
   iconClassName,
+  children,
 }) => {
   return (
     <Tooltip title={title} placement={placement}>
       <span className={clsx("info-tooltip", className)}>
-        <QuestionCircleOutlined
-          className={clsx("custom-icon", iconClassName)}
-        />
+        {children ?? (
+          <QuestionCircleOutlined
+            className={clsx("custom-icon", iconClassName)}
+          />
+        )}
       </span>
     </Tooltip>
   );

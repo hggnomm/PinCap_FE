@@ -3,22 +3,9 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import {
-  CloseCircleFilled,
-  DownOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { DownOutlined } from "@ant-design/icons";
 
-import {
-  Avatar,
-  Button,
-  Col,
-  Dropdown,
-  Input,
-  Row,
-  Space,
-  Tooltip,
-} from "antd";
+import { Avatar, Button, Col, Dropdown, Row, Space, Tooltip } from "antd";
 
 import { LogoIcon, TextIcon } from "@/assets/img";
 import iconChatbot from "@/assets/img/PinCap/chatbot.png";
@@ -28,6 +15,7 @@ import { useInitializeNotifications } from "@/hooks/useInitializeNotifications";
 import { useAuth } from "@/react-query/useAuth";
 import { toggleChatbot } from "@/store/chatSlice";
 
+import HeaderSearchBar from "./HeaderSearchBar";
 import SearchDrawer from "./SearchDrawer";
 import "./index.less";
 
@@ -37,15 +25,14 @@ const HeaderCommon = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSearchDrawerOpen, setIsSearchDrawerOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [showImageSearch, setShowImageSearch] = useState(false);
 
-  // Initialize notifications when user is authenticated
   useInitializeNotifications(isAuthenticated);
 
-  // Clear search query when navigating to home
   useEffect(() => {
-    if (location.pathname === ROUTES.PINCAP_HOME) {
-      setSearchQuery("");
+    if (location.pathname === ROUTES.SEARCH) {
+      setIsSearchDrawerOpen(false);
+      setShowImageSearch(false);
     }
   }, [location.pathname]);
 
@@ -60,33 +47,18 @@ const HeaderCommon = () => {
   };
 
   // Handle search drawer
-  const handleSearchClick = () => {
+  const handleCloseSearchDrawer = () => {
+    setIsSearchDrawerOpen(false);
+    setShowImageSearch(false);
+  };
+
+  const handleSearchDrawerOpen = () => {
     setIsSearchDrawerOpen(true);
   };
 
-  const handleCloseSearchDrawer = () => {
-    setIsSearchDrawerOpen(false);
-  };
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const handleHeaderSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchEnter = () => {
-    if (searchQuery.trim()) {
-      navigate(
-        `${ROUTES.SEARCH}?search=${encodeURIComponent(searchQuery.trim())}`
-      );
-      setIsSearchDrawerOpen(false);
-    }
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery("");
+  const handleImageSearchOpen = () => {
+    setShowImageSearch(true);
+    setIsSearchDrawerOpen(true);
   };
 
   const menuItems = [
@@ -142,35 +114,11 @@ const HeaderCommon = () => {
       {/* Middle Search Bar */}
       {isAuthenticated && (
         <Col className="middle-header">
-          <div className="search-bar">
-            <Input
-              placeholder="Search..."
-              suffix={
-                searchQuery ? (
-                  <CloseCircleFilled
-                    onClick={handleClearSearch}
-                    className="cursor-pointer transition-colors"
-                    style={{
-                      fontSize: "18px",
-                      color: "#a25772",
-                    }}
-                  />
-                ) : (
-                  <SearchOutlined
-                    style={{
-                      fontSize: "18px",
-                      color: "#a25772",
-                    }}
-                  />
-                )
-              }
-              value={searchQuery}
-              onChange={handleHeaderSearchChange}
-              onFocus={handleSearchClick}
-              onPressEnter={handleSearchEnter}
-              className="cursor-pointer header-search-input"
-            />
-          </div>
+          <HeaderSearchBar
+            onSearchDrawerOpen={handleSearchDrawerOpen}
+            onImageSearchOpen={handleImageSearchOpen}
+            onSearchDrawerClose={handleCloseSearchDrawer}
+          />
         </Col>
       )}
 
@@ -242,9 +190,7 @@ const HeaderCommon = () => {
       <SearchDrawer
         isOpen={isSearchDrawerOpen}
         onClose={handleCloseSearchDrawer}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        onClearSearch={handleClearSearch}
+        showImageSearch={showImageSearch}
       />
     </Row>
   );

@@ -12,6 +12,7 @@ import "./ViewPinComponent.less";
 
 import Empty, { NoMediaIcon } from "@/components/Empty";
 import Loading from "@/components/Loading/Loading";
+import { EMPTY_PAGINATION_RESPONSE } from "@/constants";
 import PinMedia from "@/pages/PinCap/PinMedia/PinMedia";
 import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
 
@@ -89,11 +90,8 @@ const MediaList: React.FC<MediaListProps> = ({
     queryFn: ({ pageParam }) =>
       queryFn?.(pageParam) ||
       Promise.resolve({
+        ...EMPTY_PAGINATION_RESPONSE,
         data: [],
-        current_page: 1,
-        last_page: 1,
-        per_page: 15,
-        total: 0,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
