@@ -22,6 +22,7 @@ import MediaList from "@/components/ViewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 import { useMedia } from "@/react-query/useMedia";
 import { TokenPayload } from "@/types/Auth";
+import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
 import { Media } from "@/types/type";
 import {
   FeelingType,
@@ -207,6 +208,29 @@ const DetailMedia = () => {
     } catch (error) {
       console.error("Error deleting media:", error);
     }
+  };
+
+  const getAllMediasWithFallback = async (
+    pageParam: number
+  ): Promise<PaginatedMediaResponse<Media>> => {
+    if (!id) {
+      return getAllMedias({ page: pageParam });
+    }
+
+    const responseWithMediaId = await getAllMedias({
+      page: pageParam,
+      media_id: id,
+    });
+
+    if (
+      !responseWithMediaId.data ||
+      responseWithMediaId.data.length === 0 ||
+      responseWithMediaId.total === 0
+    ) {
+      return getAllMedias({ page: pageParam });
+    }
+
+    return responseWithMediaId;
   };
 
   return (
@@ -401,7 +425,7 @@ const DetailMedia = () => {
 
       <MediaList
         queryKey={["medias", "detail-page", id]}
-        queryFn={(pageParam) => getAllMedias({ page: pageParam, media_id: id })}
+        queryFn={getAllMediasWithFallback}
       />
 
       <Suspense fallback={<></>}>
