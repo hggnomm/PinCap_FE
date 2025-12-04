@@ -37,6 +37,7 @@ const Sync: React.FC = () => {
     data: user,
     isLoading: isProfileLoading,
     error: profileError,
+    refetch,
   } = useQuery({
     queryKey: ["user"],
     queryFn: getMyProfile,
@@ -51,6 +52,10 @@ const Sync: React.FC = () => {
       showErrorToast(profileError, "Unable to load your profile information");
     }
   }, [profileError]);
+
+  const handleDisconnect = async () => {
+    await refetch();
+  };
 
   const handleConnect = async () => {
     try {
@@ -89,6 +94,7 @@ const Sync: React.FC = () => {
                   isConnected={isConnected}
                   account={account}
                   onConnect={handleConnect}
+                  onDisconnect={handleDisconnect}
                 />
               </div>
             </div>
@@ -123,6 +129,7 @@ const Sync: React.FC = () => {
                   isConnected={isConnected}
                   account={account}
                   onConnect={handleConnect}
+                  onDisconnect={handleDisconnect}
                 />
               </div>
             </div>

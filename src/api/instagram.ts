@@ -43,3 +43,13 @@ export const syncInstagramMedias = async (ids: string[]) => {
     throw error;
   }
 };
+
+export const unlinkInstagramAccount = async () => {
+  try {
+    const response = await apiClient.delete("/api/instagram/unlink");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to unlink Instagram account", error);
+    throw error;
+  }
+};

@@ -31,5 +31,8 @@ export * from './tags';
 // Privacy APIs
 export * from './privacy';
 
+// Instagram APIs
+export * from './instagram';
+
 // API Client
 export { default as apiClient } from './apiClient';

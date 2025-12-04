@@ -1,24 +1,57 @@
 "use client";
 
+import { useState } from "react";
+
 import { Link } from "react-router-dom";
 
+import { notification } from "antd";
+
+import { unlinkInstagramAccount } from "@/api/instagram";
 import InstagramAccountCard from "@/components/ConnectedAccounts/InstagramAccountCard";
 import { ROUTES } from "@/constants/routes";
 import { SocialInstagram } from "@/types/type";
+import { showErrorToast } from "@/utils/apiErrorHandler";
 
 interface AuthenticationSectionProps {
   isConnected: boolean;
   account?: SocialInstagram | null;
   onConnect: () => void | Promise<void>;
-  onDisconnect?: () => void;
+  onDisconnect?: () => void | Promise<void>;
 }
 
 export default function AuthenticationSection({
   isConnected,
   account,
   onConnect,
-  onDisconnect: _onDisconnect,
+  onDisconnect: onDisconnect,
 }: AuthenticationSectionProps) {
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+
+  const handleDisconnect = async () => {
+    if (isDisconnecting) return;
+
+    setIsDisconnecting(true);
+    try {
+      const response = await unlinkInstagramAccount();
+
+      notification.success({
+        message: "Instagram disconnected",
+        description: response?.message || "Unlink instagram successfully",
+      });
+
+      if (onDisconnect) {
+        await onDisconnect();
+      }
+    } catch (error: unknown) {
+      showErrorToast(
+        error,
+        "Failed to disconnect Instagram account. Please try again."
+      );
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-7 lg:p-8 shadow-sm">
       <div className="mb-4 space-y-3 text-center sm:text-left">
@@ -62,16 +95,15 @@ export default function AuthenticationSection({
 
       {isConnected && (
         <div>
-          {/* Connected State */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            {/* Disconnect Button */}
             <button
               type="button"
-              disabled
-              className="rounded-lg border border-red-200 bg-white px-6 py-2 font-medium text-red-400 transition-all disabled:cursor-not-allowed disabled:opacity-60"
-              title="Disconnect support coming soon"
+              disabled={isDisconnecting}
+              onClick={handleDisconnect}
+              className="rounded-lg border border-red-200 bg-white px-6 py-2 font-medium text-red-500 transition-all disabled:cursor-not-allowed disabled:opacity-60 hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+              title="Disconnect Instagram account"
             >
-              Disconnect (coming soon)
+              {isDisconnecting ? "Disconnecting..." : "Disconnect"}
             </button>
           </div>
 
