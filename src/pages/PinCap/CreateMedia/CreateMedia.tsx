@@ -316,37 +316,31 @@ const CreateMedia: React.FC = () => {
             {imageUrl && (
               <div className="draft-img relative">
                 {(() => {
-                  const isFlexibleMedia = (() => {
-                    try {
-                      const parsed = JSON.parse(imageUrl);
-                      return Array.isArray(parsed) && parsed.length > 1;
-                    } catch {
-                      return false;
-                    }
-                  })();
+                  const isFlexibleMedia =
+                    Array.isArray(imageUrl) && imageUrl.length > 1;
 
                   if (isFlexibleMedia) {
-                    const mockMedia = {
-                      id: draftId,
-                      media_url: imageUrl,
-                      type: null,
-                    } as Media;
-
                     return (
                       <MediaViewer
-                        media={mockMedia}
+                        media={
+                          {
+                            id: draftId,
+                            media_url: imageUrl,
+                            type: null,
+                          } as unknown as Media
+                        }
                         className="!min-h-0 !w-auto [&_.media-viewer]:!min-h-0 [&_.media-viewer]:!w-auto [&_.media-viewer-container]:!min-h-0 [&_.media-viewer-container]:!w-auto [&_.media-element]:!max-h-[65vh] [&_.media-element]:!w-auto"
                       />
                     );
-                  } else {
-                    return (
-                      <img
-                        className="transition-all duration-300"
-                        src={imageUrl}
-                        alt="media preview"
-                      />
-                    );
                   }
+
+                  return (
+                    <img
+                      className="transition-all duration-300"
+                      src={imageUrl}
+                      alt="media preview"
+                    />
+                  );
                 })()}
               </div>
             )}
