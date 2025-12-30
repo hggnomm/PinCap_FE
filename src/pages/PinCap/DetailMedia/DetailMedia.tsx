@@ -73,6 +73,7 @@ const DetailMedia = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const trackedMediaListRef = useRef<string[]>([]);
+  const lastTrackedMediaIdRef = useRef<string | null>(null);
 
   // Redirect to 404 if no media ID provided
   useEffect(() => {
@@ -292,12 +293,19 @@ const DetailMedia = () => {
   );
 
   // Track media list when data is loaded (only page 1)
-  // Only track if there are media_ids in the metadata
+  // Track every time we navigate to a new media (id changes)
   useEffect(() => {
+    // Reset tracked list when media id changes
+    if (id && lastTrackedMediaIdRef.current !== id) {
+      trackedMediaListRef.current = [];
+      lastTrackedMediaIdRef.current = id;
+    }
+
     if (
       isMediaListSuccess &&
       mediaListData?.pages &&
-      mediaListData.pages.length > 0
+      mediaListData.pages.length > 0 &&
+      id
     ) {
       // Only get media IDs from the first page
       const firstPage = mediaListData.pages[0];
@@ -306,9 +314,10 @@ const DetailMedia = () => {
           .map((media) => media.id)
           .filter((mediaId): mediaId is string => !!mediaId);
 
-        // Only track if we have media_ids and haven't tracked page 1 yet
+        // Track every time we navigate to this media (id matches current id)
         if (
           firstPageMediaIds.length > 0 &&
+          lastTrackedMediaIdRef.current === id &&
           trackedMediaListRef.current.length === 0
         ) {
           // Update tracked list

@@ -2,8 +2,9 @@ import { Layout, Menu } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
-  FileOutlined,
-  SettingOutlined,
+  FileImageOutlined,
+  FolderOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 
 const { Sider } = Layout;
@@ -21,19 +22,38 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onMenuChange }) => {
       label: "Dashboard",
     },
     {
-      key: "users",
+      key: "user",
       icon: <UserOutlined />,
-      label: "Users",
+      label: "User",
     },
     {
-      key: "files",
-      icon: <FileOutlined />,
-      label: "Files",
+      key: "media",
+      icon: <FileImageOutlined />,
+      label: "Media",
     },
     {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Settings",
+      key: "album",
+      icon: <FolderOutlined />,
+      label: "Album",
+    },
+    {
+      key: "report",
+      icon: <FileTextOutlined />,
+      label: "Report",
+      children: [
+        {
+          key: "report-users",
+          label: "Users",
+        },
+        {
+          key: "report-media",
+          label: "Media",
+        },
+        {
+          key: "report-reason",
+          label: "Reason Report",
+        },
+      ],
     },
   ];
 
