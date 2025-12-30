@@ -5,6 +5,7 @@ import {
   useState,
   Suspense,
   lazy,
+  useMemo,
 } from "react";
 
 import { useSelector } from "react-redux";
@@ -57,9 +58,21 @@ const DetailMedia = () => {
   const params = useParams();
   const id = params.id || location.state?.mediaId;
   const tokenPayload = useSelector(
-    (state: { auth: TokenPayload }) => state.auth
+    (state: { auth: TokenPayload & { role?: string } }) => state.auth
   );
 
+  // Check if current user is admin from token payload
+  const userIsAdmin = useMemo(() => {
+    const role = tokenPayload?.role;
+    return (
+      role === "ADMIN" ||
+      role === "admin" ||
+      role?.toUpperCase() === "ADMIN" ||
+      role?.toLowerCase() === "admin"
+    );
+  }, [tokenPayload?.role]);
+
+  console.log("userIsAdmin", userIsAdmin);
   const { mediaReaction, mediaReactionLoading } = useMedia();
   const { deleteMedia } = useMedia();
   const {
@@ -69,6 +82,15 @@ const DetailMedia = () => {
   } = useMedia().getMediaById(id, true);
 
   const [media, setMedia] = useState<Media | null>(null);
+
+  // Check if user can perform actions (owner or admin)
+  // Use useMemo to recalculate when media or userIsAdmin changes
+  const canPerformActions = useMemo(() => {
+    const isOwner = media?.ownerUser?.id === tokenPayload.id;
+    const result = isOwner || userIsAdmin;
+
+    return result;
+  }, [media?.ownerUser?.id, tokenPayload.id, userIsAdmin]);
   const [shouldOpenComments, setShouldOpenComments] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -377,7 +399,7 @@ const DetailMedia = () => {
                     <ButtonCircle
                       icon={<img src={MORE} alt="more" />}
                       dropdownMenu={[
-                        ...(media?.ownerUser?.id === tokenPayload.id
+                        ...(canPerformActions
                           ? [
                               {
                                 key: "edit-media",
@@ -479,7 +501,7 @@ const DetailMedia = () => {
                       </>
                     )}
                   </div>
-                  {media?.ownerUser.id !== tokenPayload.id && (
+                  {media?.ownerUser.id !== tokenPayload.id && !userIsAdmin && (
                     <FollowButton
                       userId={media?.ownerUser?.id || ""}
                       initialIsFollowing={media?.ownerUser?.isFollowing}

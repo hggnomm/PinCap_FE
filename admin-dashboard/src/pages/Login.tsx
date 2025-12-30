@@ -17,11 +17,11 @@ import type { LoginFormData } from "@/api/auth";
 const { Content } = Layout;
 const { Title } = Typography;
 
-interface LoginPageProps {
-  onLoginSuccess: () => void;
-}
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/constants/routes";
 
-const Login: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
+const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +32,7 @@ const Login: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       if (response.token) {
         localStorage.setItem("token", response.token);
         message.success("Login successful!");
-        onLoginSuccess();
+        navigate(ROUTES.DASHBOARD);
       }
     } catch (error) {
       const errorMessage =

@@ -1,29 +1,56 @@
-import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Layout } from "antd";
+import { message } from "antd";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import BodyRight from "@/components/BodyRight";
+import { ROUTES } from "@/constants/routes";
+import { logout } from "@/api/auth";
 
 const { Content } = Layout;
 
-interface DashboardProps {
-  onLogout: () => void;
-}
+const Dashboard: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
-  const [selectedKey, setSelectedKey] = useState<string>("dashboard");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      localStorage.removeItem("token");
+      message.success("Logout successful!");
+      navigate(ROUTES.LOGIN);
+    } catch (error: unknown) {
+      // Even if API call fails, still logout locally
+      const errorMessage =
+        error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : "Logout failed";
+      message.error(errorMessage);
+      localStorage.removeItem("token");
+      navigate(ROUTES.LOGIN);
+    }
+  };
 
-  const handleMenuChange = (key: string) => {
-    setSelectedKey(key);
+  // Get current route key from pathname
+  const getSelectedKey = (): string => {
+    const path = location.pathname;
+    if (path === ROUTES.DASHBOARD || path === "/") return "dashboard";
+    if (path === ROUTES.USER_MANAGEMENT) return "user";
+    if (path === ROUTES.MEDIA_MANAGEMENT) return "media";
+    if (path === ROUTES.ALBUM_MANAGEMENT) return "album";
+    if (path === ROUTES.REPORT_USERS) return "report-users";
+    if (path === ROUTES.REPORT_MEDIA) return "report-media";
+    if (path === ROUTES.REPORT_REASON) return "report-reason";
+    return "dashboard";
   };
 
   return (
     <Layout>
-      <Sidebar selectedKey={selectedKey} onMenuChange={handleMenuChange} />
+      <Sidebar selectedKey={getSelectedKey()} />
       <Layout>
-        <Header onLogout={onLogout} />
+        <Header onLogout={handleLogout} />
         <Content>
-          <BodyRight selectedKey={selectedKey} />
+          <BodyRight />
         </Content>
       </Layout>
     </Layout>

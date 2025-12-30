@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import {
   DashboardOutlined,
@@ -6,15 +7,18 @@ import {
   FolderOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
+import { ROUTES } from "@/constants/routes";
 
 const { Sider } = Layout;
 
 interface SidebarProps {
   selectedKey: string;
-  onMenuChange: (key: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onMenuChange }) => {
+const Sidebar: React.FC<SidebarProps> = ({ selectedKey }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const menuItems = [
     {
       key: "dashboard",
@@ -58,7 +62,31 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onMenuChange }) => {
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
-    onMenuChange(key);
+    switch (key) {
+      case "dashboard":
+        navigate(ROUTES.DASHBOARD);
+        break;
+      case "user":
+        navigate(ROUTES.USER_MANAGEMENT);
+        break;
+      case "media":
+        navigate(ROUTES.MEDIA_MANAGEMENT);
+        break;
+      case "album":
+        navigate(ROUTES.ALBUM_MANAGEMENT);
+        break;
+      case "report-users":
+        navigate(ROUTES.REPORT_USERS);
+        break;
+      case "report-media":
+        navigate(ROUTES.REPORT_MEDIA);
+        break;
+      case "report-reason":
+        navigate(ROUTES.REPORT_REASON);
+        break;
+      default:
+        break;
+    }
   };
 
   return (

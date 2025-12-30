@@ -6,7 +6,6 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { styled } from "styled-components";
 
 import {
-  DashboardOutlined,
   InstagramOutlined,
   PlusOutlined,
   ProductOutlined,
@@ -178,25 +177,6 @@ const SiderCommon = () => {
         >
           <span style={{ cursor: "pointer" }}>PinBot</span>
         </AIToolBtn>
-
-        {/* Dashboard Submenu */}
-        {/* {tokenPayload.role === "ADMIN" && ( */}
-        <Menu.SubMenu
-          key="dashboard"
-          icon={<DashboardOutlined />}
-          title="Dashboard"
-        >
-          <Menu.Item key="dashHome">
-            <Link to="/dashboard">Home</Link>
-          </Menu.Item>
-          <Menu.Item key="dashAlbum">
-            <Link to="/dashboard/album">Album</Link>
-          </Menu.Item>
-          <Menu.Item key="dashMediaReport">
-            <Link to="/dashboard/mediaReport">Media Report</Link>
-          </Menu.Item>
-        </Menu.SubMenu>
-        {/* )} */}
       </Menu>
       <Outlet />
     </Sider>

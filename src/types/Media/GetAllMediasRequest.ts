@@ -33,6 +33,4 @@ export interface GetAllMediasRequestExtended extends GetAllMediasRequest {
 export const DEFAULT_GET_ALL_MEDIAS_REQUEST: Partial<GetAllMediasRequest> = {
   per_page: 15,
   page: 1,
-  order_type: OrderType.DESC,
-  order_key: OrderKey.CREATED_AT,
 };

@@ -1,32 +1,34 @@
-import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
+import { ROUTES } from "@/constants/routes";
 
-// Check authentication on initial load
-const checkAuth = (): boolean => {
+// Protected Route Component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem("token");
-  return !!token;
+  if (!token) {
+    return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+  return <>{children}</>;
 };
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(checkAuth);
-
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsAuthenticated(false);
-  };
-
-  // Show login page if not authenticated
-  if (!isAuthenticated) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
-  }
-
-  // Show dashboard if authenticated
-  return <Dashboard onLogout={handleLogout} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path={ROUTES.LOGIN} element={<Login />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

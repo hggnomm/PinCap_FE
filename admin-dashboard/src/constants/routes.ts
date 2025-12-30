@@ -1,20 +1,10 @@
 export const ROUTES = {
-  // Public routes
-  HOME: "/",
   LOGIN: "/login",
-  NOT_FOUND: "/404",
-  FORBIDDEN: "/403",
-
-  // Admin routes
-  DASHBOARD: "/dashboard",
+  DASHBOARD: "/",
+  USER_MANAGEMENT: "/users",
+  MEDIA_MANAGEMENT: "/media",
+  ALBUM_MANAGEMENT: "/albums",
+  REPORT_USERS: "/reports/users",
+  REPORT_MEDIA: "/reports/media",
+  REPORT_REASON: "/reports/reasons",
 } as const;
-
-export const PUBLIC_ROUTES = [
-  ROUTES.HOME,
-  ROUTES.LOGIN,
-  ROUTES.NOT_FOUND,
-  ROUTES.FORBIDDEN,
-] as const;
-
-export type RouteType = (typeof ROUTES)[keyof typeof ROUTES];
-

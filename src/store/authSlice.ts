@@ -49,4 +49,14 @@ export const authSlice = createSlice({
 
 export const { addToken, logout } = authSlice.actions;
 export const authorized = (state: RootState) => state.auth.email !== "";
+export const isAdmin = (state: RootState): boolean => {
+  const role = state.auth.role;
+  // Check multiple possible admin role values
+  return (
+    role === "ADMIN" ||
+    role === "admin" ||
+    role?.toUpperCase() === "ADMIN" ||
+    role?.toLowerCase() === "admin"
+  );
+};
 export default authSlice.reducer;
