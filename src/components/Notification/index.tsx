@@ -139,6 +139,25 @@ const Notification = () => {
     dispatch(deleteNotificationById(notificationId));
   };
 
+  // Auto-refresh notifications every 5 seconds
+  useEffect(() => {
+    // Set up interval to fetch notifications every 5 seconds
+    const intervalId = setInterval(() => {
+      dispatch(
+        fetchNotifications({
+          page: 1,
+          perPage,
+          filters: { is_read: NOTIFICATION_STATUS.UNREAD },
+        })
+      );
+    }, 5000); // 5 seconds
+
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [dispatch, perPage]);
+
   return (
     <>
       <div className="relative flex cursor-pointer" ref={ref}>

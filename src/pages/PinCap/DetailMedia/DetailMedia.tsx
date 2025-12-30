@@ -1,14 +1,23 @@
-import { useEffect, useState, Suspense, lazy } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  Suspense,
+  lazy,
+} from "react";
 
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { clsx } from "clsx";
 import { saveAs } from "file-saver";
 import { motion } from "framer-motion";
 
 import { getAllMedias } from "@/api/media";
+import { trackUserEvent } from "@/api/users";
 import INSTAGRAM_ICON from "@/assets/icons/instagram-2.svg";
 import DOWNLOAD from "@/assets/img/PinCap/download.png";
 import MORE from "@/assets/img/PinCap/more.png";
@@ -63,6 +72,7 @@ const DetailMedia = () => {
   const [shouldOpenComments, setShouldOpenComments] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const trackedMediaListRef = useRef<string[]>([]);
 
   // Redirect to 404 if no media ID provided
   useEffect(() => {
@@ -93,6 +103,9 @@ const DetailMedia = () => {
     }
   }, [mediaData, queryError]);
 
+  // Track view event is handled in trackMediaList when media list is loaded
+  // Only track if there are media_ids in the list
+
   const handleFollowChange = (isFollowing: boolean, followersCount: number) => {
     setMedia((prevState) => {
       if (!prevState) return null;
@@ -111,6 +124,7 @@ const DetailMedia = () => {
     try {
       const feelingId = FeelingType.HEART; // Hiện tại chỉ có một icon
       let newReactionCount: number;
+      const isLiking = media?.reaction?.feeling_id !== feelingId;
 
       // Tính toán số lượng phản ứng
       if (media?.reaction?.feeling_id === feelingId) {
@@ -139,6 +153,17 @@ const DetailMedia = () => {
             },
           } as Media;
         });
+
+        // Track like event when user likes (not unlikes)
+        if (isLiking && id) {
+          trackUserEvent({
+            event_type: "like",
+            media_id: id,
+            metadata: null,
+          }).catch((error) => {
+            console.error("Failed to track like event:", error);
+          });
+        }
       }
     } catch (error: unknown) {
       console.error("Error when reacting to a media:", error);
@@ -232,6 +257,69 @@ const DetailMedia = () => {
 
     return responseWithMediaId;
   };
+
+  // Query to get media list for tracking
+  const { data: mediaListData, isSuccess: isMediaListSuccess } =
+    useInfiniteQuery({
+      queryKey: ["medias", "detail-page", id],
+      queryFn: ({ pageParam }) => getAllMediasWithFallback(pageParam),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        if (lastPage.current_page < lastPage.last_page) {
+          return lastPage.current_page + 1;
+        }
+        return undefined;
+      },
+      enabled: !!id,
+    });
+
+  // Function to track list media IDs
+  const trackMediaList = useCallback(
+    async (mediaIds: string[]) => {
+      if (!id || !mediaIds || mediaIds.length === 0) return;
+
+      try {
+        await trackUserEvent({
+          event_type: "view",
+          media_id: id,
+          metadata: { media_ids: mediaIds },
+        });
+      } catch (error) {
+        console.error("Failed to track media list:", error);
+      }
+    },
+    [id]
+  );
+
+  // Track media list when data is loaded (only page 1)
+  // Only track if there are media_ids in the metadata
+  useEffect(() => {
+    if (
+      isMediaListSuccess &&
+      mediaListData?.pages &&
+      mediaListData.pages.length > 0
+    ) {
+      // Only get media IDs from the first page
+      const firstPage = mediaListData.pages[0];
+      if (firstPage && firstPage.data) {
+        const firstPageMediaIds = firstPage.data
+          .map((media) => media.id)
+          .filter((mediaId): mediaId is string => !!mediaId);
+
+        // Only track if we have media_ids and haven't tracked page 1 yet
+        if (
+          firstPageMediaIds.length > 0 &&
+          trackedMediaListRef.current.length === 0
+        ) {
+          // Update tracked list
+          trackedMediaListRef.current = firstPageMediaIds;
+
+          // Track the first page list (only if we have media_ids)
+          trackMediaList(firstPageMediaIds);
+        }
+      }
+    }
+  }, [isMediaListSuccess, mediaListData, id, trackMediaList]);
 
   return (
     <div className="min-h-screen">

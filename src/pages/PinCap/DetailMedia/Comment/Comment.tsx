@@ -14,6 +14,7 @@ import {
 
 import { notification } from "antd";
 
+import { trackUserEvent } from "@/api/users";
 import { useComment } from "@/react-query/useComment";
 
 interface CommentProps {
@@ -51,6 +52,15 @@ const Comment: React.FC<CommentProps> = ({ mediaId, onCommentAdded }) => {
         media_id: mediaId,
         content: content,
         image: selectedImage || undefined,
+      });
+
+      // Track comment event
+      trackUserEvent({
+        event_type: "comment",
+        media_id: mediaId,
+        metadata: { content: content || "" },
+      }).catch((error) => {
+        console.error("Failed to track comment event:", error);
       });
 
       // Reset form

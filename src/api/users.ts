@@ -1,4 +1,5 @@
 import type { User } from "@/types/type";
+import type { TrackUserEventPayload } from "@/types/User";
 
 import apiClient from "./apiClient";
 
@@ -152,6 +153,16 @@ export const reportUser = async (data: {
     return response.data;
   } catch (error) {
     console.error("API Error:", error);
+    throw error;
+  }
+};
+
+export const trackUserEvent = async (data: TrackUserEventPayload) => {
+  try {
+    const response = await apiClient.post("/api/users/track", data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to track user event:", error);
     throw error;
   }
 };

@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { clsx } from "clsx";
 
 import { addMediasToAlbum } from "@/api/album";
+import { trackUserEvent } from "@/api/users";
 import { BaseTabs } from "@/components/BaseTabs";
 import Empty from "@/components/Empty/Empty";
 import Loading from "@/components/Loading/Loading";
@@ -264,6 +265,15 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         });
         queryClient.invalidateQueries({ queryKey: ["album-members"] });
         queryClient.invalidateQueries({ queryKey: ["album", albumId] });
+
+        // Track save event
+        trackUserEvent({
+          event_type: "save",
+          media_id: mediaId,
+          metadata: null,
+        }).catch((error) => {
+          console.error("Failed to track save event:", error);
+        });
 
         onSuccess?.();
       } else {
