@@ -47,6 +47,7 @@ interface AlbumDropdownProps {
   onClose?: () => void;
   onModalOpen?: () => void;
   onModalClose?: () => void;
+  disabled?: boolean;
 }
 
 const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
@@ -60,6 +61,7 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
   onClose,
   onModalOpen,
   onModalClose,
+  disabled = false,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
@@ -395,6 +397,11 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
   const handleTriggerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
 
+    // Prevent opening if disabled
+    if (disabled) {
+      return;
+    }
+
     // Close any other open dropdowns first
     if (currentOpenDropdown && currentOpenDropdown !== componentId) {
       const closeFunction = dropdownListeners.get(currentOpenDropdown);
@@ -435,7 +442,11 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
   return (
     <>
       <div
-        className={clsx(`album-dropdown-trigger-${componentId}`, className)}
+        className={clsx(
+          `album-dropdown-trigger-${componentId}`,
+          className,
+          disabled && "pointer-events-none"
+        )}
         onClick={handleTriggerClick}
       >
         {trigger}

@@ -61,3 +61,21 @@ export interface VisionApiError {
     status: string;
   };
 }
+
+/**
+ * Safe search data structure from API response
+ * Only checks: adult, violence, racy
+ * Ignores: spoof, medical
+ */
+export interface SafeSearchData {
+  adult: SafeSearchLikelihood;
+  spoof?: SafeSearchLikelihood;
+  medical?: SafeSearchLikelihood;
+  violence: SafeSearchLikelihood;
+  racy: SafeSearchLikelihood;
+}
+
+export interface ImagePolicyCheckResult {
+  status: "SAFE" | "WARNING" | "VIOLATION";
+  message: string;
+}

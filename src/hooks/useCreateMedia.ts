@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
+import { notification } from "antd";
+
 import { getDetailMedia } from "@/api/media";
 import { checkImageSafety, checkMultipleImagesSafety } from "@/api/vision";
 import { PRIVACY } from "@/constants/constants";
@@ -11,7 +13,9 @@ import { useMediaToast } from "@/contexts/MediaToastContext";
 import { useMedia } from "@/react-query/useMedia";
 import { TokenPayload } from "@/types/Auth";
 import { Media } from "@/types/type";
+import { SafeSearchData } from "@/types/vision";
 import { getTagName } from "@/utils/tagMapping";
+import { checkImagePolicy } from "@/utils/visionUtils";
 import { CreateMediaFormData, UpdateMediaFormData } from "@/validation/media";
 
 export const useCreateMedia = (
@@ -50,7 +54,10 @@ export const useCreateMedia = (
 
   const handleSelectMedia = useCallback(
     (media: Media, shouldUpdateForm = false) => {
-      setImageUrl(media.media_url);
+      const url = Array.isArray(media.media_url)
+        ? media.media_url[0]
+        : media.media_url || "";
+      setImageUrl(url);
       setIsSelectedDraft(true);
       setFileList([]);
       setTags(media.tags?.map(getTagName) || []);
@@ -133,6 +140,28 @@ export const useCreateMedia = (
         }
 
         if (isCreated && response?.media) {
+          // Check image policy if safe_search_data exists
+          if (response.media.safe_search_data) {
+            const policyResult = checkImagePolicy(
+              response.media.safe_search_data as SafeSearchData[]
+            );
+
+            if (policyResult.status === "VIOLATION") {
+              notification.error({
+                message: "Policy Violation",
+                description: policyResult.message,
+                duration: 5,
+              });
+            } else if (policyResult.status === "WARNING") {
+              notification.warning({
+                message: "Sensitive Content",
+                description: policyResult.message,
+                duration: 5,
+              });
+            }
+            // SAFE status doesn't need a notification
+          }
+
           showToast(response.media, formValue.id ? "update" : "create");
         }
       } else {
@@ -238,7 +267,10 @@ export const useCreateMedia = (
           const detailDraft = await getDetailMedia(draftId, true);
           if (detailDraft) {
             // Update state
-            setImageUrl(detailDraft.media_url);
+            const url = Array.isArray(detailDraft.media_url)
+              ? detailDraft.media_url[0]
+              : detailDraft.media_url || "";
+            setImageUrl(url);
             setIsSelectedDraft(true);
             setFileList([]);
             setTags(detailDraft.tags?.map(getTagName) || []);

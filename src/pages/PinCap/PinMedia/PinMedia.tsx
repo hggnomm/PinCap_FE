@@ -9,13 +9,14 @@ import React, {
 } from "react";
 
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { clsx } from "clsx";
 import { motion } from "framer-motion";
 
-import { EditFilled } from "@ant-design/icons/lib";
+import { EditFilled, ExclamationCircleOutlined } from "@ant-design/icons/lib";
 
 import { Form } from "antd";
 
@@ -23,14 +24,18 @@ import { getDetailMedia } from "@/api/media";
 import AlbumDropdown from "@/components/AlbumDropdown";
 import DotsPagination from "@/components/DotsPagination/DotsPagination";
 import MediaErrorThumbnail from "@/components/MediaErrorThumbnail";
+import InfoTooltip from "@/components/Tooltip/InfoTooltip";
 import { MEDIA_TYPES } from "@/constants/constants";
 import { useMediaError } from "@/hooks";
 import { useMedia } from "@/react-query/useMedia";
+import { TokenPayload } from "@/types/Auth";
+import { SafeSearchData } from "@/types/vision";
 import {
   ParsedMediaUrl,
   parseMediaUrl,
   normalizeMediaUrl,
 } from "@/utils/utils";
+import { checkImagePolicy } from "@/utils/visionUtils";
 
 import "react-lazy-load-image-component/src/effects/blur.css";
 import "react-medium-image-zoom/dist/styles.css";
@@ -73,6 +78,9 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
   const { deleteMedia } = useMedia();
   const [media, setMedia] = useState<Media | undefined>(mediaFromAlbum);
   const navigate = useNavigate();
+  const tokenPayload = useSelector(
+    (state: { auth: TokenPayload }) => state.auth
+  );
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
@@ -132,6 +140,35 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
     isFlexibleMedia && currentFlexibleMedia
       ? currentFlexibleMedia.url
       : displayUrl;
+
+  // Check image policy for sensitive content
+  const imagePolicyStatus = useMemo(() => {
+    if (!isImage) return null;
+    const mediaData = media || mediaFromAlbum;
+    if (mediaData?.safe_search_data) {
+      const safeSearchData =
+        mediaData.safe_search_data as unknown as SafeSearchData[];
+      if (Array.isArray(safeSearchData)) {
+        return checkImagePolicy(safeSearchData);
+      }
+    }
+    return null;
+  }, [isImage, media, mediaFromAlbum]);
+
+  const hasSensitiveContent = imagePolicyStatus?.status === "WARNING";
+
+  // Check if current user is the owner of the media
+  const isOwner = useMemo(() => {
+    const mediaData = media || mediaFromAlbum;
+    if (!mediaData || !tokenPayload?.id) return false;
+    return (
+      mediaData.ownerUser?.id === tokenPayload.id ||
+      mediaData.media_owner_id === tokenPayload.id
+    );
+  }, [media, mediaFromAlbum, tokenPayload?.id]);
+
+  // Hide save button if has sensitive content and not owner
+  const shouldShowSaveButton = isSaveMedia && (!hasSensitiveContent || isOwner);
 
   const hasError = isFlexibleMedia
     ? flexibleMediaErrors[currentMediaIndex]
@@ -234,19 +271,43 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         )}
 
         {!hasError && isImage && (
-          <LazyLoadImage
-            src={currentMediaUrl}
-            alt="Media content"
-            effect="blur"
-            threshold={100}
-            onError={handleMediaError}
-            className="mb-1 w-full h-auto rounded-2xl block"
-          />
+          <div
+            className={clsx(
+              "mb-1 w-full h-auto rounded-2xl block overflow-hidden relative",
+              hasSensitiveContent && "mb-2"
+            )}
+          >
+            <LazyLoadImage
+              src={currentMediaUrl}
+              alt="Media content"
+              effect={hasSensitiveContent ? "opacity" : "blur"}
+              threshold={100}
+              onError={handleMediaError}
+              className={clsx(
+                "w-full h-auto block transition-all duration-300",
+                hasSensitiveContent && "blur-md"
+              )}
+            />
+            {hasSensitiveContent && imagePolicyStatus?.message && (
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <InfoTooltip
+                  title={imagePolicyStatus.message}
+                  placement="top"
+                  className="pointer-events-auto"
+                >
+                  <div className="size-8 bg-orange-500 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
+                    <ExclamationCircleOutlined className="text-white text-3xl" />
+                  </div>
+                </InfoTooltip>
+              </div>
+            )}
+          </div>
         )}
 
         <motion.div
           className={clsx(
-            "overlay bottom-2.25 absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]"
+            "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
+            hasSensitiveContent ? "bottom-2" : "bottom-2.25"
           )}
           whileHover={{ opacity: 1 }}
         >
@@ -263,7 +324,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
           )}
         </motion.div>
 
-        {isSaveMedia && (
+        {shouldShowSaveButton && (
           <AlbumDropdown
             mediaId={data.id}
             componentId={`pin-media-${data.id}`}

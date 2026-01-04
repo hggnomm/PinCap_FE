@@ -28,12 +28,18 @@ interface MediaViewerProps {
   media: Media | null;
   className?: string;
   mediaClassName?: string;
+  shouldBlockContent?: boolean;
+  sensitiveMessage?: string;
+  onAcceptSensitiveView?: () => void;
 }
 
 const MediaViewer: React.FC<MediaViewerProps> = ({
   media,
   className,
   mediaClassName,
+  shouldBlockContent = false,
+  sensitiveMessage,
+  onAcceptSensitiveView,
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState<number>(0);
   const [direction, setDirection] = useState<number>(0);
@@ -428,8 +434,34 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
   if (!media) return null;
 
   return (
-    <div className={clsx("media-viewer", className)}>
+    <div className={clsx("media-viewer", className, "relative")}>
       {isFlexibleMedia ? renderFlexibleMedia() : renderSingleMedia()}
+      {shouldBlockContent && (
+        <>
+          {/* Blur overlay */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md z-20 pointer-events-none" />
+          {/* Warning message and accept button */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-30 pointer-events-auto">
+            <div className="bg-white/95 rounded-2xl p-8 max-w-md mx-4 shadow-2xl text-center">
+              <div className="mb-4">
+                <p className="text-lg font-semibold text-gray-900 mb-2">
+                  Sensitive Content
+                </p>
+                <p className="text-sm text-gray-600">
+                  {sensitiveMessage ||
+                    "This image may contain sensitive or disturbing content"}
+                </p>
+              </div>
+              <button
+                onClick={onAcceptSensitiveView}
+                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200"
+              >
+                View Anyway
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -34,11 +34,13 @@ import { useMedia } from "@/react-query/useMedia";
 import { TokenPayload } from "@/types/Auth";
 import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
 import { Media } from "@/types/type";
+import { SafeSearchData } from "@/types/vision";
 import {
   FeelingType,
   getImageReactionWithId,
   normalizeMediaUrl,
 } from "@/utils/utils";
+import { checkImagePolicy } from "@/utils/visionUtils";
 
 import Comment from "./Comment/Comment";
 import ListComments from "./ListComments/ListComments";
@@ -94,8 +96,24 @@ const DetailMedia = () => {
   const [shouldOpenComments, setShouldOpenComments] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [hasAcceptedSensitiveView, setHasAcceptedSensitiveView] =
+    useState(false);
   const trackedMediaListRef = useRef<string[]>([]);
   const lastTrackedMediaIdRef = useRef<string | null>(null);
+
+  // Check image policy for sensitive content
+  const imagePolicyStatus = useMemo(() => {
+    if (!media?.safe_search_data) return null;
+    const safeSearchData =
+      media.safe_search_data as unknown as SafeSearchData[];
+    if (Array.isArray(safeSearchData)) {
+      return checkImagePolicy(safeSearchData);
+    }
+    return null;
+  }, [media?.safe_search_data]);
+
+  const hasSensitiveContent = imagePolicyStatus?.status === "WARNING";
+  const shouldBlockContent = hasSensitiveContent && !hasAcceptedSensitiveView;
 
   // Redirect to 404 if no media ID provided
   useEffect(() => {
@@ -123,6 +141,8 @@ const DetailMedia = () => {
   useEffect(() => {
     if (mediaData) {
       setMedia(mediaData);
+      // Reset accept state when media changes
+      setHasAcceptedSensitiveView(false);
     }
   }, [mediaData, queryError]);
 
@@ -367,8 +387,13 @@ const DetailMedia = () => {
         >
           <div className="detail-media">
             <BackButton />
-            <div className="left-view">
-              <MediaViewer media={media} />
+            <div className="left-view relative">
+              <MediaViewer
+                media={media}
+                shouldBlockContent={shouldBlockContent}
+                sensitiveMessage={imagePolicyStatus?.message}
+                onAcceptSensitiveView={() => setHasAcceptedSensitiveView(true)}
+              />
             </div>
             <div className="right-view">
               <div className="right-top-view">
@@ -377,9 +402,9 @@ const DetailMedia = () => {
                     <div className="flex justify-center items-center">
                       <button
                         onClick={() => handleReaction()}
-                        disabled={mediaReactionLoading}
+                        disabled={mediaReactionLoading || shouldBlockContent}
                         className={clsx(
-                          mediaReactionLoading &&
+                          (mediaReactionLoading || shouldBlockContent) &&
                             "opacity-60 cursor-not-allowed"
                         )}
                       >
@@ -393,7 +418,13 @@ const DetailMedia = () => {
                       <span>{media?.reaction_user_count}</span>
                     </div>
 
-                    <button onClick={handleDownload}>
+                    <button
+                      onClick={handleDownload}
+                      disabled={shouldBlockContent}
+                      className={clsx(
+                        shouldBlockContent && "opacity-60 cursor-not-allowed"
+                      )}
+                    >
                       <img src={DOWNLOAD} alt="download" />
                     </button>
                     <ButtonCircle
@@ -424,8 +455,16 @@ const DetailMedia = () => {
                       mediaId={id}
                       componentId={`detail-media-${id}`}
                       position="click"
+                      disabled={shouldBlockContent}
                       trigger={
-                        <button className="album">
+                        <button
+                          className={clsx(
+                            "album",
+                            shouldBlockContent &&
+                              "opacity-60 cursor-not-allowed"
+                          )}
+                          disabled={shouldBlockContent}
+                        >
                           Album
                           <svg
                             className="inline-block ml-1 w-4 h-4"
@@ -446,7 +485,19 @@ const DetailMedia = () => {
                       mediaId={id}
                       componentId={`detail-media-save-${id}`}
                       position="click"
-                      trigger={<button className="save">Save</button>}
+                      disabled={shouldBlockContent}
+                      trigger={
+                        <button
+                          className={clsx(
+                            "save",
+                            shouldBlockContent &&
+                              "opacity-60 cursor-not-allowed"
+                          )}
+                          disabled={shouldBlockContent}
+                        >
+                          Save
+                        </button>
+                      }
                     />
                   </div>
                 </div>
