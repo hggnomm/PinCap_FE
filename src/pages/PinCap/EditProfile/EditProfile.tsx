@@ -110,7 +110,7 @@ const EditProfile = () => {
         <div className="max-w-2xl mx-auto">
           {userData && (
             <div className="bg-white rounded-2xl shadow-xl border border-slate-200/60 overflow-hidden backdrop-blur-sm">
-              <div className="bg-indigo-600 p-8 relative overflow-hidden">
+              <div className="bg-red-600/50 p-8 relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="relative flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -434,15 +434,13 @@ const EditProfile = () => {
                     onClick={handleCancel}
                     className="flex items-center justify-center gap-2 !px-8 !py-4 !border-2 !border-slate-300 text-slate-700 rounded-xl hover:!bg-slate-50 hover:!border-slate-400 transition-all duration-200 font-medium"
                   >
-                    <X className="w-4 h-4" />
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={updateMyProfileLoading}
-                    className="flex items-center justify-center gap-2 !px-8 !py-4 bg-indigo-600 hover:!bg-indigo-700 disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                    className="flex items-center justify-center gap-2 !px-8 !py-4 bg-[#a25772] hover:!bg-[#8b4a63] disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                   >
-                    <Save className="w-4 h-4" />
                     {updateMyProfileLoading
                       ? "Saving Changes..."
                       : "Save Changes"}

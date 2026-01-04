@@ -22,7 +22,7 @@ const EmptySearch: React.FC = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center min-h-[500px] px-4">
+    <div className="flex items-center justify-center min-h-[750px] px-4">
       <div className="text-center max-w-md">
         <div className="relative mb-6 flex justify-center">
           <div className="absolute inset-0 flex items-center justify-center">
@@ -36,7 +36,7 @@ const EmptySearch: React.FC = () => {
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-3">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">
           Start Your Search
         </h2>
 

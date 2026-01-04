@@ -110,6 +110,10 @@ const AlbumCard: React.FC<AlbumCardProps> = ({
 
         <div className="text-container">
           <p className="album-title">{album.album_name}</p>
+          <p className="album-media-count">
+            {album.medias_count || 0}{" "}
+            {album.medias_count === 1 ? "Media" : "Medias"}
+          </p>
           <p className="album-description">{album.description}</p>
         </div>
       </div>
