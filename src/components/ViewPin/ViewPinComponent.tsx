@@ -73,6 +73,8 @@ interface MediaListProps {
   albumContext?: { inAlbum: boolean; albumId?: string; onRemoved?: () => void };
   enabled?: boolean;
   withoutLoadingWrapper?: boolean;
+  refetchOnMount?: boolean | "always";
+  staleTime?: number;
 }
 
 const MediaList: React.FC<MediaListProps> = ({
@@ -84,6 +86,8 @@ const MediaList: React.FC<MediaListProps> = ({
   albumContext,
   enabled = true,
   withoutLoadingWrapper = false,
+  refetchOnMount,
+  staleTime,
 }) => {
   const { ref, inView } = useInView();
 
@@ -112,6 +116,8 @@ const MediaList: React.FC<MediaListProps> = ({
       return undefined;
     },
     enabled: !propMedias && enabled && !!queryKey && !!queryFn,
+    refetchOnMount: refetchOnMount,
+    staleTime: staleTime,
   });
 
   useEffect(() => {

@@ -11,9 +11,11 @@ interface IAuth {
   email: string;
   name: string | null;
   role: string;
-  isAuthenticated: boolean,
+  isAuthenticated: boolean;
 }
-const tokenInfo: TokenPayload | null = decodedToken(localStorage.getItem('token')); 
+const tokenInfo: TokenPayload | null = decodedToken(
+  localStorage.getItem("token")
+);
 
 const initialState: IAuth = {
   id: tokenInfo?.id || "",
@@ -21,7 +23,6 @@ const initialState: IAuth = {
   email: tokenInfo?.mail || "",
   role: tokenInfo?.role || "",
   isAuthenticated: false,
-
 };
 
 export const authSlice = createSlice({
@@ -29,7 +30,9 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     addToken: (state, _action) => {
-      const tokenInfo: TokenPayload | null = decodedToken(localStorage.getItem('token')); 
+      const tokenInfo: TokenPayload | null = decodedToken(
+        localStorage.getItem("token")
+      );
       state.id = tokenInfo?.id || "";
       state.email = tokenInfo?.mail || "";
       state.name = tokenInfo?.name || "";
@@ -37,7 +40,7 @@ export const authSlice = createSlice({
       state.isAuthenticated = true;
     },
     logout: (state) => {
-      localStorage.removeItem('token');
+      localStorage.removeItem("token");
       state.id = "";
       state.email = "";
       state.name = "";
