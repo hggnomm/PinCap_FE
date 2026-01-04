@@ -71,12 +71,13 @@ export const useUser = () => {
 
   const getUserRelationships = (
     userId: string,
-    relationship: "followers" | "followees"
+    relationship: "followers" | "followees",
+    enabled: boolean = true
   ) => {
     return useQuery({
       queryKey: ["relationships", userId, relationship],
       queryFn: () => users.getUserRelationships(userId, relationship),
-      enabled: !!userId,
+      enabled: !!userId && enabled,
       staleTime: 5 * 60 * 1000,
     });
   };

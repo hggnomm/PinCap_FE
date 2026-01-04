@@ -10,6 +10,7 @@ import Zoom from "react-medium-image-zoom";
 
 import { clsx } from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
+import { Eye } from "lucide-react";
 import "react-medium-image-zoom/dist/styles.css";
 
 import DotsPagination from "@/components/DotsPagination/DotsPagination";
@@ -442,19 +443,22 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md z-20 pointer-events-none" />
           {/* Warning message and accept button */}
           <div className="absolute inset-0 flex flex-col items-center justify-center z-30 pointer-events-auto">
-            <div className="bg-white/95 rounded-2xl p-8 max-w-md mx-4 shadow-2xl text-center">
-              <div className="mb-4">
-                <p className="text-lg font-semibold text-gray-900 mb-2">
-                  Sensitive Content
+            <div className="bg-transparent rounded-2xl p-8 max-w-md mx-4 text-center">
+              <div className="mb-0 flex justify-center">
+                <Eye className="w-12 h-12 text-white" />
+              </div>
+              <div className="mb-3">
+                <p className="text-lg font-semibold text-white mb-2">
+                  Violent or graphic content
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-white/90">
                   {sensitiveMessage ||
-                    "This image may contain sensitive or disturbing content"}
+                    "This photo is covered so people can choose whether they want to see it."}
                 </p>
               </div>
               <button
                 onClick={onAcceptSensitiveView}
-                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200"
+                className="w-full bg-black hover:bg-black/80 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200"
               >
                 View Anyway
               </button>

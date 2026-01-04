@@ -216,6 +216,7 @@ const UserProfile = () => {
                     <ProfileStats
                       user={userProfile}
                       followersCount={followersCount}
+                      userId={id || userProfile.id}
                     />
 
                     {userProfile.social_instagram && (

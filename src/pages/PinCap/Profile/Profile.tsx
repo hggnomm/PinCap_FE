@@ -109,7 +109,7 @@ const Profile = () => {
                   </div>
 
                   {/* Stats Cards */}
-                  <ProfileStats user={user} />
+                  <ProfileStats user={user} userId={user.id} />
 
                   {user.social_instagram && (
                     <InstagramAccountCard

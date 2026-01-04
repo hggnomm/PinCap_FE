@@ -295,8 +295,11 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
                   placement="top"
                   className="pointer-events-auto"
                 >
-                  <div className="size-8 bg-orange-500 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
-                    <ExclamationCircleOutlined className="text-white text-3xl" />
+                  <div className="size-8 bg-black rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
+                    <ExclamationCircleOutlined
+                      style={{ color: "white" }}
+                      className="text-3xl"
+                    />
                   </div>
                 </InfoTooltip>
               </div>
