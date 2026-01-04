@@ -1,5 +1,7 @@
 import React from "react";
 
+import { clsx } from "clsx";
+
 interface StatCardProps {
   value: string | number;
   label: string;
@@ -17,9 +19,9 @@ const StatCard: React.FC<StatCardProps> = ({
   borderColor,
   textColor,
 }) => (
-  <div className={`${gradientColors} p-4 rounded-2xl border ${borderColor}`}>
-    <div className={`text-2xl font-bold ${textColor}`}>{value}</div>
-    <div className={`text-sm ${textColor}/70 flex items-center gap-1`}>
+  <div className={clsx(gradientColors, "p-4 rounded-2xl border", borderColor)}>
+    <div className={clsx("text-2xl font-bold", textColor)}>{value}</div>
+    <div className={clsx("text-sm flex items-center gap-1", `${textColor}/70`)}>
       {icon}
       {label}
     </div>
@@ -27,4 +29,3 @@ const StatCard: React.FC<StatCardProps> = ({
 );
 
 export default StatCard;
-
