@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import {
   DashboardOutlined,
@@ -17,7 +17,6 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ selectedKey }) => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const menuItems = [
     {
