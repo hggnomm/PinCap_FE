@@ -20,7 +20,7 @@ export interface MediaItem {
 }
 
 export interface ConversationHistoryItem {
-  role: "user" | "assistant";
+  role: "user" | "model";
   content: string;
 }
 

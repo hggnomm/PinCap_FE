@@ -42,9 +42,9 @@ export interface GetMediasParams {
   type?: "0" | "1"; // "0": IMAGE, "1": VIDEO
   media_type?: string; // For backward compatibility
   privacy?: "0" | "1"; // "0": PRIVATE, "1": PUBLIC
-  is_created?: boolean;
-  is_comment?: boolean;
-  is_policy_violation?: boolean;
+  is_created?: 0 | 1; // 0: false, 1: true
+  is_comment?: 0 | 1; // 0: false, 1: true
+  is_policy_violation?: 0 | 1; // 0: false, 1: true
   media_owner_id?: string;
   user_id?: string; // For backward compatibility
   album_id?: string;

@@ -24,3 +24,6 @@ export * from "./reportReasons";
 
 // Admin Albums APIs
 export * from "./albums";
+
+// Dashboard APIs
+export * from "./dashboard";

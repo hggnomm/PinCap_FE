@@ -37,6 +37,7 @@ const Dashboard: React.FC = () => {
     if (path === ROUTES.DASHBOARD || path === "/") return "dashboard";
     if (path === ROUTES.USER_MANAGEMENT) return "user";
     if (path === ROUTES.MEDIA_MANAGEMENT) return "media";
+    if (path === ROUTES.MEDIA_POLICY_DETECT) return "media-policy-detect";
     if (path === ROUTES.ALBUM_MANAGEMENT) return "album";
     if (path === ROUTES.REPORT_USERS) return "report-users";
     if (path === ROUTES.REPORT_MEDIA) return "report-media";

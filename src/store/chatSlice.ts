@@ -1,7 +1,12 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 import { ChatService } from "@/api/chat";
-import type { MediaItem, ChatIntent } from "@/types/api/chat";
+import type {
+  MediaItem,
+  ChatIntent,
+  AskConfirmation,
+  AlbumData,
+} from "@/types/api/chat";
 
 /**
  * Generate a unique ID for messages
@@ -22,6 +27,8 @@ export interface Message {
   intent?: ChatIntent;
   action?: string;
   isInitial?: boolean; // Flag to mark static welcome messages
+  ask_confirmation?: AskConfirmation;
+  album?: AlbumData;
 }
 
 interface ChatState {
@@ -78,8 +85,7 @@ export const sendMessageToBot = createAsyncThunk(
         (msg) => msg.id && !msg.isGenerating && !msg.isInitial // Exclude initial static messages
       )
       .map((msg) => ({
-        role:
-          msg.sender === "user" ? ("user" as const) : ("assistant" as const),
+        role: msg.sender === "user" ? ("user" as const) : ("model" as const),
         content: msg.text,
       }));
 
@@ -161,6 +167,8 @@ const chatSlice = createSlice({
           media: response.media || undefined,
           intent: response.intent,
           action: response.action || undefined,
+          ask_confirmation: response.ask_confirmation || undefined,
+          album: response.album || undefined,
         };
 
         state.messages.push(aiMessage);

@@ -6,6 +6,7 @@ import {
   FileImageOutlined,
   FolderOutlined,
   FileTextOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
 import { ROUTES } from "@/constants/routes";
 
@@ -33,6 +34,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey }) => {
       key: "media",
       icon: <FileImageOutlined />,
       label: "Media",
+    },
+    {
+      key: "media-policy-detect",
+      icon: <WarningOutlined />,
+      label: "Media Policy Detect",
     },
     {
       key: "album",
@@ -70,6 +76,9 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey }) => {
         break;
       case "media":
         navigate(ROUTES.MEDIA_MANAGEMENT);
+        break;
+      case "media-policy-detect":
+        navigate(ROUTES.MEDIA_POLICY_DETECT);
         break;
       case "album":
         navigate(ROUTES.ALBUM_MANAGEMENT);

@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import { useDispatch, useSelector } from "react-redux";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { toast } from "react-toastify";
 
 import { motion } from "framer-motion";
 import { Send } from "lucide-react";
@@ -10,6 +11,11 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import { CloseCircleOutlined } from "@ant-design/icons";
 
+import { Modal } from "antd";
+
+import { addMediasToAlbum } from "@/api/album";
+import { useAlbum } from "@/react-query/useAlbum";
+import type { Message } from "@/store/chatSlice";
 import { sendMessageToBot } from "@/store/chatSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import type { MediaItem } from "@/types/api/chat";
@@ -26,6 +32,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
   const isTyping = useSelector((state: RootState) => state.chat.isTyping);
   const [input, setInput] = useState<string>("");
   const messageEndRef = useRef<HTMLDivElement | null>(null);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<{
+    album?: { name: string; description: string; media_ids: string[] };
+  } | null>(null);
+  const { createAlbum, createAlbumLoading } = useAlbum();
 
   const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,6 +62,50 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
     );
   };
 
+  const handleCreateAlbumClick = (message: Message) => {
+    setSelectedMessage(message);
+    setConfirmModalVisible(true);
+  };
+
+  const handleConfirmCreateAlbum = async () => {
+    if (!selectedMessage?.album) return;
+
+    try {
+      const albumResponse = await createAlbum({
+        album_name: selectedMessage.album.name,
+        privacy: "0", // Default to private
+      });
+
+      // Add medias to album if media_ids exist
+      if (
+        selectedMessage.album.media_ids.length > 0 &&
+        albumResponse?.album?.id
+      ) {
+        try {
+          await addMediasToAlbum({
+            album_id: albumResponse.album.id,
+            media_ids: selectedMessage.album.media_ids,
+          });
+        } catch (addMediaError) {
+          console.error("Failed to add medias to album:", addMediaError);
+          // Still show success if album was created
+        }
+      }
+
+      toast.success("Album created successfully!");
+      setConfirmModalVisible(false);
+      setSelectedMessage(null);
+    } catch (error) {
+      toast.error("Failed to create album. Please try again.");
+      console.error("Create album failed:", error);
+    }
+  };
+
+  const handleCancelCreateAlbum = () => {
+    setConfirmModalVisible(false);
+    setSelectedMessage(null);
+  };
+
   const renderMediaItems = (mediaItems: MediaItem[]) => {
     if (!mediaItems || mediaItems.length === 0) return null;
 
@@ -72,13 +127,12 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
             <a
               key={item.id}
               href={mediaLink}
-              target={hasImageUrl ? "_blank" : undefined}
-              rel={hasImageUrl ? "noopener noreferrer" : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={(e) => {
-                if (!hasImageUrl) {
-                  e.preventDefault();
-                  window.location.href = mediaLink;
-                }
+                // Always open in new tab
+                e.preventDefault();
+                window.open(mediaLink, "_blank", "noopener,noreferrer");
               }}
               style={{
                 display: "block",
@@ -260,6 +314,33 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                     {message.media && message.media.length > 0 && (
                       <>{renderMediaItems(message.media)}</>
                     )}
+                    {message.ask_confirmation &&
+                      message.ask_confirmation.action === "CREATE_ALBUM" && (
+                        <div style={{ marginTop: "12px" }}>
+                          <button
+                            onClick={() => handleCreateAlbumClick(message)}
+                            style={{
+                              padding: "8px 16px",
+                              backgroundColor: "#a25772",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: "8px",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                              fontWeight: 500,
+                              transition: "background-color 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#902a55";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#a25772";
+                            }}
+                          >
+                            Create Album
+                          </button>
+                        </div>
+                      )}
                   </>
                 )}
               </div>
@@ -302,6 +383,35 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
           </div>
         </form>
       </div>
+
+      <Modal
+        title="Confirm Create Album"
+        open={confirmModalVisible}
+        onOk={handleConfirmCreateAlbum}
+        onCancel={handleCancelCreateAlbum}
+        confirmLoading={createAlbumLoading}
+        okText="Create"
+        cancelText="Cancel"
+      >
+        <p>Bạn có muốn tạo album dựa theo các ảnh trên?</p>
+        {selectedMessage?.album && (
+          <div style={{ marginTop: "12px" }}>
+            <p>
+              <strong>Album name:</strong> {selectedMessage.album.name}
+            </p>
+            {selectedMessage.album.description && (
+              <p>
+                <strong>Description:</strong>{" "}
+                {selectedMessage.album.description}
+              </p>
+            )}
+            <p>
+              <strong>Number of media:</strong>{" "}
+              {selectedMessage.album.media_ids.length}
+            </p>
+          </div>
+        )}
+      </Modal>
     </motion.div>
   );
 };

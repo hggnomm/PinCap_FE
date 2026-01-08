@@ -14,25 +14,17 @@ import {
   Tag,
   Flex,
   Image,
-  Row,
-  Col,
 } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   UndoOutlined,
-  PlusOutlined,
   SearchOutlined,
   ClearOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
 import type { AdminMedia, GetMediasParams, UpdateMediaData } from "@/api/media";
-import {
-  getMedias,
-  updateMedia,
-  deleteMedia,
-  restoreMedia,
-  createMedia,
-} from "@/api/media";
+import { getMedias, updateMedia, deleteMedia, restoreMedia } from "@/api/media";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -45,7 +37,7 @@ interface EditMediaFormData {
   privacy?: string | null;
 }
 
-const MediaManagementView: React.FC = () => {
+const MediaPolicyDetectView: React.FC = () => {
   const [medias, setMedias] = useState<AdminMedia[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -59,6 +51,7 @@ const MediaManagementView: React.FC = () => {
       import.meta.env.VITE_PINCAP_DOMAIN || "https://pin-cap-fe.vercel.app"
     );
   };
+
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -67,12 +60,10 @@ const MediaManagementView: React.FC = () => {
   const [searchParams, setSearchParams] = useState<GetMediasParams>({
     page: 1,
     per_page: 10,
+    is_policy_violation: 1, // Default filter for policy violations
   });
   const [searchInput, setSearchInput] = useState("");
-  const [descriptionSearchInput, setDescriptionSearchInput] = useState("");
-  const [userSearchInput, setUserSearchInput] = useState("");
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [editingMedia, setEditingMedia] = useState<AdminMedia | null>(null);
   const [form] = Form.useForm();
 
@@ -154,18 +145,10 @@ const MediaManagementView: React.FC = () => {
   useEffect(() => {
     const hasFilters = Boolean(
       searchParams.media_name ||
-        searchParams.description ||
-        searchParams.user_search ||
-        searchParams.type ||
         searchParams.media_type ||
-        searchParams.privacy ||
-        searchParams.is_created !== undefined ||
-        searchParams.is_comment !== undefined ||
-        searchParams.is_policy_violation !== undefined ||
-        searchParams.media_owner_id ||
+        searchParams.deleted_at ||
         searchParams.user_id ||
-        searchParams.album_id ||
-        searchParams.deleted_at
+        searchParams.album_id
     );
 
     fetchMedias(pagination.total === 0 || hasFilters);
@@ -199,65 +182,10 @@ const MediaManagementView: React.FC = () => {
     setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
-  const handleSearchDescription = (value: string) => {
-    setSearchParams((prev) => ({
-      ...prev,
-      description: value || undefined,
-      page: 1,
-    }));
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  };
-
-  const handleSearchUser = (value: string) => {
-    setSearchParams((prev) => ({
-      ...prev,
-      user_search: value || undefined,
-      page: 1,
-    }));
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  };
-
   const handleFilterType = (value: string) => {
     setSearchParams((prev) => ({
       ...prev,
-      type: value ? (value === "IMAGE" ? "0" : "1") : undefined, // Convert to "0" or "1"
-      media_type: undefined, // Clear old media_type
-      page: 1,
-    }));
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  };
-
-  const handleFilterPrivacy = (value: string) => {
-    setSearchParams((prev) => ({
-      ...prev,
-      privacy: value ? (value === "PRIVATE" ? "0" : "1") : undefined, // "0": PRIVATE, "1": PUBLIC
-      page: 1,
-    }));
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  };
-
-  const handleFilterIsCreated = (value: 0 | 1 | undefined) => {
-    setSearchParams((prev) => ({
-      ...prev,
-      is_created: value,
-      page: 1,
-    }));
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  };
-
-  const handleFilterIsComment = (value: 0 | 1 | undefined) => {
-    setSearchParams((prev) => ({
-      ...prev,
-      is_comment: value,
-      page: 1,
-    }));
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  };
-
-  const handleFilterPolicyViolation = (value: 0 | 1 | undefined) => {
-    setSearchParams((prev) => ({
-      ...prev,
-      is_policy_violation: value,
+      media_type: value ? value.toUpperCase() : undefined,
       page: 1,
     }));
     setPagination((prev) => ({ ...prev, current: 1 }));
@@ -276,11 +204,10 @@ const MediaManagementView: React.FC = () => {
     const defaultParams: GetMediasParams = {
       page: 1,
       per_page: 10,
+      is_policy_violation: 1, // Keep policy violation filter (1 = true)
     };
     setSearchParams(defaultParams);
     setSearchInput("");
-    setDescriptionSearchInput("");
-    setUserSearchInput("");
     setPagination({
       current: 1,
       pageSize: 10,
@@ -289,74 +216,54 @@ const MediaManagementView: React.FC = () => {
   };
 
   const handleEdit = (media: AdminMedia) => {
+    console.log("Editing media:", media);
     setEditingMedia(media);
     const mediaUrl = Array.isArray(media.media_url)
       ? media.media_url[0]
       : media.media_url;
     const mediaType = media.type || media.media_type || "";
-    form.setFieldsValue({
+    const formValues = {
       media_name: media.media_name || "",
       media_url: typeof mediaUrl === "string" ? mediaUrl : "",
       media_type: mediaType,
       description: media.description || "",
       privacy: media.privacy || "",
-    });
+    };
+    console.log("Setting form values:", formValues);
+    form.setFieldsValue(formValues);
     setIsEditModalVisible(true);
   };
 
-  const handleCreate = () => {
-    form.resetFields();
-    setEditingMedia(null);
-    setIsCreateModalVisible(true);
-  };
-
   const handleEditSubmit = async (values: EditMediaFormData) => {
-    if (!editingMedia) return;
+    if (!editingMedia) {
+      message.error("No media selected for editing");
+      return;
+    }
 
     try {
       const updateData: UpdateMediaData = {
         media_name: values.media_name,
         media_url: values.media_url,
-        media_type: editingMedia.type || editingMedia.media_type || null, // Keep original type, don't allow edit
+        media_type: editingMedia.type || editingMedia.media_type || null,
         description: values.description || null,
         privacy: values.privacy || null,
       };
 
+      console.log("Updating media:", editingMedia.id, updateData);
       await updateMedia(editingMedia.id, updateData);
       message.success("Media updated successfully");
       setIsEditModalVisible(false);
       form.resetFields();
       fetchMedias();
     } catch (error: unknown) {
+      console.error("Error updating media:", error);
       const errorMessage =
         error && typeof error === "object" && "message" in error
           ? String(error.message)
+          : error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } })?.response
+              ?.data?.message || "Failed to update media"
           : "Failed to update media";
-      message.error(errorMessage);
-    }
-  };
-
-  const handleCreateSubmit = async (
-    values: EditMediaFormData & { user_id: string }
-  ) => {
-    try {
-      await createMedia({
-        media_name: values.media_name,
-        media_url: values.media_url,
-        media_type: values.media_type || null,
-        user_id: values.user_id,
-        description: values.description || null,
-        privacy: values.privacy || null,
-      });
-      message.success("Media created successfully");
-      setIsCreateModalVisible(false);
-      form.resetFields();
-      fetchMedias();
-    } catch (error: unknown) {
-      const errorMessage =
-        error && typeof error === "object" && "message" in error
-          ? String(error.message)
-          : "Failed to create media";
       message.error(errorMessage);
     }
   };
@@ -475,6 +382,15 @@ const MediaManagementView: React.FC = () => {
       },
     },
     {
+      title: "Policy Violation",
+      key: "policy_violation",
+      render: () => (
+        <Tag color="red" icon={<WarningOutlined />}>
+          Violation Detected
+        </Tag>
+      ),
+    },
+    {
       title: "Status",
       dataIndex: "deleted_at",
       key: "status",
@@ -500,7 +416,6 @@ const MediaManagementView: React.FC = () => {
             type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
-            disabled={!!record.deleted_at}
             title="Edit"
             size="small"
           />
@@ -546,20 +461,20 @@ const MediaManagementView: React.FC = () => {
       style={{ width: "100%", padding: 24 }}
     >
       <Flex justify="space-between" align="center">
-        <Title level={2}>Media Management</Title>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-          Create Media
-        </Button>
+        <Title level={2}>
+          <WarningOutlined style={{ color: "#ff4d4f", marginRight: 8 }} />
+          Media Policy Detect
+        </Title>
       </Flex>
 
       <Card>
-        <Row gutter={[16, 16]}>
-          {/* Search Inputs Row */}
-          <Col xs={24} sm={12} md={8}>
+        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+          <Space>
             <Input
               placeholder="Search by name"
               prefix={<SearchOutlined />}
               allowClear
+              style={{ width: 300 }}
               value={searchInput}
               onPressEnter={(e) => {
                 handleSearch(e.currentTarget.value);
@@ -572,186 +487,41 @@ const MediaManagementView: React.FC = () => {
                 }
               }}
             />
-          </Col>
-          <Col xs={24} sm={12} md={8}>
-            <Input
-              placeholder="Search by description"
-              prefix={<SearchOutlined />}
-              allowClear
-              value={descriptionSearchInput}
-              onPressEnter={(e) => {
-                handleSearchDescription(e.currentTarget.value);
-              }}
-              onChange={(e) => {
-                const value = e.target.value;
-                setDescriptionSearchInput(value);
-                if (!value) {
-                  handleSearchDescription("");
-                }
-              }}
-            />
-          </Col>
-          <Col xs={24} sm={12} md={8}>
-            <Input
-              placeholder="Search by user (email/name)"
-              prefix={<SearchOutlined />}
-              allowClear
-              value={userSearchInput}
-              onPressEnter={(e) => {
-                handleSearchUser(e.currentTarget.value);
-              }}
-              onChange={(e) => {
-                const value = e.target.value;
-                setUserSearchInput(value);
-                if (!value) {
-                  handleSearchUser("");
-                }
-              }}
-            />
-          </Col>
-
-          {/* Filter Selects Row 1 */}
-          <Col xs={24} sm={12} md={6}>
             <Select
               placeholder="Filter by type"
               allowClear
-              style={{ width: "100%" }}
-              value={
-                searchParams.type === "0"
-                  ? "IMAGE"
-                  : searchParams.type === "1"
-                  ? "VIDEO"
-                  : undefined
-              }
+              style={{ width: 150 }}
+              value={searchParams.media_type?.toLowerCase()}
               onChange={handleFilterType}
             >
               <Option value="IMAGE">Image</Option>
               <Option value="VIDEO">Video</Option>
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Select
-              placeholder="Filter by privacy"
-              allowClear
-              style={{ width: "100%" }}
-              value={
-                searchParams.privacy === "0"
-                  ? "PRIVATE"
-                  : searchParams.privacy === "1"
-                  ? "PUBLIC"
-                  : undefined
-              }
-              onChange={handleFilterPrivacy}
-            >
-              <Option value="PRIVATE">Private</Option>
-              <Option value="PUBLIC">Public</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Select
-              placeholder="Filter by is_created"
-              allowClear
-              style={{ width: "100%" }}
-              value={
-                searchParams.is_created === 1
-                  ? "1"
-                  : searchParams.is_created === 0
-                  ? "0"
-                  : undefined
-              }
-              onChange={(value) =>
-                handleFilterIsCreated(
-                  value ? (value === "1" ? 1 : 0) : undefined
-                )
-              }
-            >
-              <Option value="1">Created</Option>
-              <Option value="0">Not Created</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Select
-              placeholder="Filter by is_comment"
-              allowClear
-              style={{ width: "100%" }}
-              value={
-                searchParams.is_comment === 1
-                  ? "1"
-                  : searchParams.is_comment === 0
-                  ? "0"
-                  : undefined
-              }
-              onChange={(value) =>
-                handleFilterIsComment(
-                  value ? (value === "1" ? 1 : 0) : undefined
-                )
-              }
-            >
-              <Option value="1">Comment Enabled</Option>
-              <Option value="0">Comment Disabled</Option>
-            </Select>
-          </Col>
-
-          {/* Filter Selects Row 2 */}
-          <Col xs={24} sm={12} md={8}>
-            <Select
-              placeholder="Filter by policy violation"
-              allowClear
-              style={{ width: "100%" }}
-              value={
-                searchParams.is_policy_violation === 1
-                  ? "1"
-                  : searchParams.is_policy_violation === 0
-                  ? "0"
-                  : undefined
-              }
-              onChange={(value) =>
-                handleFilterPolicyViolation(
-                  value ? (value === "1" ? 1 : 0) : undefined
-                )
-              }
-            >
-              <Option value="1">Has Violation</Option>
-              <Option value="0">No Violation</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={12} md={8}>
             <Select
               placeholder="Filter by status"
               allowClear
-              style={{ width: "100%" }}
+              style={{ width: 150 }}
               value={searchParams.deleted_at}
               onChange={handleFilterDeleted}
             >
               <Option value="null">Active</Option>
               <Option value="not_null">Deleted</Option>
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={8}>
             <Button
               icon={<ClearOutlined />}
               onClick={handleClearFilters}
               disabled={
                 !searchParams.media_name &&
-                !searchParams.description &&
-                !searchParams.user_search &&
-                !searchParams.type &&
                 !searchParams.media_type &&
-                !searchParams.privacy &&
-                searchParams.is_created === undefined &&
-                searchParams.is_comment === undefined &&
-                searchParams.is_policy_violation === undefined &&
-                !searchParams.media_owner_id &&
+                !searchParams.deleted_at &&
                 !searchParams.user_id &&
-                !searchParams.album_id &&
-                !searchParams.deleted_at
+                !searchParams.album_id
               }
-              style={{ width: "100%" }}
             >
               Clear Filters
             </Button>
-          </Col>
-        </Row>
+          </Space>
+        </Space>
 
         <Table
           columns={columns}
@@ -762,7 +532,7 @@ const MediaManagementView: React.FC = () => {
           pagination={{
             ...pagination,
             showSizeChanger: true,
-            showTotal: (total) => `Total ${total} medias`,
+            showTotal: (total) => `Total ${total} policy violations`,
           }}
           onChange={handleTableChange}
         />
@@ -811,60 +581,8 @@ const MediaManagementView: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-
-      {/* Create Modal */}
-      <Modal
-        title="Create Media"
-        open={isCreateModalVisible}
-        onCancel={() => {
-          setIsCreateModalVisible(false);
-          form.resetFields();
-        }}
-        onOk={() => form.submit()}
-        okText="Create"
-      >
-        <Form form={form} layout="vertical" onFinish={handleCreateSubmit}>
-          <Form.Item
-            name="media_name"
-            label="Media Name"
-            rules={[{ required: true, message: "Please enter media name" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="media_url"
-            label="Media URL"
-            rules={[{ required: true, message: "Please enter media URL" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="user_id"
-            label="User ID"
-            rules={[{ required: true, message: "Please enter user ID" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="media_type" label="Media Type">
-            <Select placeholder="Select media type">
-              <Option value="image">Image</Option>
-              <Option value="video">Video</Option>
-              <Option value="audio">Audio</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="description" label="Description">
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Form.Item name="privacy" label="Privacy">
-            <Select placeholder="Select privacy">
-              <Option value="PUBLIC">Public</Option>
-              <Option value="PRIVATE">Private</Option>
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
     </Space>
   );
 };
 
-export default MediaManagementView;
+export default MediaPolicyDetectView;
