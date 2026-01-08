@@ -68,10 +68,10 @@ export const sendMessageToBot = createAsyncThunk(
       suggested_media_ids?: string[];
       file_url?: string | null;
     },
-    { getState }
+    { getState: _getState }
   ) => {
-    const state = getState() as { chat: ChatState; auth: { id: string } };
-    const messages = state.chat.messages;
+    // const state = getState() as { chat: ChatState; auth: { id: string } }; // Not used - conversation_history is disabled
+    // const messages = state.chat.messages; // Not used - conversation_history is disabled
     // const userId = state.auth.id; // Not needed - backend will get from auth token
 
     // if (!userId) {
@@ -80,21 +80,21 @@ export const sendMessageToBot = createAsyncThunk(
 
     // Build conversation history from previous messages (excluding initial static welcome messages)
     // Convert format from {sender, text} to {role, content}
-    const conversationHistory = messages
-      .filter(
-        (msg) => msg.id && !msg.isGenerating && !msg.isInitial // Exclude initial static messages
-      )
-      .map((msg) => ({
-        role: msg.sender === "user" ? ("user" as const) : ("model" as const),
-        content: msg.text,
-      }));
+    // const conversationHistory = messages
+    //   .filter(
+    //     (msg) => msg.id && !msg.isGenerating && !msg.isInitial // Exclude initial static messages
+    //   )
+    //   .map((msg) => ({
+    //     role: msg.sender === "user" ? ("user" as const) : ("model" as const),
+    //     content: msg.text,
+    //   }));
 
     // Prepare request payload
     const requestPayload = {
       // user_id: userId, // Not needed - backend will get from auth token
       message: payload.message,
-      conversation_history:
-        conversationHistory.length > 0 ? conversationHistory : undefined,
+      // conversation_history:
+      //   conversationHistory.length > 0 ? conversationHistory : undefined,
       suggested_media_ids: payload.suggested_media_ids || undefined,
       file_url: payload.file_url || undefined,
     };
