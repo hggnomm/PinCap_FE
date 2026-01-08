@@ -119,9 +119,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
         }}
       >
         {mediaItems.map((item) => {
-          // Create link to media detail page if no URL provided
-          const mediaLink = item.url || `/media/${item.id}`;
-          const hasImageUrl = !!item.url;
+          // Use media_url from response, fallback to url for backward compatibility
+          const imageUrl = item.media_url || item.url;
+          const mediaLink = `/media/${item.id}`;
 
           return (
             <a
@@ -157,10 +157,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                   backgroundColor: "#f0f0f0",
                 }}
               >
-                {hasImageUrl ? (
+                {imageUrl ? (
                   <img
-                    src={item.url}
-                    alt={item.title || "Media"}
+                    src={imageUrl}
+                    alt="Media"
                     style={{
                       position: "absolute",
                       top: 0,
@@ -195,37 +195,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                       padding: "8px",
                     }}
                   >
-                    {item.title || "Media"}
+                    Media
                   </div>
                 )}
               </div>
-              {item.title && hasImageUrl && (
-                <div
-                  style={{
-                    padding: "8px",
-                    fontSize: "12px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.title}
-                </div>
-              )}
-              {item.description && (
-                <div
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "11px",
-                    color: "#666",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.description}
-                </div>
-              )}
             </a>
           );
         })}

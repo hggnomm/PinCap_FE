@@ -11,7 +11,8 @@ export type ChatIntent =
 
 export interface MediaItem {
   id: string;
-  title: string;
+  media_url: string;
+  title?: string; // Optional for backward compatibility
   description?: string;
   tags?: string[];
   popularity_score?: number;
