@@ -13,20 +13,20 @@ import FieldItem from "@/components/Form/fieldItem/FieldItem";
 import ModalComponent from "@/components/Modal/ModalComponent";
 import { ReportReason } from "@/types/type";
 
-interface ReportUserModalProps {
+interface ReportMediaModalProps {
   visible: boolean;
   onCancel: () => void;
   onConfirm: (reasonId?: string, otherReasons?: string) => void;
   reportReasons: ReportReason[];
-  userName: string;
+  mediaName?: string;
 }
 
-const ReportUserModal: React.FC<ReportUserModalProps> = ({
+const ReportMediaModal: React.FC<ReportMediaModalProps> = ({
   visible,
   onCancel,
   onConfirm,
   reportReasons,
-  userName,
+  mediaName,
 }) => {
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [otherReasons, setOtherReasons] = useState<string>("");
@@ -105,7 +105,7 @@ const ReportUserModal: React.FC<ReportUserModalProps> = ({
 
   return (
     <ModalComponent
-      titleDefault="Report User"
+      titleDefault="Report Media"
       visible={visible}
       onCancel={handleCancel}
       onConfirm={isSubmitDisabled ? undefined : handleSubmit}
@@ -149,4 +149,5 @@ const ReportUserModal: React.FC<ReportUserModalProps> = ({
   );
 };
 
-export default ReportUserModal;
+export default ReportMediaModal;
+

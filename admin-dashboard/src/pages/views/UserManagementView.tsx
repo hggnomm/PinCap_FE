@@ -55,6 +55,7 @@ const UserManagementView: React.FC = () => {
     page: 1,
     per_page: 10,
   });
+  const [searchInput, setSearchInput] = useState("");
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
@@ -147,6 +148,7 @@ const UserManagementView: React.FC = () => {
     // Calculate total on first load or when filters change
     const hasFilters = Boolean(
       searchParams.email ||
+        searchParams.id ||
         searchParams.role ||
         searchParams.deleted_at ||
         searchParams.first_name ||
@@ -177,9 +179,17 @@ const UserManagementView: React.FC = () => {
   };
 
   const handleSearch = (value: string) => {
+    // Check if value looks like a UUID (ID) or email
+    const isUUID =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        value
+      );
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
     setSearchParams((prev) => ({
       ...prev,
-      email: value || undefined,
+      email: isEmail ? value : undefined,
+      id: isUUID ? value : undefined,
       page: 1,
     }));
     setPagination((prev) => ({ ...prev, current: 1 }));
@@ -209,6 +219,7 @@ const UserManagementView: React.FC = () => {
       per_page: 10,
     };
     setSearchParams(defaultParams);
+    setSearchInput("");
     setPagination({
       current: 1,
       pageSize: 10,
@@ -371,16 +382,17 @@ const UserManagementView: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
+      width: 90,
       render: (_: unknown, record: AdminUser) => (
-        <Space>
+        <Space size={0}>
           <Button
             type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             disabled={!!record.deleted_at}
-          >
-            Edit
-          </Button>
+            title="Edit"
+            size="small"
+          />
           {record.deleted_at ? (
             <Popconfirm
               title="Are you sure you want to restore this user?"
@@ -388,9 +400,12 @@ const UserManagementView: React.FC = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="link" icon={<UndoOutlined />}>
-                Restore
-              </Button>
+              <Button
+                type="link"
+                icon={<UndoOutlined />}
+                title="Restore"
+                size="small"
+              />
             </Popconfirm>
           ) : (
             <Popconfirm
@@ -399,9 +414,13 @@ const UserManagementView: React.FC = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="link" danger icon={<DeleteOutlined />}>
-                Delete
-              </Button>
+              <Button
+                type="link"
+                danger
+                icon={<DeleteOutlined />}
+                title="Delete"
+                size="small"
+              />
             </Popconfirm>
           )}
         </Space>
@@ -426,14 +445,18 @@ const UserManagementView: React.FC = () => {
         <Space direction="vertical" size="middle" style={{ width: "100%" }}>
           <Space>
             <Input
-              placeholder="Search by email"
+              placeholder="Search by email or ID"
               prefix={<SearchOutlined />}
               allowClear
               style={{ width: 300 }}
-              value={searchParams.email || ""}
-              onPressEnter={(e) => handleSearch(e.currentTarget.value)}
+              value={searchInput}
+              onPressEnter={(e) => {
+                handleSearch(e.currentTarget.value);
+              }}
               onChange={(e) => {
-                if (!e.target.value) {
+                const value = e.target.value;
+                setSearchInput(value);
+                if (!value) {
                   handleSearch("");
                 }
               }}
@@ -445,8 +468,8 @@ const UserManagementView: React.FC = () => {
               value={searchParams.role}
               onChange={handleFilterRole}
             >
-              <Option value="1">Admin</Option>
-              <Option value="0">User</Option>
+              <Option value="0">Admin</Option>
+              <Option value="1">User</Option>
             </Select>
             <Select
               placeholder="Filter by status"
@@ -463,6 +486,7 @@ const UserManagementView: React.FC = () => {
               onClick={handleClearFilters}
               disabled={
                 !searchParams.email &&
+                !searchParams.id &&
                 !searchParams.role &&
                 !searchParams.deleted_at &&
                 !searchParams.first_name &&

@@ -53,7 +53,9 @@ const MediaManagementView: React.FC = () => {
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return "http://localhost:3000";
     }
-    return "https://pin-cap-fe.vercel.app";
+    return (
+      import.meta.env.VITE_PINCAP_DOMAIN || "https://pin-cap-fe.vercel.app"
+    );
   };
   const [pagination, setPagination] = useState({
     current: 1,
@@ -64,6 +66,7 @@ const MediaManagementView: React.FC = () => {
     page: 1,
     per_page: 10,
   });
+  const [searchInput, setSearchInput] = useState("");
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [editingMedia, setEditingMedia] = useState<AdminMedia | null>(null);
@@ -208,6 +211,7 @@ const MediaManagementView: React.FC = () => {
       per_page: 10,
     };
     setSearchParams(defaultParams);
+    setSearchInput("");
     setPagination({
       current: 1,
       pageSize: 10,
@@ -420,16 +424,17 @@ const MediaManagementView: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
+      width: 90,
       render: (_: unknown, record: AdminMedia) => (
-        <Space>
+        <Space size={0}>
           <Button
             type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             disabled={!!record.deleted_at}
-          >
-            Edit
-          </Button>
+            title="Edit"
+            size="small"
+          />
           {record.deleted_at ? (
             <Popconfirm
               title="Are you sure you want to restore this media?"
@@ -437,9 +442,12 @@ const MediaManagementView: React.FC = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="link" icon={<UndoOutlined />}>
-                Restore
-              </Button>
+              <Button
+                type="link"
+                icon={<UndoOutlined />}
+                title="Restore"
+                size="small"
+              />
             </Popconfirm>
           ) : (
             <Popconfirm
@@ -448,9 +456,13 @@ const MediaManagementView: React.FC = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="link" danger icon={<DeleteOutlined />}>
-                Delete
-              </Button>
+              <Button
+                type="link"
+                danger
+                icon={<DeleteOutlined />}
+                title="Delete"
+                size="small"
+              />
             </Popconfirm>
           )}
         </Space>
@@ -479,10 +491,14 @@ const MediaManagementView: React.FC = () => {
               prefix={<SearchOutlined />}
               allowClear
               style={{ width: 300 }}
-              value={searchParams.media_name || ""}
-              onPressEnter={(e) => handleSearch(e.currentTarget.value)}
+              value={searchInput}
+              onPressEnter={(e) => {
+                handleSearch(e.currentTarget.value);
+              }}
               onChange={(e) => {
-                if (!e.target.value) {
+                const value = e.target.value;
+                setSearchInput(value);
+                if (!value) {
                   handleSearch("");
                 }
               }}

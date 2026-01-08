@@ -81,6 +81,15 @@ export const useMedia = () => {
     },
   });
 
+  const reportMediaMutation = useMutation({
+    mutationFn: (data: {
+      media_id: string;
+      reason_report_id?: string;
+      other_reasons?: string;
+    }) => media.reportMedia(data),
+    retry: false,
+  });
+
   return {
     getMediaList,
     getMediaById,
@@ -97,5 +106,8 @@ export const useMedia = () => {
     mediaReaction: mediaReactionMutation.mutateAsync,
     mediaReactionLoading: mediaReactionMutation.isPending,
     mediaReactionError: mediaReactionMutation.error,
+    reportMedia: reportMediaMutation.mutateAsync,
+    reportMediaLoading: reportMediaMutation.isPending,
+    reportMediaError: reportMediaMutation.error,
   };
 };

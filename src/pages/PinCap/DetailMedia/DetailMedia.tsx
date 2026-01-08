@@ -31,6 +31,7 @@ import MediaViewer from "@/components/MediaViewer/MediaViewer";
 import MediaList from "@/components/ViewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 import { useMedia } from "@/react-query/useMedia";
+import { useUser } from "@/react-query/useUser";
 import { TokenPayload } from "@/types/Auth";
 import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
 import { Media } from "@/types/type";
@@ -52,6 +53,9 @@ const EditMediaModal = lazy(
 );
 const DeleteMediaModal = lazy(
   () => import("@/components/Modal/media/DeleteMediaModal")
+);
+const ReportMediaModal = lazy(
+  () => import("@/components/Modal/media/ReportMediaModal")
 );
 
 const DetailMedia = () => {
@@ -75,8 +79,9 @@ const DetailMedia = () => {
   }, [tokenPayload?.role]);
 
   console.log("userIsAdmin", userIsAdmin);
-  const { mediaReaction, mediaReactionLoading } = useMedia();
+  const { mediaReaction, mediaReactionLoading, reportMedia } = useMedia();
   const { deleteMedia } = useMedia();
+  const { getReportReasons } = useUser();
   const {
     data: mediaData,
     isLoading: loading,
@@ -93,11 +98,25 @@ const DetailMedia = () => {
 
     return result;
   }, [media?.ownerUser?.id, tokenPayload.id, userIsAdmin]);
+
+  // Check if media belongs to current user
+  const isMyMedia = useMemo(() => {
+    return media?.ownerUser?.id === tokenPayload.id;
+  }, [media?.ownerUser?.id, tokenPayload.id]);
   const [shouldOpenComments, setShouldOpenComments] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [hasAcceptedSensitiveView, setHasAcceptedSensitiveView] =
     useState(false);
+
+  const reportReasonsQuery = getReportReasons();
+  // Handle API response structure: could be array directly or { data: [...] }
+  const reportReasons = Array.isArray(reportReasonsQuery.data)
+    ? reportReasonsQuery.data
+    : Array.isArray(reportReasonsQuery.data?.data)
+    ? reportReasonsQuery.data.data
+    : [];
   const trackedMediaListRef = useRef<string[]>([]);
   const lastTrackedMediaIdRef = useRef<string | null>(null);
 
@@ -278,6 +297,34 @@ const DetailMedia = () => {
     }
   };
 
+  const handleReportMedia = async (
+    reasonId?: string,
+    otherReasons?: string
+  ) => {
+    if (!id) return;
+
+    try {
+      await reportMedia({
+        media_id: id,
+        reason_report_id: reasonId,
+        other_reasons: otherReasons,
+      });
+      toast.success("Media reported successfully!");
+      setIsReportModalVisible(false);
+    } catch (error) {
+      console.error("Error reporting media:", error);
+      toast.error("Failed to report media. Please try again.");
+    }
+  };
+
+  const handleOpenReportModal = () => {
+    setIsReportModalVisible(true);
+  };
+
+  const handleCloseReportModal = () => {
+    setIsReportModalVisible(false);
+  };
+
   const getAllMediasWithFallback = async (
     pageParam: number
   ): Promise<PaginatedMediaResponse<Media>> => {
@@ -439,14 +486,15 @@ const DetailMedia = () => {
                               },
                             ]
                           : []),
-                        {
-                          key: "report-media",
-                          title: "Report Media",
-                          onClick: () => {
-                            // TODO: Implement report media logic
-                            console.log("Report Media clicked");
-                          },
-                        },
+                        ...(!isMyMedia
+                          ? [
+                              {
+                                key: "report-media",
+                                title: "Report Media",
+                                onClick: handleOpenReportModal,
+                              },
+                            ]
+                          : []),
                       ]}
                     />
                   </div>
@@ -612,6 +660,14 @@ const DetailMedia = () => {
           media={media}
           onCancel={handleDeleteModalCancel}
           onConfirm={handleDeleteConfirm}
+        />
+
+        <ReportMediaModal
+          visible={isReportModalVisible}
+          onCancel={handleCloseReportModal}
+          onConfirm={handleReportMedia}
+          reportReasons={reportReasons}
+          mediaName={media?.media_name}
         />
       </Suspense>
     </div>

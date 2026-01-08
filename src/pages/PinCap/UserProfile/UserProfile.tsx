@@ -32,8 +32,11 @@ const UserProfile = () => {
   const [reportModalVisible, setReportModalVisible] = useState(false);
 
   const reportReasonsQuery = getReportReasons();
+  // Handle API response structure: could be array directly or { data: [...] }
   const reportReasons = Array.isArray(reportReasonsQuery.data)
     ? reportReasonsQuery.data
+    : Array.isArray(reportReasonsQuery.data?.data)
+    ? reportReasonsQuery.data.data
     : [];
 
   if (id && currentUser && id === currentUser.id) {

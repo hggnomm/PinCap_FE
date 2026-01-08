@@ -34,7 +34,9 @@ const AlbumManagementView: React.FC = () => {
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return "http://localhost:3000";
     }
-    return "https://pin-cap-fe.vercel.app";
+    return (
+      import.meta.env.VITE_PINCAP_DOMAIN || "https://pin-cap-fe.vercel.app"
+    );
   };
 
   const [pagination, setPagination] = useState({
@@ -46,6 +48,7 @@ const AlbumManagementView: React.FC = () => {
     page: 1,
     per_page: 10,
   });
+  const [searchInput, setSearchInput] = useState("");
 
   const fetchAlbums = async (calculateTotal = false) => {
     setLoading(true);
@@ -187,6 +190,7 @@ const AlbumManagementView: React.FC = () => {
       per_page: 10,
     };
     setSearchParams(defaultParams);
+    setSearchInput("");
     setPagination({
       current: 1,
       pageSize: 10,
@@ -302,8 +306,9 @@ const AlbumManagementView: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
+      width: 90,
       render: (_: unknown, record: AdminAlbum) => (
-        <Space>
+        <Space size={0}>
           {record.deleted_at ? (
             <Popconfirm
               title="Are you sure you want to restore this album?"
@@ -311,9 +316,12 @@ const AlbumManagementView: React.FC = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="link" icon={<UndoOutlined />}>
-                Restore
-              </Button>
+              <Button
+                type="link"
+                icon={<UndoOutlined />}
+                title="Restore"
+                size="small"
+              />
             </Popconfirm>
           ) : (
             <Popconfirm
@@ -322,9 +330,13 @@ const AlbumManagementView: React.FC = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="link" danger icon={<DeleteOutlined />}>
-                Delete
-              </Button>
+              <Button
+                type="link"
+                danger
+                icon={<DeleteOutlined />}
+                title="Delete"
+                size="small"
+              />
             </Popconfirm>
           )}
         </Space>
@@ -350,10 +362,14 @@ const AlbumManagementView: React.FC = () => {
               prefix={<SearchOutlined />}
               allowClear
               style={{ width: 300 }}
-              value={searchParams.album_name || ""}
-              onPressEnter={(e) => handleSearch(e.currentTarget.value)}
+              value={searchInput}
+              onPressEnter={(e) => {
+                handleSearch(e.currentTarget.value);
+              }}
               onChange={(e) => {
-                if (!e.target.value) {
+                const value = e.target.value;
+                setSearchInput(value);
+                if (!value) {
                   handleSearch("");
                 }
               }}

@@ -406,16 +406,16 @@ const ReportUsersView: React.FC = () => {
       title: "Actions",
       key: "actions",
       fixed: "right" as const,
-      width: 200,
+      width: 90,
       render: (_: unknown, record: AdminUserReport) => (
-        <Space>
+        <Space size={0}>
           <Button
             type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
-          >
-            Edit
-          </Button>
+            title="Edit"
+            size="small"
+          />
           {record.deleted_at ? (
             <>
               <Popconfirm
@@ -424,9 +424,12 @@ const ReportUsersView: React.FC = () => {
                 okText="Yes"
                 cancelText="No"
               >
-                <Button type="link" icon={<UndoOutlined />}>
-                  Restore
-                </Button>
+                <Button
+                  type="link"
+                  icon={<UndoOutlined />}
+                  title="Restore"
+                  size="small"
+                />
               </Popconfirm>
               <Popconfirm
                 title="Are you sure you want to permanently delete this report?"
@@ -434,9 +437,13 @@ const ReportUsersView: React.FC = () => {
                 okText="Yes"
                 cancelText="No"
               >
-                <Button type="link" danger icon={<DeleteOutlined />}>
-                  Force Delete
-                </Button>
+                <Button
+                  type="link"
+                  danger
+                  icon={<DeleteOutlined />}
+                  title="Force Delete"
+                  size="small"
+                />
               </Popconfirm>
             </>
           ) : (
@@ -446,9 +453,13 @@ const ReportUsersView: React.FC = () => {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="link" danger icon={<DeleteOutlined />}>
-                Delete
-              </Button>
+              <Button
+                type="link"
+                danger
+                icon={<DeleteOutlined />}
+                title="Delete"
+                size="small"
+              />
             </Popconfirm>
           )}
         </Space>
