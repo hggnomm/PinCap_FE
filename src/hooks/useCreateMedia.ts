@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 import { notification } from "antd";
 
-import { getDetailMedia } from "@/api/media";
+import { getDetailMedia, generateMetadata } from "@/api/media";
 import { checkImageSafety, checkMultipleImagesSafety } from "@/api/vision";
 import { PRIVACY } from "@/constants/constants";
 import { ENV } from "@/constants/env";
@@ -43,6 +43,8 @@ export const useCreateMedia = (
   const [imageUrl, setImageUrl] = useState("");
   const [draftId, setDraftId] = useState<string>("");
   const [fetchedDraftId, setFetchedDraftId] = useState<string>("");
+  const [isGeneratingMetadata, setIsGeneratingMetadata] =
+    useState<boolean>(false);
 
   const {
     data: draftsResponse,
@@ -61,6 +63,11 @@ export const useCreateMedia = (
       setIsSelectedDraft(true);
       setFileList([]);
       setTags(media.tags?.map(getTagName) || []);
+
+      // Set draftId when selecting a draft
+      if (media.id) {
+        setDraftId(media.id);
+      }
 
       if (shouldUpdateForm && updateFormFields) {
         updateFormFields({
@@ -245,6 +252,56 @@ export const useCreateMedia = (
     await handleCreateOrUpdateMedia(formValue, true);
   };
 
+  const handleGenerateMetadata = async (
+    field?: "title" | "description" | "all",
+    mediaId?: string
+  ) => {
+    const idToUse = mediaId || draftId;
+
+    if (!idToUse) {
+      toast.error("No draft selected");
+      return;
+    }
+
+    setIsGeneratingMetadata(true);
+    try {
+      const response = await generateMetadata(idToUse);
+
+      if (response && response.message === "success") {
+        const updates: Partial<CreateMediaFormData> = {};
+
+        if (field === "title" || field === "all") {
+          updates.media_name = response.title || "";
+        }
+
+        if (field === "description" || field === "all") {
+          updates.description = response.description || "";
+        }
+
+        if (field === "all" && response.tags) {
+          setTags(response.tags);
+          updates.tags_name = response.tags;
+        }
+
+        if (updateFormFields) {
+          updateFormFields(updates);
+        }
+      } else {
+        toast.error("Failed to generate metadata");
+      }
+    } catch (error) {
+      toast.error(
+        `Error generating metadata: ${
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred."
+        }`
+      );
+    } finally {
+      setIsGeneratingMetadata(false);
+    }
+  };
+
   // Reset form
   const resetForm = () => {
     setFileList([]);
@@ -329,6 +386,7 @@ export const useCreateMedia = (
     imageUrl,
     setImageUrl,
     draftId,
+    isGeneratingMetadata,
 
     // Drafts
     drafts,
@@ -339,6 +397,7 @@ export const useCreateMedia = (
     handleSelectMedia,
     handleFormChange,
     handleGenerateClick,
+    handleGenerateMetadata,
     resetForm,
   };
 };

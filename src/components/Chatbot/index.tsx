@@ -4,16 +4,15 @@ import Markdown from "react-markdown";
 import { useDispatch, useSelector } from "react-redux";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 
-import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
 import { motion } from "framer-motion";
 import { Send } from "lucide-react";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import { CloseCircleOutlined } from "@ant-design/icons";
 
-import { ENV } from "@/constants/env";
-import { addMessage, setTyping } from "@/store/chatSlice";
-import { RootState } from "@/store/store";
+import { sendMessageToBot } from "@/store/chatSlice";
+import { AppDispatch, RootState } from "@/store/store";
+import type { MediaItem } from "@/types/api/chat";
 import "./index.less";
 
 interface ChatbotProps {
@@ -21,18 +20,12 @@ interface ChatbotProps {
   isOpen: boolean;
 }
 
-// Initialize connection with Google Generative AI
-const genAI = new GoogleGenerativeAI(ENV.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
-  const dispatch = useDispatch();
+const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const messages = useSelector((state: RootState) => state.chat.messages);
   const isTyping = useSelector((state: RootState) => state.chat.isTyping);
   const [input, setInput] = useState<string>("");
-  const [currentResponse, setCurrentResponse] = useState<string>(""); // Local state for intermediate stream
   const messageEndRef = useRef<HTMLDivElement | null>(null);
-  const chatSessionRef = useRef<ChatSession | null>(null);
 
   const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,74 +33,159 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
 
   useEffect(() => {
     scrollToBottom();
-
-    if (!chatSessionRef.current) {
-      chatSessionRef.current = model.startChat({
-        generationConfig: {
-          temperature: 0.9,
-          topK: 1,
-          topP: 1,
-          maxOutputTokens: 2048,
-        },
-        history: [],
-      });
-    }
-  }, [messages, currentResponse]); // Trigger scroll when messages or currentResponse updates
+  }, [messages, isTyping]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
 
-    // Dispatch the user's message immediately to Redux
-    dispatch(addMessage({ sender: "user", text: input }));
+    const messageText = input.trim();
     setInput("");
-    dispatch(setTyping(true));
 
-    try {
-      let fullResponse = "";
-      const result = await chatSessionRef.current!.sendMessageStream(input);
+    // Dispatch the async thunk - it will handle adding user message and calling API
+    dispatch(
+      sendMessageToBot({
+        message: messageText,
+        // file_url: null, // Not needed for now
+      })
+    );
+  };
 
-      setCurrentResponse(""); // Reset current streaming response
+  const renderMediaItems = (mediaItems: MediaItem[]) => {
+    if (!mediaItems || mediaItems.length === 0) return null;
 
-      // Process the stream and update local state, only saving final response to Redux
-      for await (const chunk of result.stream) {
-        const chunkText = chunk.text();
-        fullResponse += chunkText;
-        setCurrentResponse(fullResponse); // Update local state to display stream
-      }
+    return (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+          gap: "12px",
+          marginTop: "12px",
+        }}
+      >
+        {mediaItems.map((item) => {
+          // Create link to media detail page if no URL provided
+          const mediaLink = item.url || `/media/${item.id}`;
+          const hasImageUrl = !!item.url;
 
-      // When streaming is done, dispatch the final message to Redux
-      dispatch(
-        addMessage({
-          sender: "ai",
-          text: fullResponse,
-          isGenerating: false,
-        })
-      );
-      setCurrentResponse(""); // Clear the local state
-      dispatch(setTyping(false));
-    } catch (error) {
-      console.error(error);
-      dispatch(setTyping(false));
-      dispatch(
-        addMessage({
-          sender: "ai",
-          text: "Sorry, there was an error",
-          isGenerating: false,
-        })
-      );
-    }
+          return (
+            <a
+              key={item.id}
+              href={mediaLink}
+              target={hasImageUrl ? "_blank" : undefined}
+              rel={hasImageUrl ? "noopener noreferrer" : undefined}
+              onClick={(e) => {
+                if (!hasImageUrl) {
+                  e.preventDefault();
+                  window.location.href = mediaLink;
+                }
+              }}
+              style={{
+                display: "block",
+                borderRadius: "8px",
+                overflow: "hidden",
+                textDecoration: "none",
+                color: "inherit",
+                transition: "transform 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  paddingTop: "100%", // Square aspect ratio
+                  backgroundColor: "#f0f0f0",
+                }}
+              >
+                {hasImageUrl ? (
+                  <img
+                    src={item.url}
+                    alt={item.title || "Media"}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">No Image</div>`;
+                      }
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#999",
+                      fontSize: "14px",
+                      textAlign: "center",
+                      padding: "8px",
+                    }}
+                  >
+                    {item.title || "Media"}
+                  </div>
+                )}
+              </div>
+              {item.title && hasImageUrl && (
+                <div
+                  style={{
+                    padding: "8px",
+                    fontSize: "12px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.title}
+                </div>
+              )}
+              {item.description && (
+                <div
+                  style={{
+                    padding: "4px 8px",
+                    fontSize: "11px",
+                    color: "#666",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.description}
+                </div>
+              )}
+            </a>
+          );
+        })}
+      </div>
+    );
   };
 
   const MarkdownComponent = {
     code({
-      node,
       inline,
       className,
       children,
       ...props
     }: {
-      node?: any;
       inline?: boolean;
       className?: string;
       children: React.ReactNode;
@@ -123,35 +201,16 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
         </code>
       );
     },
-    h1: ({
-      node,
-      ...props
-    }: {
-      node?: React.ReactNode;
-      children: React.ReactNode;
-    }) => <h1 style={{ fontSize: "2em", fontWeight: "bold" }} {...props} />,
-    h2: ({
-      node,
-      ...props
-    }: {
-      node?: React.ReactNode;
-      children: React.ReactNode;
-    }) => <h2 style={{ fontSize: "1.5em", fontWeight: "bold" }} {...props} />,
-    h3: ({
-      node,
-      ...props
-    }: {
-      node?: React.ReactNode;
-      children: React.ReactNode;
-    }) => <h3 style={{ fontSize: "1.17em", fontWeight: "bold" }} {...props} />,
-    li: ({
-      node,
-      children,
-      ...props
-    }: {
-      node?: React.ReactNode;
-      children: React.ReactNode;
-    }) => (
+    h1: ({ ...props }: { children: React.ReactNode }) => (
+      <h1 style={{ fontSize: "2em", fontWeight: "bold" }} {...props} />
+    ),
+    h2: ({ ...props }: { children: React.ReactNode }) => (
+      <h2 style={{ fontSize: "1.5em", fontWeight: "bold" }} {...props} />
+    ),
+    h3: ({ ...props }: { children: React.ReactNode }) => (
+      <h3 style={{ fontSize: "1.17em", fontWeight: "bold" }} {...props} />
+    ),
+    li: ({ children, ...props }: { children: React.ReactNode }) => (
       <li style={{ listStyleType: "none", marginBottom: "0.5em" }} {...props}>
         {children}
       </li>
@@ -174,9 +233,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
       </div>
       <div className="chatbot-body">
         <div className="messages-container">
-          {messages.map((message, index) => (
+          {messages.map((message) => (
             <div
-              key={index}
+              key={message.id}
               className={`message ${
                 message.sender === "user" ? "user-message" : "ai-message"
               }`}
@@ -189,29 +248,33 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
                 {message.sender === "user" ? (
                   message.text
                 ) : (
-                  <Markdown
-                    className={`markdown ${
-                      message.isGenerating ? "typing-animation" : ""
-                    }`}
-                    components={MarkdownComponent}
-                  >
-                    {message.text || "Thinking..."}
-                  </Markdown>
+                  <>
+                    <Markdown
+                      className={`markdown ${
+                        message.isGenerating ? "typing-animation" : ""
+                      }`}
+                      components={MarkdownComponent as any}
+                    >
+                      {message.text || "Đang suy nghĩ..."}
+                    </Markdown>
+                    {message.media && message.media.length > 0 && (
+                      <>{renderMediaItems(message.media)}</>
+                    )}
+                  </>
                 )}
               </div>
             </div>
           ))}
 
-          {/* Render the streaming response if AI is typing */}
-          {isTyping && currentResponse && (
+          {/* Show typing indicator */}
+          {isTyping && (
             <div className="message ai-message">
               <div className="message-box ai-box">
-                <Markdown
-                  className="markdown typing-animation"
-                  components={MarkdownComponent}
-                >
-                  {currentResponse}
-                </Markdown>
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
             </div>
           )}
@@ -225,10 +288,15 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot, isOpen }) => {
               type="text"
               className="input-field"
               value={input}
-              placeholder="Type a message..."
+              placeholder="Nhập tin nhắn..."
               onChange={(e) => setInput(e.target.value)}
+              disabled={isTyping}
             />
-            <button className="send-btn">
+            <button
+              className="send-btn"
+              type="submit"
+              disabled={isTyping || !input.trim()}
+            >
               <Send size={20} />
             </button>
           </div>

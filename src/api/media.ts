@@ -229,3 +229,16 @@ export const searchMediaByImage = async (params: {
     throw error;
   }
 };
+
+// Generate metadata (title, description, tags) for media using AI
+export const generateMetadata = async (mediaId: string) => {
+  try {
+    const res = await apiClient.post("/api/medias/generate-metadata", {
+      media_id: mediaId,
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

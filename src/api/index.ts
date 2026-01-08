@@ -34,5 +34,8 @@ export * from './privacy';
 // Instagram APIs
 export * from './instagram';
 
+// Chat APIs
+export * from './chat';
+
 // API Client
 export { default as apiClient } from './apiClient';

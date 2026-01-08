@@ -1,0 +1,26 @@
+.ai-generate-button {
+  background: linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(60deg, #00f, #00e8ff, #ff00ff) border-box;
+  color: #000 !important;
+  border-radius: 16px !important;
+  border: 2px solid transparent;
+  transition: background 0.3s ease;
+  position: relative;
+  z-index: 0;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(#fff, #fff) padding-box,
+      linear-gradient(60deg, #ff00ff, #00c0ff) border-box;
+    cursor: pointer;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+}
+

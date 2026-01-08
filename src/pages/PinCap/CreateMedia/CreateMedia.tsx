@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import "./index.less";
 import "./FilePond.less";
+import "./AIGenerateButton.less";
 import { FilePond, registerPlugin } from "react-filepond";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -20,6 +21,7 @@ import Title from "antd/es/typography/Title";
 
 import { Button, Col, Form, Input, Row, Select, Spin, Drawer, Tag } from "antd";
 
+import iconAI from "@/assets/img/PinCap/ai-technology-img.png";
 import ImageEditor from "@/components/ImageEditor";
 import MediaViewer from "@/components/MediaViewer/MediaViewer";
 import { PRIVACY } from "@/constants/constants";
@@ -67,12 +69,14 @@ const CreateMedia: React.FC = () => {
     imageUrl,
     setImageUrl,
     draftId,
+    isGeneratingMetadata,
     drafts,
     loadingDrafts,
     refetchDrafts,
     handleSelectMedia,
     handleFormChange,
     handleGenerateClick,
+    handleGenerateMetadata,
     resetForm,
   } = useCreateMedia(
     () => form.resetFields(),
@@ -383,6 +387,31 @@ const CreateMedia: React.FC = () => {
               "!w-full !px-8": fileList.length >= 2,
             })}
           >
+            {isSelectedDraft && (
+              <div className="field-item-create mb-4">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const formId = form.getFieldValue("id");
+                    await handleGenerateMetadata("all", formId);
+                    // Clear tags input field after generating
+                    form.setFieldValue("tags_name", "");
+                  }}
+                  disabled={isGeneratingMetadata}
+                  className={clsx(
+                    "ai-generate-button",
+                    "w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium shadow-md"
+                  )}
+                >
+                  <img src={iconAI} alt="AI" className="w-5 h-5" />
+                  <span>
+                    {isGeneratingMetadata
+                      ? "Generating with AI..."
+                      : "Generate Title, Description & Tags with AI"}
+                  </span>
+                </button>
+              </div>
+            )}
             <div className="field-item-create">
               <span className="text-label">Title</span>
               <Form.Item name="media_name">
