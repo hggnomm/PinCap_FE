@@ -479,6 +479,7 @@ const UserManagementView: React.FC = () => {
           dataSource={users}
           loading={loading}
           rowKey="id"
+          scroll={{ x: "max-content" }}
           pagination={{
             ...pagination,
             showSizeChanger: true,

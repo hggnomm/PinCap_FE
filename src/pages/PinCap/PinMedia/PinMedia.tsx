@@ -309,14 +309,14 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
 
         <motion.div
           className={clsx(
-            "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-[1] rounded-[15px]",
+            "overlay absolute top-0 left-0 right-0 bg-black/40 opacity-0 transition-opacity duration-300 z-20 rounded-[15px]",
             hasSensitiveContent ? "bottom-2" : "bottom-2.25"
           )}
           whileHover={{ opacity: 1 }}
         >
           {isEditMedia && (
             <div
-              className="absolute bottom-2.5 right-2.5 w-10 h-10 bg-white rounded-full flex justify-center items-center shadow-md transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+              className="absolute bottom-2.5 right-2.5 w-10 h-10 bg-white rounded-full flex justify-center items-center shadow-md transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer z-30"
               onClick={(e) => {
                 setEditModalVisible(true);
                 e.stopPropagation();

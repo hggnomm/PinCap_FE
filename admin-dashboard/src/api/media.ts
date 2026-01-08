@@ -4,22 +4,49 @@ import type { MessageResponse } from "./types";
 // ==================== Types ====================
 export interface AdminMedia {
   id: string;
-  media_name: string;
-  media_url: string;
-  media_type?: string | null;
-  user_id: string;
+  media_name: string | null;
+  media_url: string | string[];
+  type: "IMAGE" | "VIDEO" | null;
+  media_type?: string | null; // For backward compatibility
+  user_id?: string; // For backward compatibility
+  media_owner_id: string;
   album_id?: string | null;
   description?: string | null;
-  privacy?: string | null;
+  privacy?: "PUBLIC" | "PRIVATE" | null;
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;
+  user_owner?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    avatar?: string | null;
+  };
+  safe_search_data?: Array<{
+    racy?: string;
+    adult?: string;
+    spoof?: string;
+    medical?: string;
+    violence?: string;
+  }> | null;
+  reactions_count?: number;
+  comments_count?: number;
+  albums_count?: number;
 }
 
 export interface GetMediasParams {
   media_name?: string;
-  media_type?: string;
-  user_id?: string;
+  description?: string;
+  user_search?: string; // Search by user (email, first name, or last name)
+  type?: "0" | "1"; // "0": IMAGE, "1": VIDEO
+  media_type?: string; // For backward compatibility
+  privacy?: "0" | "1"; // "0": PRIVATE, "1": PUBLIC
+  is_created?: boolean;
+  is_comment?: boolean;
+  is_policy_violation?: boolean;
+  media_owner_id?: string;
+  user_id?: string; // For backward compatibility
   album_id?: string;
   deleted_at?: "null" | "not_null";
   per_page?: number;
@@ -111,7 +138,9 @@ export const updateMedia = async (
 /**
  * Soft delete a media
  */
-export const deleteMedia = async (mediaId: string): Promise<MessageResponse> => {
+export const deleteMedia = async (
+  mediaId: string
+): Promise<MessageResponse> => {
   try {
     const response = await apiClient.delete(`/api/admin/medias/${mediaId}`);
     return response.data;
@@ -126,7 +155,9 @@ export const deleteMedia = async (mediaId: string): Promise<MessageResponse> => 
  */
 export const restoreMedia = async (mediaId: string): Promise<MediaResponse> => {
   try {
-    const response = await apiClient.post(`/api/admin/medias/${mediaId}/restore`);
+    const response = await apiClient.post(
+      `/api/admin/medias/${mediaId}/restore`
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to restore media:", error);
@@ -150,4 +181,3 @@ export const forceDeleteMedia = async (
     throw error;
   }
 };
-

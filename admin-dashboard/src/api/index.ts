@@ -21,3 +21,6 @@ export * from "./mediaReports";
 
 // Admin Report Reasons APIs
 export * from "./reportReasons";
+
+// Admin Albums APIs
+export * from "./albums";

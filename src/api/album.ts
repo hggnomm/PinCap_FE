@@ -26,6 +26,7 @@ export const getDetailAlbum = async (albumId: string) => {
     return res.data;
   } catch (error) {
     console.log(error);
+    throw error; // Re-throw error so React Query can catch it
   }
 };
 

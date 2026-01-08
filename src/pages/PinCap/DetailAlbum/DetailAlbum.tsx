@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import "./DetailAlbum.less";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 
 import { LockFilled, MoreOutlined } from "@ant-design/icons/lib";
@@ -26,7 +26,8 @@ import { UpdateAlbumFormData } from "@/validation/album";
 
 const DetailAlbum = () => {
   const location = useLocation();
-  const albumId = location.state?.albumId;
+  const params = useParams();
+  const albumId = params.id || location.state?.albumId;
   const navigate = useNavigate();
   const tokenPayload = useSelector(
     (state: { auth: TokenPayload }) => state.auth
@@ -39,14 +40,39 @@ const DetailAlbum = () => {
 
   // Use React Query hooks
   const { getAlbumById, updateAlbum, deleteAlbum } = useAlbum();
-  const { data: albumData, isLoading: loading } = getAlbumById(albumId);
+  const {
+    data: albumData,
+    isLoading: loading,
+    error,
+    isError,
+  } = getAlbumById(albumId);
 
   useEffect(() => {
     if (!albumId) {
       toast.error("Album ID is missing.");
       navigate(ROUTES.MY_ALBUM);
+      return;
     }
   }, [albumId, navigate]);
+
+  useEffect(() => {
+    if (isError && error && albumId) {
+      // Error from apiClient has structure: { status, message, errors }
+      const errorStatus =
+        error && typeof error === "object" && "status" in error
+          ? (error as { status?: number }).status
+          : null;
+
+      // Check if it's a 404, 400, or 403 error
+      if (errorStatus === 404 || errorStatus === 400) {
+        toast.error("Album does not exist");
+        navigate(ROUTES.MY_ALBUM);
+      } else if (errorStatus === 403) {
+        toast.error("You do not have permission to view this album");
+        navigate(ROUTES.MY_ALBUM);
+      }
+    }
+  }, [isError, error, navigate, albumId]);
 
   const handleEditAlbum = async (albumRequest: UpdateAlbumFormData) => {
     try {

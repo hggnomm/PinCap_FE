@@ -46,6 +46,15 @@ interface EditMediaFormData {
 const MediaManagementView: React.FC = () => {
   const [medias, setMedias] = useState<AdminMedia[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Get base URL based on environment
+  const getBaseUrl = () => {
+    const hostname = window.location.hostname;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:3000";
+    }
+    return "https://pin-cap-fe.vercel.app";
+  };
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -178,7 +187,7 @@ const MediaManagementView: React.FC = () => {
   const handleFilterType = (value: string) => {
     setSearchParams((prev) => ({
       ...prev,
-      media_type: value || undefined,
+      media_type: value ? value.toUpperCase() : undefined, // Convert to uppercase to match API
       page: 1,
     }));
     setPagination((prev) => ({ ...prev, current: 1 }));
@@ -208,10 +217,14 @@ const MediaManagementView: React.FC = () => {
 
   const handleEdit = (media: AdminMedia) => {
     setEditingMedia(media);
+    const mediaUrl = Array.isArray(media.media_url)
+      ? media.media_url[0]
+      : media.media_url;
+    const mediaType = media.type || media.media_type || "";
     form.setFieldsValue({
-      media_name: media.media_name,
-      media_url: media.media_url,
-      media_type: media.media_type || "",
+      media_name: media.media_name || "",
+      media_url: typeof mediaUrl === "string" ? mediaUrl : "",
+      media_type: mediaType,
       description: media.description || "",
       privacy: media.privacy || "",
     });
@@ -231,7 +244,7 @@ const MediaManagementView: React.FC = () => {
       const updateData: UpdateMediaData = {
         media_name: values.media_name,
         media_url: values.media_url,
-        media_type: values.media_type || null,
+        media_type: editingMedia.type || editingMedia.media_type || null, // Keep original type, don't allow edit
         description: values.description || null,
         privacy: values.privacy || null,
       };
@@ -306,24 +319,52 @@ const MediaManagementView: React.FC = () => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
       key: "id",
-      width: 200,
-      ellipsis: true,
+      width: 300,
+      render: (_: unknown, record: AdminMedia) => {
+        const baseUrl = getBaseUrl();
+        const mediaLink = `${baseUrl}/media/${record.id}`;
+        return (
+          <a
+            href={mediaLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ wordBreak: "break-all" }}
+          >
+            {record.id}
+          </a>
+        );
+      },
     },
     {
       title: "Preview",
       key: "preview",
       width: 100,
       render: (_: unknown, record: AdminMedia) => {
+        const mediaType = record.type || record.media_type;
         const isImage =
-          record.media_type?.includes("image") ||
-          record.media_url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-        if (isImage) {
+          mediaType === "IMAGE" || mediaType?.toLowerCase() === "image";
+
+        // Get first URL if media_url is array
+        const mediaUrl = Array.isArray(record.media_url)
+          ? record.media_url[0]
+          : record.media_url;
+
+        // Check if URL is image by extension
+        const isImageByUrl =
+          mediaUrl &&
+          typeof mediaUrl === "string" &&
+          mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+
+        if (
+          (isImage || isImageByUrl) &&
+          mediaUrl &&
+          typeof mediaUrl === "string"
+        ) {
           return (
             <Image
-              src={record.media_url}
-              alt={record.media_name}
+              src={mediaUrl}
+              alt={record.media_name || "Media"}
               width={50}
               height={50}
               style={{ objectFit: "cover" }}
@@ -339,19 +380,26 @@ const MediaManagementView: React.FC = () => {
       dataIndex: "media_name",
       key: "media_name",
       ellipsis: true,
+      render: (name: string | null) => name || "-",
     },
     {
       title: "Type",
-      dataIndex: "media_type",
-      key: "media_type",
-      render: (type: string | null) => type || "-",
+      key: "type",
+      render: (_: unknown, record: AdminMedia) => {
+        const type = record.type || record.media_type;
+        return type ? type.toUpperCase() : "-";
+      },
     },
     {
-      title: "User ID",
-      dataIndex: "user_id",
-      key: "user_id",
-      width: 200,
-      ellipsis: true,
+      title: "User",
+      key: "user",
+      render: (_: unknown, record: AdminMedia) => {
+        if (record.user_owner) {
+          return `${record.user_owner.first_name} ${record.user_owner.last_name}`;
+        }
+        const userId = record.media_owner_id || record.user_id;
+        return userId || "-";
+      },
     },
     {
       title: "Status",
@@ -443,12 +491,11 @@ const MediaManagementView: React.FC = () => {
               placeholder="Filter by type"
               allowClear
               style={{ width: 150 }}
-              value={searchParams.media_type}
+              value={searchParams.media_type?.toLowerCase()}
               onChange={handleFilterType}
             >
-              <Option value="image">Image</Option>
-              <Option value="video">Video</Option>
-              <Option value="audio">Audio</Option>
+              <Option value="IMAGE">Image</Option>
+              <Option value="VIDEO">Video</Option>
             </Select>
             <Select
               placeholder="Filter by status"
@@ -481,6 +528,7 @@ const MediaManagementView: React.FC = () => {
           dataSource={medias}
           loading={loading}
           rowKey="id"
+          scroll={{ x: "max-content" }}
           pagination={{
             ...pagination,
             showSizeChanger: true,
@@ -517,11 +565,10 @@ const MediaManagementView: React.FC = () => {
             <Input />
           </Form.Item>
           <Form.Item name="media_type" label="Media Type">
-            <Select placeholder="Select media type">
-              <Option value="image">Image</Option>
-              <Option value="video">Video</Option>
-              <Option value="audio">Audio</Option>
-            </Select>
+            <Input
+              disabled
+              value={editingMedia?.type || editingMedia?.media_type || "-"}
+            />
           </Form.Item>
           <Form.Item name="description" label="Description">
             <Input.TextArea rows={4} />
