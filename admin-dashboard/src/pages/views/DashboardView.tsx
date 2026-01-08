@@ -18,7 +18,6 @@ import {
   WarningOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-// Bỏ Rose, Pie vì không dùng nữa
 import { Column, Liquid } from "@ant-design/charts";
 import { getDashboardStats } from "@/api/dashboard";
 import { ROUTES } from "@/constants/routes";

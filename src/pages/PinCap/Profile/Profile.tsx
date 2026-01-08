@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Edit, Mail, Phone, User, MapPin, Calendar } from "lucide-react";
 
-import { getMediasByUserId } from "@/api/media";
+import { getMyMedias } from "@/api/media";
 import BackButton from "@/components/BackButton/BackButton";
 import InstagramAccountCard from "@/components/ConnectedAccounts/InstagramAccountCard";
 import Loading from "@/components/Loading/Loading";
@@ -10,8 +10,6 @@ import { InfoItem, ProfileStats } from "@/components/Profile";
 import MediaList from "@/components/ViewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query/useAuth";
-import { PaginatedMediaResponse } from "@/types/Media/MediaResponse";
-import { Media } from "@/types/type";
 
 const Profile = () => {
   const { user, isLoadingUser } = useAuth();
@@ -21,23 +19,12 @@ const Profile = () => {
     navigate(ROUTES.EDIT_PROFILE);
   };
 
-  // Query function for fetching user medias
-  const userMediasQueryFn = (pageParam: number) => {
-    if (!user?.id) {
-      return Promise.resolve({
-        current_page: 1,
-        last_page: 1,
-        per_page: 15,
-        total: 0,
-        data: [],
-      } as PaginatedMediaResponse<Media>);
-    }
-
-    return getMediasByUserId({
-      user_id: user.id,
-      page: pageParam,
-      per_page: 15,
-    }) as Promise<PaginatedMediaResponse<Media>>;
+  // Query function for fetching my medias
+  const myMediasQueryFn = (pageParam: number) => {
+    return getMyMedias({
+      pageParam,
+      is_created: true,
+    });
   };
 
   return (
@@ -197,14 +184,14 @@ const Profile = () => {
         )}
 
         {/* User Media List - Full Width */}
-        {user && user.id && (
+        {user && (
           <div className="w-full pb-8">
             <MediaList
-              queryKey={["userMedias", user.id]}
-              queryFn={userMediasQueryFn}
+              queryKey={["myMedias"]}
+              queryFn={myMediasQueryFn}
               isEditMedia={false}
               isSaveMedia={true}
-              enabled={!!user.id}
+              enabled={!!user}
             />
           </div>
         )}

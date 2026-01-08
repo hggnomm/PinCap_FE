@@ -366,7 +366,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
       <Suspense fallback={<></>}>
         <EditMediaModal
           visible={editModalVisible}
-          media={mediaFromAlbum ?? null}
+          media={media ?? mediaFromAlbum ?? null}
           onCancel={() => {
             setEditModalVisible(false);
             setIsFirstOpen(true);
