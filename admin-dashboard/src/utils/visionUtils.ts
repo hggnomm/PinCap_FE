@@ -7,8 +7,8 @@ export interface ImagePolicyCheckResult {
 
 /**
  * Checks image policy based on safe_search_data
- * Only checks: adult, violence, racy
- * Ignores: spoof, medical
+ * Only checks: adult, violence
+ * Ignores: spoof, medical, racy
  *
  * @param safeSearchData - Array of safe search data from API response
  * @returns Policy check result with status and message
@@ -20,8 +20,8 @@ export const checkImagePolicy = (
     return { status: "SAFE", message: "Success image policy" };
   }
 
-  const { adult, violence, racy } = safeSearchData[0];
-  const targetValues = [adult, violence, racy];
+  const { adult, violence } = safeSearchData[0];
+  const targetValues = [adult, violence];
 
   // Case 3: Violation - Any field is LIKELY or VERY_LIKELY
   if (targetValues.some((val) => ["LIKELY", "VERY_LIKELY"].includes(val || ""))) {
