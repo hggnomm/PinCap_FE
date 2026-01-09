@@ -111,6 +111,8 @@ const Notification = () => {
   ) => {
     event.stopPropagation();
     dispatch(markNotificationAsRead(notificationId));
+    // Don't refetch immediately - keep the notification in the list
+    // It will be filtered out on next auto-refresh, but user can still see it
   };
 
   const handleMarkAllAsRead = async (event: React.MouseEvent) => {
@@ -140,7 +142,10 @@ const Notification = () => {
   };
 
   // Auto-refresh notifications every 5 seconds
+  // Only refresh if dropdown is visible to avoid unnecessary API calls
   useEffect(() => {
+    if (!isComponentVisible) return;
+
     // Set up interval to fetch notifications every 5 seconds
     const intervalId = setInterval(() => {
       dispatch(
@@ -156,7 +161,7 @@ const Notification = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [dispatch, perPage]);
+  }, [dispatch, perPage, isComponentVisible]);
 
   return (
     <>

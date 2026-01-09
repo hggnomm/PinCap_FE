@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
+import { useLocation } from "react-router-dom";
+
 import "./index.less";
 import "./FilePond.less";
 import "./AIGenerateButton.less";
@@ -41,6 +43,7 @@ registerPlugin(
 
 const CreateMedia: React.FC = () => {
   const [form] = Form.useForm();
+  const location = useLocation();
 
   // Image Editor states
   const [isImageEditorVisible, setIsImageEditorVisible] =
@@ -69,6 +72,7 @@ const CreateMedia: React.FC = () => {
     imageUrl,
     setImageUrl,
     draftId,
+    setDraftId,
     isGeneratingMetadata,
     drafts,
     loadingDrafts,
@@ -82,6 +86,17 @@ const CreateMedia: React.FC = () => {
     () => form.resetFields(),
     (values) => form.setFieldsValue(values)
   );
+
+  // Read draft_id from URL query parameter
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const draftIdFromUrl = searchParams.get("draft_id");
+    if (draftIdFromUrl && draftIdFromUrl !== draftId) {
+      // Set draftId from URL, which will trigger the fetch in useCreateMedia hook
+      setDraftId(draftIdFromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   const handleTagInput = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {

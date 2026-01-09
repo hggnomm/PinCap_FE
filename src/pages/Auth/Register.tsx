@@ -1,37 +1,75 @@
-import { Button, Col, Form, Input, notification, Row, Progress } from "antd";
-import { register, resendVerifyEmail } from "@/api/auth";
 import React, { useState, useEffect } from "react";
-import Title from "antd/es/typography/Title";
-import RegisterImage from "@/assets/img/PinCap/register_page_image.jpg";
-import { LogoIcon } from "@/assets/img";
+
 import { useNavigate } from "react-router-dom";
+
 import { motion } from "framer-motion";
-import { MailOutlined, CheckCircleOutlined, ReloadOutlined } from "@ant-design/icons";
+
+import {
+  MailOutlined,
+  CheckCircleOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+
+import Title from "antd/es/typography/Title";
+
+import { Button, Col, Form, Input, notification, Row, Progress } from "antd";
+
+import { register, resendVerifyEmail } from "@/api/auth";
+import { LogoIcon } from "@/assets/img";
+import RegisterImage from "@/assets/img/PinCap/register_page_image.jpg";
 import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/react-query";
 import "./index.less";
 // List of common passwords to disallow
-const commonPasswords = ["123456", "password", "admin", "qwerty", "welcome", "123456789", "12345678", "111111", "abc123"];
+const commonPasswords = [
+  "123456",
+  "password",
+  "admin",
+  "qwerty",
+  "welcome",
+  "123456789",
+  "12345678",
+  "111111",
+  "abc123",
+];
 
 const Register = () => {
-  const [api, contextHolder] = notification.useNotification();
+  const [, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [passwordValue, setPasswordValue] = useState("");
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     feedback: "",
-    color: "#ff4d4f"
+    color: "#ff4d4f",
   });
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [isResending, setIsResending] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(30);
 
   useEffect(() => {
     if (user) {
       navigate(ROUTES.PINCAP_HOME, { replace: true });
     }
   }, [user, navigate]);
+
+  // Countdown timer for resend email button
+  useEffect(() => {
+    if (showEmailVerification && resendCountdown > 0) {
+      const timer = setInterval(() => {
+        setResendCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [showEmailVerification, resendCountdown]);
 
   const onSwitchLogin = () => {
     navigate(ROUTES.LOGIN);
@@ -100,7 +138,7 @@ const Register = () => {
     return {
       score,
       feedback: feedback.join(", "),
-      color
+      color,
     };
   };
 
@@ -110,7 +148,13 @@ const Register = () => {
     setPasswordStrength(calculatePasswordStrength(password));
   };
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+  }) => {
     try {
       const response = await register(values);
 
@@ -124,16 +168,21 @@ const Register = () => {
         // Show email verification UI instead of just notification
         setUserEmail(values.email);
         setShowEmailVerification(true);
-        
+        setResendCountdown(30); // Reset countdown when showing verification UI
+
         notification.success({
           message: response.message || "Registration successful",
           description: "Please check your email to verify your account.",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        (error && typeof error === "object" && "message" in error
+          ? (error as { message?: string }).message
+          : null) || "An unknown error occurred.";
       notification.error({
         message: "Can't register",
-        description: error?.message || "An unknown error occurred.",
+        description: errorMessage,
       });
     }
   };
@@ -147,19 +196,45 @@ const Register = () => {
       return;
     }
 
+    // Prevent resend if countdown is still active or if already resending
+    if (resendCountdown > 0 || isResending) {
+      return;
+    }
+
     setIsResending(true);
     try {
       const response = await resendVerifyEmail(userEmail);
-      
+
+      // Reset countdown to 30 seconds immediately after successful resend
+      // This ensures the button is disabled and user must wait 30s before next resend
+      setResendCountdown(30);
+
       notification.success({
         message: "Email Sent",
-        description: response.message || "We've sent a new verification email to your inbox.",
+        description:
+          response.message ||
+          "We've sent a new verification email to your inbox.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error resending verification email:", error);
-      
-      const errorMessage = error?.response?.data?.message || error?.message || "Failed to resend verification email";
-      
+
+      let errorMessage = "Failed to resend verification email";
+      if (error && typeof error === "object") {
+        if ("response" in error) {
+          const responseError = error as {
+            response?: { data?: { message?: string } };
+            message?: string;
+          };
+          errorMessage =
+            responseError.response?.data?.message ||
+            responseError.message ||
+            errorMessage;
+        } else if ("message" in error) {
+          errorMessage =
+            (error as { message?: string }).message || errorMessage;
+        }
+      }
+
       notification.error({
         message: "Failed to resend",
         description: errorMessage,
@@ -189,10 +264,10 @@ const Register = () => {
           <span>Step into a world of opportunities with PinCap today!</span>
         </Row>
         {contextHolder}
-        
+
         {showEmailVerification && (
           <div className="flex justify-center items-center w-full py-5">
-            <motion.div 
+            <motion.div
               className="text-center bg-white rounded-xl p-10 shadow-lg border border-gray-100 w-[90%] max-w-md"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -201,41 +276,45 @@ const Register = () => {
               <div className="mb-5">
                 <CheckCircleOutlined className="text-6xl text-green-500" />
               </div>
-              
+
               <Title level={3} className="text-green-500 text-center my-5">
                 Registration Successful!
               </Title>
-              
+
               <div className="flex items-center justify-center my-5 text-base text-gray-600">
                 <MailOutlined className="text-xl text-blue-500 mr-2" />
-                <span>We've sent a verification email to:</span>
+                <span>We&apos;ve sent a verification email to:</span>
               </div>
-              
+
               <div className="bg-green-50 border border-green-200 rounded-md py-3 px-5 my-4 text-green-700 font-semibold text-base break-all">
                 {userEmail}
               </div>
-              
+
               <div className="my-6">
                 <p className="my-2 text-sm text-gray-600 leading-relaxed">
-                  Please check your inbox and click the verification link to activate your account.
+                  Please check your inbox and click the verification link to
+                  activate your account.
                 </p>
                 <p className="my-2 text-sm text-gray-600 leading-relaxed">
-                  The link will expire in 24 hours.
+                  The link will expire in 5 minutes.
                 </p>
               </div>
-              
+
               <div className="flex justify-center gap-3 my-8 flex-wrap">
-                <Button 
-                  type="default" 
+                <Button
+                  type="default"
                   icon={<ReloadOutlined />}
                   loading={isResending}
+                  disabled={resendCountdown > 0 || isResending}
                   onClick={handleResendEmail}
-                  className="rounded-md font-medium h-10 px-5 border-gray-300 text-gray-600 hover:border-[#a25772] hover:text-[#a25772]"
+                  className="rounded-md font-medium h-10 px-5 border-gray-300 text-gray-600 hover:border-[#a25772] hover:text-[#a25772] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Resend Email
+                  {resendCountdown > 0
+                    ? `Resend Email (${resendCountdown}s)`
+                    : "Resend Email"}
                 </Button>
-                
-                <Button 
+
+                <Button
                   type="primary"
                   onClick={onSwitchLogin}
                   className="rounded-md font-medium h-10 px-5 bg-[#a25772] border-[#a25772] hover:bg-[#8b4a63] hover:border-[#8b4a63]"
@@ -243,131 +322,154 @@ const Register = () => {
                   Go to Login
                 </Button>
               </div>
-              
+
               <div className="border-t border-gray-100 pt-5 mt-6">
                 <p className="text-xs text-gray-500 text-center">
-                  Didn't receive the email? Check your spam folder or contact support.
+                  Didn&apos;t receive the email? Check your spam folder or
+                  contact support.
                 </p>
               </div>
             </motion.div>
           </div>
         )}
-        
+
         {!showEmailVerification && (
-          <Form name="register_form" className="form !gap-3" onFinish={onFinish}>
-          <Row className="form-field">
-            <span>First name</span>
-            <Form.Item 
-              name="first_name" 
-              rules={[{ required: true, message: "Please enter your first name" }]} 
-              noStyle
-            >
-              <Input />
-            </Form.Item>
-          </Row>
-          <Row className="form-field">
-            <span>Last name</span>
-            <Form.Item 
-              name="last_name" 
-              rules={[{ required: true, message: "Please enter your last name" }]} 
-              noStyle
-            >
-              <Input />
-            </Form.Item>
-          </Row>
-          <Row className="form-field">
-            <span>Email</span>
-            <Form.Item 
-              name="email" 
-              rules={[
-                { required: true, message: "Please enter your email" },
-                { type: "email", message: "Please enter a valid email" }
-              ]} 
-              noStyle
-            >
-              <Input />
-            </Form.Item>
-          </Row>
+          <Form
+            name="register_form"
+            className="form !gap-3"
+            onFinish={onFinish}
+          >
+            <Row className="form-field">
+              <span>First name</span>
+              <Form.Item
+                name="first_name"
+                rules={[
+                  { required: true, message: "Please enter your first name" },
+                ]}
+                noStyle
+              >
+                <Input />
+              </Form.Item>
+            </Row>
+            <Row className="form-field">
+              <span>Last name</span>
+              <Form.Item
+                name="last_name"
+                rules={[
+                  { required: true, message: "Please enter your last name" },
+                ]}
+                noStyle
+              >
+                <Input />
+              </Form.Item>
+            </Row>
+            <Row className="form-field">
+              <span>Email</span>
+              <Form.Item
+                name="email"
+                rules={[
+                  { required: true, message: "Please enter your email" },
+                  { type: "email", message: "Please enter a valid email" },
+                ]}
+                noStyle
+              >
+                <Input />
+              </Form.Item>
+            </Row>
 
-          <Row className="form-field">
-            <span>Password</span>
-            <Form.Item 
-              name="password" 
-              rules={[
-                { required: true, message: "Please enter a password" },
-                { min: 8, message: "Password must be at least 8 characters" },
-                {
-                  pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
-                  message: "Password must include uppercase, lowercase, number, and special character"
-                },
-                {
-                  validator: (_, value) => {
-                    if (value && commonPasswords.includes(value.toLowerCase())) {
-                      return Promise.reject("Please use a stronger password");
-                    }
-                    return Promise.resolve();
+            <Row className="form-field">
+              <span>Password</span>
+              <Form.Item
+                name="password"
+                rules={[
+                  { required: true, message: "Please enter a password" },
+                  { min: 8, message: "Password must be at least 8 characters" },
+                  {
+                    pattern:
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
+                    message:
+                      "Password must include uppercase, lowercase, number, and special character",
                   },
-                },
-              ]} 
-              noStyle
-            >
-              <Input.Password onChange={handlePasswordChange} />
-            </Form.Item>
-            
-            {passwordValue && (
-              <div className="password-strength">
-                <Progress 
-                  percent={passwordStrength.score} 
-                  showInfo={false} 
-                  strokeColor={passwordStrength.color}
-                  size="small"
-                  style={{ marginTop: 5 }}
-                />
-                <div className="strength-label" style={{ color: passwordStrength.color, fontSize: '12px', marginTop: 5 }}>
-                  {passwordStrength.score === 100 ? "Strong password" : passwordStrength.feedback}
-                </div>
-              </div>
-            )}
-          </Row>
-
-          <Row className="form-field">
-            <span>Confirm Password</span>
-            <Form.Item
-              name="password_confirmation"
-              dependencies={['password']}
-              rules={[
-                { required: true, message: "Please confirm your password" },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
+                  {
+                    validator: (_, value) => {
+                      if (
+                        value &&
+                        commonPasswords.includes(value.toLowerCase())
+                      ) {
+                        return Promise.reject("Please use a stronger password");
+                      }
                       return Promise.resolve();
-                    }
-                    return Promise.reject("The two passwords do not match");
+                    },
                   },
-                }),
-              ]}
-              noStyle
-            >
-              <Input.Password />
-            </Form.Item>
-          </Row>
+                ]}
+                noStyle
+              >
+                <Input.Password onChange={handlePasswordChange} />
+              </Form.Item>
 
-          <div className="field-btn">
-            <Button
-              className="button submit-btn"
-              type="primary"
-              htmlType="submit"
-            >
-              Register
-            </Button>
-          </div>
-          <Row className="register-field">
-            <div>
-              Have An Account Yet?{" "}
-              <span onClick={onSwitchLogin}>Login an account</span>
+              {passwordValue && (
+                <div className="password-strength">
+                  <Progress
+                    percent={passwordStrength.score}
+                    showInfo={false}
+                    strokeColor={passwordStrength.color}
+                    size="small"
+                    style={{ marginTop: 5 }}
+                  />
+                  <div
+                    className="strength-label"
+                    style={{
+                      color: passwordStrength.color,
+                      fontSize: "12px",
+                      marginTop: 5,
+                    }}
+                  >
+                    {passwordStrength.score === 100
+                      ? "Strong password"
+                      : passwordStrength.feedback}
+                  </div>
+                </div>
+              )}
+            </Row>
+
+            <Row className="form-field">
+              <span>Confirm Password</span>
+              <Form.Item
+                name="password_confirmation"
+                dependencies={["password"]}
+                rules={[
+                  { required: true, message: "Please confirm your password" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject("The two passwords do not match");
+                    },
+                  }),
+                ]}
+                noStyle
+              >
+                <Input.Password />
+              </Form.Item>
+            </Row>
+
+            <div className="field-btn">
+              <Button
+                className="button submit-btn"
+                type="primary"
+                htmlType="submit"
+              >
+                Register
+              </Button>
             </div>
-          </Row>
-        </Form>
+            <Row className="register-field">
+              <div>
+                Have An Account Yet?{" "}
+                <span onClick={onSwitchLogin}>Login an account</span>
+              </div>
+            </Row>
+          </Form>
         )}
       </Col>
       <Col xs={0} md={14} className="left-login">

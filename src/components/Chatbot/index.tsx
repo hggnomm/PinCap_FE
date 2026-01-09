@@ -16,6 +16,7 @@ import { CloseCircleOutlined } from "@ant-design/icons";
 import { Modal } from "antd";
 
 import { addMediasToAlbum } from "@/api/album";
+import { getDetailMedia } from "@/api/media";
 import { useAlbum } from "@/react-query/useAlbum";
 import type { Message } from "@/store/chatSlice";
 import { sendMessageToBot } from "@/store/chatSlice";
@@ -175,14 +176,36 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
     setSelectedMessage(null);
   };
 
-  const handleViewMedia = (message: Message) => {
+  const handleViewMedia = async (message: Message) => {
     if (message.media && message.media.length > 0) {
-      // Navigate to the first media item
-      navigate(`/media/${message.media[0].id}`);
+      const mediaId = message.media[0].id;
+
+      try {
+        const mediaDetail = await getDetailMedia(mediaId, true);
+
+        if (mediaDetail) {
+          if (
+            mediaDetail.is_created === 0 ||
+            mediaDetail.is_created === false
+          ) {
+            navigate(`/create-media?draft_id=${mediaId}`);
+          } else {
+            navigate(`/media/${mediaId}`);
+          }
+        } else {
+          toast.error("Failed to load media details");
+        }
+      } catch (error) {
+        console.error("Error fetching media details:", error);
+        toast.error("Failed to load media details");
+      }
     }
   };
 
-  const renderMediaItems = (mediaItems: MediaItem[]) => {
+  const renderMediaItems = (
+    mediaItems: MediaItem[],
+    isDraft: boolean = false
+  ) => {
     if (!mediaItems || mediaItems.length === 0) return null;
 
     return (
@@ -192,6 +215,39 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
           const imageUrl = item.media_url || item.url;
           const mediaLink = `/media/${item.id}`;
 
+          // If it's a draft, render as non-clickable div
+          if (isDraft) {
+            return (
+              <div
+                key={item.id}
+                className="block rounded-lg overflow-hidden no-underline text-inherit cursor-default"
+              >
+                <div className="relative w-full pt-[100%] bg-gray-100">
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt="Media"
+                      className="absolute top-0 left-0 w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = "none";
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400">No Image</div>`;
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-gray-400 text-sm text-center p-2">
+                      Media
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          }
+
+          // Normal media item - clickable
           return (
             <a
               key={item.id}
@@ -203,7 +259,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                 e.preventDefault();
                 window.open(mediaLink, "_blank", "noopener,noreferrer");
               }}
-              className="block rounded-lg overflow-hidden no-underline text-inherit transition-transform duration-200 hover:scale-105"
+              className="block rounded-lg overflow-hidden no-underline text-inherit transition-all duration-300 ease-in-out hover:scale-[1.02] cursor-pointer"
             >
               <div className="relative w-full pt-[100%] bg-gray-100">
                 {imageUrl ? (
@@ -302,7 +358,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                 })}
               >
                 {message.sender === "user" ? (
-                  message.text
+                  <div className="break-words whitespace-pre-wrap">
+                    {message.text}
+                  </div>
                 ) : (
                   <>
                     <Markdown
@@ -318,11 +376,16 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                       {message.text || "Đang suy nghĩ..."}
                     </Markdown>
                     {message.media && message.media.length > 0 && (
-                      <>{renderMediaItems(message.media)}</>
+                      <>
+                        {renderMediaItems(
+                          message.media,
+                          message.intent === "CREATE_MEDIA_FROM_INPUT"
+                        )}
+                      </>
                     )}
                     {message.ask_confirmation &&
                       message.ask_confirmation.action === "CREATE_ALBUM" && (
-                        <div className="mt-3">
+                        <div className="mt-3 flex justify-center">
                           <button
                             onClick={() => handleCreateAlbumClick(message)}
                             className="px-4 py-2 bg-rose-600 text-white border-none rounded-lg cursor-pointer text-sm font-medium transition-colors duration-200 hover:bg-rose-700"
@@ -334,7 +397,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                     {message.intent === "CREATE_MEDIA_FROM_INPUT" &&
                       message.media &&
                       message.media.length > 0 && (
-                        <div className="mt-3">
+                        <div className="mt-3 flex justify-center">
                           <button
                             onClick={() => handleViewMedia(message)}
                             className="px-4 py-2 bg-rose-600 text-white border-none rounded-lg cursor-pointer text-sm font-medium transition-colors duration-200 hover:bg-rose-700"

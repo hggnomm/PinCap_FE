@@ -386,6 +386,7 @@ export const useCreateMedia = (
     imageUrl,
     setImageUrl,
     draftId,
+    setDraftId,
     isGeneratingMetadata,
 
     // Drafts
