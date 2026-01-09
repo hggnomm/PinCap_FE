@@ -107,7 +107,7 @@ export const useCreateMedia = (
 
     const newTimeout = setTimeout(() => {
       handleCreateOrUpdateMedia(formValue, false);
-    }, 5000);
+    }, 1000);
 
     setDebounceTimeout(newTimeout);
   };
