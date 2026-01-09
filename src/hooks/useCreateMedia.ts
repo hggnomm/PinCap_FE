@@ -20,6 +20,9 @@ import { getTagName } from "@/utils/tagMapping";
 import { checkImagePolicy } from "@/utils/visionUtils";
 import { CreateMediaFormData, UpdateMediaFormData } from "@/validation/media";
 
+// Delay in milliseconds before creating/updating draft
+const DRAFT_SAVE_DELAY = 1000;
+
 const mapPrivacyToFormValue = (privacy: string | undefined): "0" | "1" => {
   if (!privacy) return PRIVACY.PRIVATE;
 
@@ -107,7 +110,7 @@ export const useCreateMedia = (
 
     const newTimeout = setTimeout(() => {
       handleCreateOrUpdateMedia(formValue, false);
-    }, 1000);
+    }, DRAFT_SAVE_DELAY);
 
     setDebounceTimeout(newTimeout);
   };
