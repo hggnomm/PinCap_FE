@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { toast } from "react-toastify";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { clsx } from "clsx";
 import { motion } from "framer-motion";
 import { Send } from "lucide-react";
@@ -32,6 +33,7 @@ interface ChatbotProps {
 const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const messages = useSelector((state: RootState) => state.chat.messages);
   const isTyping = useSelector((state: RootState) => state.chat.isTyping);
   const [input, setInput] = useState<string>("");
@@ -177,6 +179,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
           privacy: albumResponse.privacy || "PRIVATE",
           medias_count: mediaIds.length,
         });
+
+        // Invalidate albums query to refetch MyAlbum data
+        queryClient.invalidateQueries({ queryKey: ["albums"] });
+        queryClient.invalidateQueries({ queryKey: ["album-members"] });
       }
 
       setConfirmModalVisible(false);

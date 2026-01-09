@@ -30,6 +30,7 @@ import { PRIVACY } from "@/constants/constants";
 import { useCreateMedia } from "@/hooks";
 import { Media } from "@/types/type";
 import { getTagName } from "@/utils/tagMapping";
+import { isVideo } from "@/utils/utils";
 
 import DraftMedia from "./DraftMedia";
 
@@ -369,6 +370,29 @@ const CreateMedia: React.FC = () => {
                         }
                         className="!min-h-0 !w-auto [&_.media-viewer]:!min-h-0 [&_.media-viewer]:!w-auto [&_.media-viewer-container]:!min-h-0 [&_.media-viewer-container]:!w-auto [&_.media-element]:!max-h-[65vh] [&_.media-element]:!w-auto"
                       />
+                    );
+                  }
+
+                  // Check if single media is video
+                  const singleMediaUrl = Array.isArray(mediaUrl)
+                    ? mediaUrl[0]
+                    : typeof mediaUrl === "string"
+                    ? mediaUrl
+                    : imageUrl;
+                  const isVideoUrl = isVideo(singleMediaUrl);
+
+                  if (isVideoUrl) {
+                    return (
+                      <video
+                        className="transition-all rounded-2xl duration-300 w-full h-auto"
+                        controls
+                        muted
+                        playsInline
+                        preload="metadata"
+                      >
+                        <source src={singleMediaUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
                     );
                   }
 
