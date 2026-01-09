@@ -71,3 +71,4 @@ export const AlbumToastProvider: React.FC<AlbumToastProviderProps> = ({
     </AlbumToastContext.Provider>
   );
 };
+

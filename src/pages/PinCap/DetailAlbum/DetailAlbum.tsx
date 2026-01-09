@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import "./DetailAlbum.less";
 import { useSelector } from "react-redux";
@@ -21,6 +21,7 @@ import MediaList from "@/components/ViewPin/ViewPinComponent";
 import { ROUTES } from "@/constants/routes";
 import { useAlbum } from "@/react-query/useAlbum";
 import { TokenPayload } from "@/types/Auth";
+import { AlbumUser } from "@/types/type";
 import { isAlbumOwner } from "@/utils/utils";
 import { UpdateAlbumFormData } from "@/validation/album";
 
@@ -108,6 +109,14 @@ const DetailAlbum = () => {
 
   const isOwner = albumData ? isAlbumOwner(albumData, tokenPayload.id) : false;
 
+  // Check if current user is in allUser (has permission to edit media)
+  const hasEditPermission = useMemo(() => {
+    if (!albumData?.allUser || !tokenPayload?.id) return false;
+    return albumData.allUser.some(
+      (user: AlbumUser) => user.id === tokenPayload.id
+    );
+  }, [albumData?.allUser, tokenPayload?.id]);
+
   return (
     <Loading isLoading={loading}>
       <div className="album-detail-container">
@@ -174,7 +183,7 @@ const DetailAlbum = () => {
         {albumData?.medias && albumData.medias.length > 0 && (
           <MediaList
             medias={albumData?.medias}
-            isEditMedia
+            isEditMedia={hasEditPermission}
             isSaveMedia={false}
             albumContext={{
               inAlbum: true,
