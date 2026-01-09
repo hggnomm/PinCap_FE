@@ -66,9 +66,7 @@ export const getAlbums = async (
 /**
  * Restore a soft-deleted album (set deleted_at to null)
  */
-export const restoreAlbum = async (
-  albumId: string
-): Promise<AlbumResponse> => {
+export const restoreAlbum = async (albumId: string): Promise<AlbumResponse> => {
   try {
     const response = await apiClient.put(`/api/admin/albums/${albumId}`);
     return response.data;
@@ -111,4 +109,3 @@ export const forceDeleteAlbum = async (
     throw error;
   }
 };
-
