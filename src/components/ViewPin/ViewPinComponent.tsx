@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from "react";
+import React, { useEffect, useMemo, useCallback, useRef } from "react";
 
 import { useInView } from "react-intersection-observer";
 
@@ -89,7 +89,11 @@ const MediaList: React.FC<MediaListProps> = ({
   refetchOnMount,
   staleTime,
 }) => {
-  const { ref, inView } = useInView();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const { ref, inView } = useInView({
+    threshold: 0,
+    rootMargin: "200px", // Trigger fetch when element is 200px away from viewport
+  });
 
   const {
     data,
@@ -120,11 +124,69 @@ const MediaList: React.FC<MediaListProps> = ({
     staleTime: staleTime,
   });
 
+  const lastFetchTimeRef = useRef<number>(0);
+  const scrollCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    if (inView && hasNextPage) {
-      fetchNextPage();
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      const now = Date.now();
+      // Throttle: Only fetch if last fetch was more than 500ms ago
+      if (now - lastFetchTimeRef.current > 500) {
+        lastFetchTimeRef.current = now;
+        fetchNextPage();
+      }
     }
-  }, [fetchNextPage, inView, hasNextPage]);
+  }, [fetchNextPage, inView, hasNextPage, isFetchingNextPage]);
+
+  // Additional scroll check for fast scrolling
+  useEffect(() => {
+    if (propMedias || !hasNextPage) return;
+
+    const checkScrollPosition = () => {
+      if (isFetchingNextPage) return;
+
+      const sentinelElement = sentinelRef.current;
+      if (!sentinelElement) return;
+
+      const rect = sentinelElement.getBoundingClientRect();
+      const windowHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+
+      // If sentinel is within 500px of viewport, trigger fetch
+      if (rect.top <= windowHeight + 500 && hasNextPage) {
+        const now = Date.now();
+        if (now - lastFetchTimeRef.current > 500) {
+          lastFetchTimeRef.current = now;
+          fetchNextPage();
+        }
+      }
+    };
+
+    // Check on scroll with throttling
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    const handleScroll = () => {
+      if (scrollTimeout) return;
+      scrollTimeout = setTimeout(() => {
+        checkScrollPosition();
+        scrollTimeout = null;
+      }, 100);
+    };
+
+    // Periodic check for fast scrolling
+    scrollCheckIntervalRef.current = setInterval(checkScrollPosition, 500);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("wheel", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("wheel", handleScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      if (scrollCheckIntervalRef.current) {
+        clearInterval(scrollCheckIntervalRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, propMedias]);
 
   const medias = useMemo(() => {
     if (propMedias) {
@@ -194,7 +256,17 @@ const MediaList: React.FC<MediaListProps> = ({
           >
             {content}
           </Masonry>
-          {!propMedias && <div ref={ref} className="h-2.5" />}
+          {!propMedias && (
+            <div
+              ref={(node) => {
+                sentinelRef.current = node;
+                if (typeof ref === "function") {
+                  ref(node);
+                }
+              }}
+              className="h-2.5"
+            />
+          )}
         </>
       )}
     </motion.div>
