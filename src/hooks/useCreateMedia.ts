@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { notification } from "antd";
 
 import { getDetailMedia, generateMetadata } from "@/api/media";
+import { trackUserEvent } from "@/api/users";
 import { checkImageSafety, checkMultipleImagesSafety } from "@/api/vision";
 import { PRIVACY } from "@/constants/constants";
 import { ENV } from "@/constants/env";
@@ -197,6 +198,15 @@ export const useCreateMedia = (
           // Invalidate MyMedia query to refetch updated data
           queryClient.invalidateQueries({
             queryKey: ["medias", "my-media", "created"],
+          });
+
+          // Track create media event
+          trackUserEvent({
+            event_type: "view",
+            media_id: response.media.id,
+            metadata: { media_ids: [response.media.id] },
+          }).catch((error) => {
+            console.error("Failed to track create media event:", error);
           });
         }
       } else {
