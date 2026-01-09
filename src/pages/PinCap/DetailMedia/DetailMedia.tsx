@@ -292,8 +292,20 @@ const DetailMedia = () => {
       setIsDeleteModalVisible(false);
       setIsEditModalVisible(false);
       navigate(ROUTES.MY_MEDIA);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error deleting media:", error);
+      const errorMessage =
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        error.status === 403
+          ? "You don't have permission to delete this media."
+          : error &&
+            typeof error === "object" &&
+            "message" in error
+          ? String(error.message)
+          : "An error occurred while deleting the media. Please try again.";
+      toast.error(errorMessage);
     }
   };
 

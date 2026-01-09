@@ -108,6 +108,7 @@ export const deleteMedias = async (ids: string[]) => {
     return res.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 

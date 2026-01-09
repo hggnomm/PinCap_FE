@@ -189,7 +189,13 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
       try {
         const detail: Media = await getDetailMedia(idMedia, true);
         if (detail) {
-          setMedia(detail);
+          // Preserve added_by_user from mediaFromAlbum if it exists
+          const mediaWithAddedBy = {
+            ...detail,
+            added_by_user:
+              mediaFromAlbum?.added_by_user || detail.added_by_user,
+          };
+          setMedia(mediaWithAddedBy);
           form.setFieldsValue({
             media_name: detail?.media_name,
             description: detail?.description,
@@ -199,7 +205,7 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
         console.error("Error fetching details media: " + error);
       }
     },
-    [form]
+    [form, mediaFromAlbum]
   );
 
   useEffect(() => {
@@ -224,11 +230,18 @@ const PinMedia: React.FC<PinMediaProps> = (props) => {
       if (onDelete) {
         onDelete();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error deleting media:", error);
-      toast.error(
-        "An error occurred while deleting the media. Please try again."
-      );
+      const errorMessage =
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        error.status === 403
+          ? "You don't have permission to delete this media."
+          : error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : "An error occurred while deleting the media. Please try again.";
+      toast.error(errorMessage);
     }
   };
 

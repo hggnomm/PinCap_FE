@@ -102,11 +102,18 @@ const DraftMedia = ({
       if (onDraftDeleted) {
         onDraftDeleted();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error deleting draft:", error);
-      toast.error(
-        "An error occurred while deleting the draft. Please try again."
-      );
+      const errorMessage =
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        error.status === 403
+          ? "You don't have permission to delete this draft."
+          : error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : "An error occurred while deleting the draft. Please try again.";
+      toast.error(errorMessage);
     }
   };
 

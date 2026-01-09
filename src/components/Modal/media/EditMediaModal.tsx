@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+
+import { clsx } from "clsx";
 
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 
@@ -12,12 +14,12 @@ import FieldItem from "@/components/Form/fieldItem/FieldItem";
 import Loading from "@/components/Loading/Loading";
 import MediaViewer from "@/components/MediaViewer/MediaViewer";
 import ModalComponent from "@/components/Modal/ModalComponent";
-import { PRIVACY } from "@/constants/constants";
+import { ALBUM_ROLES, PRIVACY } from "@/constants/constants";
 import { useMediaToast } from "@/contexts/MediaToastContext";
 import { useAlbum } from "@/react-query/useAlbum";
 import { useMedia } from "@/react-query/useMedia";
 import { TokenPayload } from "@/types/Auth";
-import { Media } from "@/types/type";
+import { AlbumUser, Media } from "@/types/type";
 import { UpdateMediaFormData } from "@/validation/media";
 
 interface EditMediaModalProps {
@@ -45,7 +47,7 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
   const [privacy, setPrivacy] = useState(false);
   const [isComment, setIsComment] = useState(false);
   const { updateMedia } = useMedia();
-  const { removeMediasFromAlbum } = useAlbum();
+  const { removeMediasFromAlbum, getAlbumById } = useAlbum();
   const { showToast } = useMediaToast();
 
   const tokenPayload = useSelector(
@@ -53,6 +55,26 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
   );
   const ownerId = media?.ownerUser?.id ?? media?.media_owner_id;
   const isOwner = ownerId === tokenPayload.id;
+
+  // Fetch album data when in album context
+  const { data: albumData } = getAlbumById(
+    albumId || "",
+    inAlbumContext && !!albumId && visible
+  );
+
+  // Check if user has editor permission or higher (EDIT or OWNER)
+  const hasEditorPermission = useMemo(() => {
+    if (!inAlbumContext || !albumData?.allUser || !tokenPayload?.id) {
+      return false;
+    }
+    const currentUser = albumData.allUser.find(
+      (user: AlbumUser) => user.id === tokenPayload.id
+    );
+    return (
+      currentUser?.album_role === ALBUM_ROLES.EDIT ||
+      currentUser?.album_role === ALBUM_ROLES.OWNER
+    );
+  }, [inAlbumContext, albumData?.allUser, tokenPayload?.id]);
 
   useEffect(() => {
     if (visible && media) {
@@ -189,8 +211,13 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
             </Form>
 
             <div
-              className="cursor-pointer p-2 text-left hover:scale-[0.99] hover:bg-gray-100 transition-transform mt-6 rounded-lg"
-              onClick={onDeleteClick}
+              className={clsx(
+                "p-2 text-left transition-transform mt-6 rounded-lg",
+                isOwner
+                  ? "cursor-pointer hover:scale-[0.99] hover:bg-gray-100"
+                  : "opacity-50 pointer-events-none cursor-not-allowed"
+              )}
+              onClick={isOwner ? onDeleteClick : undefined}
             >
               <p className="font-medium text-lg text-gray-900">Delete media</p>
               <p className="text-sm text-gray-500 font-medium">
@@ -200,20 +227,64 @@ const EditMediaModal: React.FC<EditMediaModalProps> = ({
 
             {inAlbumContext && albumId && media && (
               <div
-                className="cursor-pointer p-2 text-left hover:scale-[0.99] hover:bg-gray-100 transition-transform mt-3 rounded-lg"
-                onClick={async () => {
-                  try {
-                    await removeMediasFromAlbum({
-                      album_id: albumId,
-                      medias_id: [media.id],
-                    });
-                    toast.success("Removed media from album");
-                    onRemovedFromAlbum?.();
-                    onCancel();
-                  } catch {
-                    toast.error("Failed to remove media from album");
-                  }
-                }}
+                className={clsx(
+                  "p-2 text-left transition-transform mt-3 rounded-lg",
+                  hasEditorPermission
+                    ? "cursor-pointer hover:scale-[0.99] hover:bg-gray-100"
+                    : "opacity-50 pointer-events-none cursor-not-allowed"
+                )}
+                onClick={
+                  hasEditorPermission
+                    ? async () => {
+                        try {
+                          await removeMediasFromAlbum({
+                            album_id: albumId,
+                            medias_id: [media.id],
+                          });
+                          toast.success("Removed media from album");
+                          onRemovedFromAlbum?.();
+                          onCancel();
+                        } catch (error: unknown) {
+                          console.error(
+                            "Error removing media from album:",
+                            error
+                          );
+                          let errorMessage =
+                            "Failed to remove media from album";
+
+                          // Check if error has message property (from apiClient interceptor)
+                          if (
+                            error &&
+                            typeof error === "object" &&
+                            "message" in error
+                          ) {
+                            errorMessage = String(error.message);
+                          }
+                          // Fallback: check axios error response structure
+                          else if (
+                            error &&
+                            typeof error === "object" &&
+                            "response" in error &&
+                            error.response &&
+                            typeof error.response === "object" &&
+                            "data" in error.response &&
+                            error.response.data &&
+                            typeof error.response.data === "object"
+                          ) {
+                            if ("message" in error.response.data) {
+                              errorMessage = String(
+                                error.response.data.message
+                              );
+                            } else if ("error" in error.response.data) {
+                              errorMessage = String(error.response.data.error);
+                            }
+                          }
+
+                          toast.error(errorMessage);
+                        }
+                      }
+                    : undefined
+                }
               >
                 <p className="font-medium text-lg text-gray-900">
                   Remove from this album
