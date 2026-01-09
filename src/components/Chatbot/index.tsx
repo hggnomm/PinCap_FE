@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 
 import Markdown from "react-markdown";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { toast } from "react-toastify";
 
+import { clsx } from "clsx";
 import { motion } from "framer-motion";
 import { Send } from "lucide-react";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -28,6 +30,7 @@ interface ChatbotProps {
 
 const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const messages = useSelector((state: RootState) => state.chat.messages);
   const isTyping = useSelector((state: RootState) => state.chat.isTyping);
   const [input, setInput] = useState<string>("");
@@ -86,8 +89,74 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
             album_id: albumResponse.album.id,
             media_ids: selectedMessage.album.media_ids,
           });
-        } catch (addMediaError) {
+        } catch (addMediaError: unknown) {
           console.error("Failed to add medias to album:", addMediaError);
+
+          // Type guard for error object
+          const isErrorWithStatus = (
+            err: unknown
+          ): err is { status?: number; message?: string } => {
+            return (
+              typeof err === "object" &&
+              err !== null &&
+              ("status" in err || "message" in err)
+            );
+          };
+
+          const isErrorWithResponse = (
+            err: unknown
+          ): err is {
+            response?: {
+              status?: number;
+              data?: { error?: string; message?: string };
+            };
+            message?: string;
+          } => {
+            return (
+              typeof err === "object" &&
+              err !== null &&
+              ("response" in err || "message" in err)
+            );
+          };
+
+          // Get error status
+          let errorStatus: number | undefined;
+          if (isErrorWithStatus(addMediaError)) {
+            errorStatus = addMediaError.status;
+          } else if (isErrorWithResponse(addMediaError)) {
+            errorStatus = addMediaError.response?.status;
+          }
+
+          // Show error message if it's a permission error (403)
+          if (errorStatus === 403) {
+            let errorMessage =
+              "You do not have permission to add media to this album";
+            if (isErrorWithResponse(addMediaError)) {
+              errorMessage =
+                addMediaError.response?.data?.error ||
+                addMediaError.response?.data?.message ||
+                addMediaError.message ||
+                errorMessage;
+            } else if (isErrorWithStatus(addMediaError)) {
+              errorMessage = addMediaError.message || errorMessage;
+            }
+            toast.error(errorMessage);
+          } else if (errorStatus === 422) {
+            toast.warning("Some media items may already be in the album");
+          } else {
+            // For other errors, show a warning but don't fail the whole operation
+            let errorMessage = "Failed to add some media to album";
+            if (isErrorWithResponse(addMediaError)) {
+              errorMessage =
+                addMediaError.response?.data?.error ||
+                addMediaError.response?.data?.message ||
+                addMediaError.message ||
+                errorMessage;
+            } else if (isErrorWithStatus(addMediaError)) {
+              errorMessage = addMediaError.message || errorMessage;
+            }
+            toast.warning(errorMessage);
+          }
           // Still show success if album was created
         }
       }
@@ -106,18 +175,18 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
     setSelectedMessage(null);
   };
 
+  const handleViewMedia = (message: Message) => {
+    if (message.media && message.media.length > 0) {
+      // Navigate to the first media item
+      navigate(`/media/${message.media[0].id}`);
+    }
+  };
+
   const renderMediaItems = (mediaItems: MediaItem[]) => {
     if (!mediaItems || mediaItems.length === 0) return null;
 
     return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-          gap: "12px",
-          marginTop: "12px",
-        }}
-      >
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3 mt-3">
         {mediaItems.map((item) => {
           // Use media_url from response, fallback to url for backward compatibility
           const imageUrl = item.media_url || item.url;
@@ -134,67 +203,25 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                 e.preventDefault();
                 window.open(mediaLink, "_blank", "noopener,noreferrer");
               }}
-              style={{
-                display: "block",
-                borderRadius: "8px",
-                overflow: "hidden",
-                textDecoration: "none",
-                color: "inherit",
-                transition: "transform 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
+              className="block rounded-lg overflow-hidden no-underline text-inherit transition-transform duration-200 hover:scale-105"
             >
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  paddingTop: "100%", // Square aspect ratio
-                  backgroundColor: "#f0f0f0",
-                }}
-              >
+              <div className="relative w-full pt-[100%] bg-gray-100">
                 {imageUrl ? (
                   <img
                     src={imageUrl}
                     alt="Media"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
+                    className="absolute top-0 left-0 w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = "none";
                       const parent = target.parentElement;
                       if (parent) {
-                        parent.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">No Image</div>`;
+                        parent.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400">No Image</div>`;
                       }
                     }}
                   />
                 ) : (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#999",
-                      fontSize: "14px",
-                      textAlign: "center",
-                      padding: "8px",
-                    }}
-                  >
+                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-gray-400 text-sm text-center p-2">
                     Media
                   </div>
                 )}
@@ -229,16 +256,16 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
       );
     },
     h1: ({ ...props }: { children: React.ReactNode }) => (
-      <h1 style={{ fontSize: "2em", fontWeight: "bold" }} {...props} />
+      <h1 className="text-[2em] font-bold" {...props} />
     ),
     h2: ({ ...props }: { children: React.ReactNode }) => (
-      <h2 style={{ fontSize: "1.5em", fontWeight: "bold" }} {...props} />
+      <h2 className="text-[1.5em] font-bold" {...props} />
     ),
     h3: ({ ...props }: { children: React.ReactNode }) => (
-      <h3 style={{ fontSize: "1.17em", fontWeight: "bold" }} {...props} />
+      <h3 className="text-[1.17em] font-bold" {...props} />
     ),
     li: ({ children, ...props }: { children: React.ReactNode }) => (
-      <li style={{ listStyleType: "none", marginBottom: "0.5em" }} {...props}>
+      <li className="list-none mb-2" {...props}>
         {children}
       </li>
     ),
@@ -253,7 +280,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
       className="chatbot-window z-10"
     >
       <div className="chatbot-header">
-        <span style={{ fontWeight: 500 }}>Pinbot: Virtual Assistant</span>
+        <span className="font-medium">Pinbot: Virtual Assistant</span>
         <button className="close-btn" onClick={toggleChatbot}>
           <CloseCircleOutlined />
         </button>
@@ -263,24 +290,30 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`message ${
-                message.sender === "user" ? "user-message" : "ai-message"
-              }`}
+              className={clsx("message", {
+                "user-message": message.sender === "user",
+                "ai-message": message.sender === "ai",
+              })}
             >
               <div
-                className={`message-box ${
-                  message.sender === "user" ? "user-box" : "ai-box"
-                }`}
+                className={clsx("message-box", {
+                  "user-box": message.sender === "user",
+                  "ai-box": message.sender === "ai",
+                })}
               >
                 {message.sender === "user" ? (
                   message.text
                 ) : (
                   <>
                     <Markdown
-                      className={`markdown ${
-                        message.isGenerating ? "typing-animation" : ""
-                      }`}
-                      components={MarkdownComponent as any}
+                      className={clsx("markdown", {
+                        "typing-animation": message.isGenerating,
+                      })}
+                      components={
+                        MarkdownComponent as Parameters<
+                          typeof Markdown
+                        >[0]["components"]
+                      }
                     >
                       {message.text || "Đang suy nghĩ..."}
                     </Markdown>
@@ -289,28 +322,24 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
                     )}
                     {message.ask_confirmation &&
                       message.ask_confirmation.action === "CREATE_ALBUM" && (
-                        <div style={{ marginTop: "12px" }}>
+                        <div className="mt-3">
                           <button
                             onClick={() => handleCreateAlbumClick(message)}
-                            style={{
-                              padding: "8px 16px",
-                              backgroundColor: "#a25772",
-                              color: "#fff",
-                              border: "none",
-                              borderRadius: "8px",
-                              cursor: "pointer",
-                              fontSize: "14px",
-                              fontWeight: 500,
-                              transition: "background-color 0.2s",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = "#902a55";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = "#a25772";
-                            }}
+                            className="px-4 py-2 bg-rose-600 text-white border-none rounded-lg cursor-pointer text-sm font-medium transition-colors duration-200 hover:bg-rose-700"
                           >
                             Create Album
+                          </button>
+                        </div>
+                      )}
+                    {message.intent === "CREATE_MEDIA_FROM_INPUT" &&
+                      message.media &&
+                      message.media.length > 0 && (
+                        <div className="mt-3">
+                          <button
+                            onClick={() => handleViewMedia(message)}
+                            className="px-4 py-2 bg-rose-600 text-white border-none rounded-lg cursor-pointer text-sm font-medium transition-colors duration-200 hover:bg-rose-700"
+                          >
+                            View Media
                           </button>
                         </div>
                       )}
@@ -368,7 +397,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ toggleChatbot }) => {
       >
         <p>Bạn có muốn tạo album dựa theo các ảnh trên?</p>
         {selectedMessage?.album && (
-          <div style={{ marginTop: "12px" }}>
+          <div className="mt-3">
             <p>
               <strong>Album name:</strong> {selectedMessage.album.name}
             </p>

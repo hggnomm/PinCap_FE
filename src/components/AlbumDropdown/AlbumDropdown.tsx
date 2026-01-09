@@ -259,6 +259,18 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         medias_id: [mediaId],
       });
 
+      // Check if response has error field (even if status is 200)
+      if (response?.error) {
+        toast.error(response.error);
+        return;
+      }
+
+      // Check if response has error message (for backward compatibility)
+      if (response?.message) {
+        toast.error(response.message);
+        return;
+      }
+
       if (response) {
         queryClient.invalidateQueries({ queryKey: ["albums", mediaId] });
         queryClient.invalidateQueries({ queryKey: ["albums"] });
@@ -285,11 +297,32 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
     } catch (error: any) {
       console.error("Error saving media to album:", error);
 
+      // Get error status from error object (from apiClient interceptor)
+      const errorStatus =
+        error && typeof error === "object" && "status" in error
+          ? (error as { status?: number }).status
+          : error?.response?.status;
+
       // Handle specific error cases
-      if (error?.response?.status === 422) {
+      if (errorStatus === 403) {
+        // Check for error field first, then message
+        const errorMessage =
+          error?.response?.data?.error ||
+          error?.response?.data?.message ||
+          error?.message ||
+          "You do not have permission to add media to this album";
+        toast.error(errorMessage);
+      } else if (errorStatus === 422) {
         toast.warning(`Media is already in "${albumName}" album`);
+      } else if (error?.response?.data?.error) {
+        // Check error field first
+        toast.error(error.response.data.error);
       } else if (error?.response?.data?.message) {
+        // Fallback to message field
         toast.error(error.response.data.message);
+      } else if (error?.message) {
+        // Fallback to error.message (from apiClient interceptor)
+        toast.error(error.message);
       } else {
         toast.error("Error saving media to album");
       }

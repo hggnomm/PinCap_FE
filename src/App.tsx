@@ -50,7 +50,6 @@ const HomeRouteHandler = () => {
     <>
       <HeaderCommon />
       <Home />
-      <ChatbotProvider />
     </>
   );
 };

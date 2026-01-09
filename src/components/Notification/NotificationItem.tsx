@@ -1,9 +1,20 @@
-import React from 'react';
-import { DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { NOTIFICATION_TYPES } from '@/constants/constants';
-import { useNotificationActions } from '@/react-query/useNotificationActions';
-import clsx from 'clsx';
-import { Button } from 'antd/es';
+import React from "react";
+
+import { useNavigate } from "react-router-dom";
+
+import clsx from "clsx";
+
+import {
+  DeleteOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
+
+import { Button } from "antd/es";
+
+import { NOTIFICATION_TYPES } from "@/constants/constants";
+import { ROUTES } from "@/constants/routes";
+import { useNotificationActions } from "@/react-query/useNotificationActions";
 
 interface NotificationItemProps {
   notification: any;
@@ -16,6 +27,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   onMarkAsRead,
   onDelete,
 }) => {
+  const navigate = useNavigate();
   const {
     actionLoading,
     actionCompleted,
@@ -28,8 +40,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
   // Extract album ID from link
   const getAlbumId = () => {
-    if (!notification.link || typeof notification.link !== 'string') return null;
-    const parts = notification.link.split('/albums/');
+    if (!notification.link || typeof notification.link !== "string")
+      return null;
+    const parts = notification.link.split("/albums/");
     return parts.length > 1 ? parts[1] : null;
   };
 
@@ -39,7 +52,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     if (!albumId || !notification.id) return;
 
     await handleAcceptAlbumInvitation(albumId, () => {
-      setTimeout(() => onMarkAsRead(notification.id, event), 1000);
+      setTimeout(() => {
+        onMarkAsRead(notification.id, event);
+        // Navigate to album detail page
+        navigate(ROUTES.ALBUM_DETAIL.replace(":id", albumId));
+      }, 1000);
     });
   };
 
@@ -59,12 +76,14 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
     return (
       <div className="flex items-center justify-center gap-2 mt-2 py-2 px-3 bg-gray-100 rounded-lg">
-        <span className={clsx(
-          'text-sm font-medium',
-          actionCompleted === 'accepted' && 'text-green-600',
-          actionCompleted === 'rejected' && 'text-gray-600'
-        )}>
-          {actionCompleted === 'accepted' ? '✓ Accepted' : '✗ Rejected'}
+        <span
+          className={clsx(
+            "text-sm font-medium",
+            actionCompleted === "accepted" && "text-green-600",
+            actionCompleted === "rejected" && "text-gray-600"
+          )}
+        >
+          {actionCompleted === "accepted" ? "✓ Accepted" : "✗ Rejected"}
         </span>
       </div>
     );
@@ -78,33 +97,32 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         icon={<CheckOutlined className="text-xs" />}
         onClick={onAccept}
         disabled={!!actionLoading || notification.is_read}
-        loading={actionLoading === 'accept'}
+        loading={actionLoading === "accept"}
         className={clsx(
-          '!flex-1 !flex !items-center !justify-center !gap-2 !h-auto !py-2 !px-3 !rounded-lg !font-medium !text-sm !transition-all !duration-200',
-          actionLoading === 'accept' && '!animate-pulse',
-          notification.is_read 
-            ? '!bg-gray-100 !text-gray-400 !border-gray-200'
-            : '!bg-green-500 !text-white hover:!bg-green-600 active:!scale-95 !border-green-500'
+          "!flex-1 !flex !items-center !justify-center !gap-2 !h-auto !py-2 !px-3 !rounded-lg !font-medium !text-sm !transition-all !duration-200",
+          actionLoading === "accept" && "!animate-pulse",
+          notification.is_read
+            ? "!bg-gray-100 !text-gray-400 !border-gray-200"
+            : "!bg-[#a25772] !text-white hover:!bg-[#bf6787] active:!scale-95 !border-[#a25772]"
         )}
       >
-        {actionLoading === 'accept' ? 'Accepting...' : 'Accept'}
+        {actionLoading === "accept" ? "Accepting..." : "Accept"}
       </Button>
       <Button
-        type="primary"
-        danger
+        type="default"
         icon={<CloseOutlined className="text-xs" />}
         onClick={onReject}
         disabled={!!actionLoading || notification.is_read}
-        loading={actionLoading === 'reject'}
+        loading={actionLoading === "reject"}
         className={clsx(
-          '!flex-1 !flex !items-center !justify-center !gap-2 !h-auto !py-2 !px-3 !rounded-lg !font-medium !text-sm !transition-all !duration-200',
-          actionLoading === 'reject' && '!animate-pulse',
+          "!flex-1 !flex !items-center !justify-center !gap-2 !h-auto !py-2 !px-3 !rounded-lg !font-medium !text-sm !transition-all !duration-200",
+          actionLoading === "reject" && "!animate-pulse",
           notification.is_read
-            ? '!bg-gray-100 !text-gray-400 !border-gray-200'
-            : '!bg-red-500 !text-white hover:!bg-red-600 active:!scale-95 !border-red-500'
+            ? "!bg-gray-100 !text-gray-400 !border-gray-200"
+            : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200 active:!scale-95 !border-gray-300"
         )}
       >
-        {actionLoading === 'reject' ? 'Rejecting...' : 'Reject'}
+        {actionLoading === "reject" ? "Rejecting..." : "Reject"}
       </Button>
     </div>
   );
@@ -134,8 +152,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   return (
     <div
       className={clsx(
-        'flex flex-col border-b border-gray-100 px-4 py-3 hover:bg-gray-50 transition-colors duration-150',
-        notification.is_read && 'opacity-50'
+        "flex flex-col border-b border-gray-100 px-4 py-3 hover:bg-gray-50 transition-colors duration-150",
+        notification.is_read && "opacity-50"
       )}
     >
       <div className="flex items-start gap-3">
@@ -144,12 +162,16 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           {notification.sender?.avatar ? (
             <img
               src={notification.sender.avatar}
-              alt={notification.sender?.name || 'User'}
+              alt={notification.sender?.name || "User"}
               className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-medium text-sm border-2 border-gray-200">
-              {((notification.sender?.name || notification.title || 'N').charAt(0) || 'N').toUpperCase()}
+              {(
+                (notification.sender?.name || notification.title || "N").charAt(
+                  0
+                ) || "N"
+              ).toUpperCase()}
             </div>
           )}
         </div>
@@ -157,12 +179,16 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         {/* Content */}
         <div
           className={clsx(
-            'flex-grow min-h-0 flex flex-col',
-            notification.notification_type !== NOTIFICATION_TYPES.ALBUM_INVITATION && 'cursor-pointer'
+            "flex-grow min-h-0 flex flex-col",
+            notification.notification_type !==
+              NOTIFICATION_TYPES.ALBUM_INVITATION && "cursor-pointer"
           )}
           onClick={(e) => {
             // Disable mark as read for ALBUM_INVITATION type
-            if (notification.notification_type === NOTIFICATION_TYPES.ALBUM_INVITATION) {
+            if (
+              notification.notification_type ===
+              NOTIFICATION_TYPES.ALBUM_INVITATION
+            ) {
               return;
             }
             if (notification.id) {
@@ -172,22 +198,24 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         >
           <div className="flex-grow flex flex-col">
             <p className="text-gray-800 font-semibold text-sm mb-1 leading-tight line-clamp-1">
-              {notification.title || 'Notification'}
+              {notification.title || "Notification"}
             </p>
             <p className="text-gray-600 text-sm mb-2 leading-tight line-clamp-2">
-              {notification.content || notification.message || ''}
+              {notification.content || notification.message || ""}
             </p>
             <div className="flex items-center gap-2">
               <p className="text-gray-400 text-xs">
-                {notification.created_at 
+                {notification.created_at
                   ? (() => {
                       try {
-                        return new Date(notification.created_at).toLocaleString('vi-VN');
+                        return new Date(notification.created_at).toLocaleString(
+                          "vi-VN"
+                        );
                       } catch (error) {
-                        return 'Just now';
+                        return "Just now";
                       }
                     })()
-                  : 'Just now'}
+                  : "Just now"}
               </p>
               {!notification.is_read && (
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -210,12 +238,16 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             }}
             disabled={notification.is_read}
             className={clsx(
-              'p-2 rounded-full transition-colors duration-200',
+              "p-2 rounded-full transition-colors duration-200",
               notification.is_read
-                ? 'text-gray-300 cursor-not-allowed'
-                : 'text-gray-400 hover:text-red-500 hover:bg-red-50 cursor-pointer'
+                ? "text-gray-300 cursor-not-allowed"
+                : "text-gray-400 hover:text-red-500 hover:bg-red-50 cursor-pointer"
             )}
-            title={notification.is_read ? 'Cannot delete read notification' : 'Delete notification'}
+            title={
+              notification.is_read
+                ? "Cannot delete read notification"
+                : "Delete notification"
+            }
           >
             <DeleteOutlined className="text-sm" />
           </button>
@@ -226,4 +258,3 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 };
 
 export default NotificationItem;
-
