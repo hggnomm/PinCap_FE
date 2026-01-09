@@ -1,8 +1,8 @@
-import React, { Suspense, lazy } from "react";
+import React from "react";
 
 import { useMediaToast } from "@/contexts/MediaToastContext";
 
-const MediaSuccessToast = lazy(() => import("./MediaSuccessToast"));
+import MediaSuccessToast from "./MediaSuccessToast";
 
 const MediaToastContainer: React.FC = () => {
   const { isVisible, hideToast, mediaData, action } = useMediaToast();
@@ -10,14 +10,12 @@ const MediaToastContainer: React.FC = () => {
   if (!mediaData || !action) return null;
 
   return (
-    <Suspense fallback={null}>
-      <MediaSuccessToast
-        isVisible={isVisible}
-        onClose={hideToast}
-        mediaData={mediaData}
-        action={action}
-      />
-    </Suspense>
+    <MediaSuccessToast
+      isVisible={isVisible}
+      onClose={hideToast}
+      mediaData={mediaData}
+      action={action}
+    />
   );
 };
 

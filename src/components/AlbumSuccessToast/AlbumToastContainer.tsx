@@ -1,8 +1,8 @@
-import React, { Suspense, lazy } from "react";
+import React from "react";
 
 import { useAlbumToast } from "@/contexts/AlbumToastContext";
 
-const AlbumSuccessToast = lazy(() => import("./AlbumSuccessToast"));
+import AlbumSuccessToast from "./AlbumSuccessToast";
 
 const AlbumToastContainer: React.FC = () => {
   const { isVisible, hideToast, albumData } = useAlbumToast();
@@ -10,15 +10,12 @@ const AlbumToastContainer: React.FC = () => {
   if (!albumData) return null;
 
   return (
-    <Suspense fallback={null}>
-      <AlbumSuccessToast
-        isVisible={isVisible}
-        onClose={hideToast}
-        albumData={albumData}
-      />
-    </Suspense>
+    <AlbumSuccessToast
+      isVisible={isVisible}
+      onClose={hideToast}
+      albumData={albumData}
+    />
   );
 };
 
 export default AlbumToastContainer;
-
