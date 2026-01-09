@@ -62,6 +62,7 @@ export const useCreateMedia = (
   const [isLoadCreateDraft, setIsLoadCreateDraft] = useState<boolean>(false);
   const [textCreateDraft, setTextCreateDraft] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [mediaUrl, setMediaUrl] = useState<string | string[]>("");
   const [draftId, setDraftId] = useState<string>("");
   const [fetchedDraftId, setFetchedDraftId] = useState<string>("");
   const [isGeneratingMetadata, setIsGeneratingMetadata] =
@@ -81,6 +82,7 @@ export const useCreateMedia = (
         ? media.media_url[0]
         : media.media_url || "";
       setImageUrl(url);
+      setMediaUrl(media.media_url || "");
       setIsSelectedDraft(true);
       setFileList([]);
       setTags(media.tags?.map(getTagName) || []);
@@ -333,6 +335,7 @@ export const useCreateMedia = (
     setFileList([]);
     setTags([]);
     setImageUrl("");
+    setMediaUrl("");
     setDrawerVisible(false);
     setIsLoadCreateDraft(false);
     setIsFormDisabled(true);
@@ -354,6 +357,7 @@ export const useCreateMedia = (
               ? detailDraft.media_url[0]
               : detailDraft.media_url || "";
             setImageUrl(url);
+            setMediaUrl(detailDraft.media_url || "");
             setIsSelectedDraft(true);
             setFileList([]);
             setTags(detailDraft.tags?.map(getTagName) || []);
@@ -408,6 +412,8 @@ export const useCreateMedia = (
     textCreateDraft,
     imageUrl,
     setImageUrl,
+    mediaUrl,
+    setMediaUrl,
     draftId,
     setDraftId,
     isGeneratingMetadata,

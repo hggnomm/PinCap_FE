@@ -71,6 +71,8 @@ const CreateMedia: React.FC = () => {
     textCreateDraft,
     imageUrl,
     setImageUrl,
+    mediaUrl,
+    setMediaUrl,
     draftId,
     setDraftId,
     isGeneratingMetadata,
@@ -188,6 +190,7 @@ const CreateMedia: React.FC = () => {
     if (editingImageIndex === 0 && imageUrl) {
       setFileList([editedFile]);
       setImageUrl("");
+      setMediaUrl("");
       setIsSelectedDraft(false);
     } else {
       const newFileList = [...fileList];
@@ -352,7 +355,7 @@ const CreateMedia: React.FC = () => {
               <div className="draft-img relative">
                 {(() => {
                   const isFlexibleMedia =
-                    Array.isArray(imageUrl) && imageUrl.length > 1;
+                    Array.isArray(mediaUrl) && mediaUrl.length > 1;
 
                   if (isFlexibleMedia) {
                     return (
@@ -360,7 +363,7 @@ const CreateMedia: React.FC = () => {
                         media={
                           {
                             id: draftId,
-                            media_url: imageUrl,
+                            media_url: mediaUrl,
                             type: null,
                           } as unknown as Media
                         }
