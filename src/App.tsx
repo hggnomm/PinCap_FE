@@ -84,80 +84,94 @@ const App = () => {
             <MediaToastContainer />
             <AlbumToastContainer />
           </Suspense>
-        <div className="App">
-          <Routes>
-            {/* Public Routes */}
-            <Route path={ROUTES.LOGIN} element={<Login />} />
-            <Route path={ROUTES.REGISTER} element={<Register />} />
-            <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
-            <Route path={ROUTES.FORBIDDEN} element={<Forbidden />} />
+          <div className="App">
+            <Routes>
+              {/* Public Routes */}
+              <Route path={ROUTES.LOGIN} element={<Login />} />
+              <Route path={ROUTES.REGISTER} element={<Register />} />
+              <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
+              <Route path={ROUTES.FORBIDDEN} element={<Forbidden />} />
 
-            <Route path={ROUTES.HOME} element={<HomeRouteHandler />} />
+              <Route path={ROUTES.HOME} element={<HomeRouteHandler />} />
 
-            {/* Protected Routes */}
-            <Route
-              path="*"
-              element={
-                <ProtectedRoute>
-                  <Layout className="main-container">
-                    <HeaderCommon />
-                    <Layout className="body-layout">
-                      <SiderCommon />
-                      <Content className="right-layout">
-                        <Routes>
-                          <Route
-                            path={ROUTES.PINCAP_HOME}
-                            element={<PinCap />}
-                          />
-                          <Route
-                            path={ROUTES.CREATE_MEDIA}
-                            element={<CreateMedia />}
-                          />
-                          <Route path={ROUTES.AI_TOOLS} element={<ImageAi />} />
-                          <Route
-                            path={ROUTES.MEDIA_DETAIL}
-                            element={<DetailMedia />}
-                          />
-                          <Route path={ROUTES.MY_ALBUM} element={<MyAlbum />} />
-                          <Route
-                            path={ROUTES.ALBUM_DETAIL}
-                            element={<DetailAlbum />}
-                          />
-                          <Route path={ROUTES.MY_MEDIA} element={<MyMedia />} />
-                          <Route path={ROUTES.PROFILE} element={<Profile />} />
-                          <Route
-                            path={ROUTES.EDIT_PROFILE}
-                            element={<EditProfile />}
-                          />
-                          <Route
-                            path={ROUTES.USER_PROFILE}
-                            element={<UserProfile />}
-                          />
-                          <Route path={ROUTES.SEARCH} element={<Search />} />
-                          <Route
-                            path={ROUTES.INSTAGRAM_ABOUT}
-                            element={<InstagramAbout />}
-                          />
-                          <Route
-                            path={ROUTES.INSTAGRAM_SYNC}
-                            element={<InstagramSync />}
-                          />
+              {/* Protected Routes */}
+              <Route
+                path="*"
+                element={
+                  <ProtectedRoute>
+                    <Layout className="main-container">
+                      <HeaderCommon />
+                      <Layout className="body-layout">
+                        <SiderCommon />
+                        <Content className="right-layout">
+                          <Routes>
+                            <Route
+                              path={ROUTES.PINCAP_HOME}
+                              element={<PinCap />}
+                            />
+                            <Route
+                              path={ROUTES.CREATE_MEDIA}
+                              element={<CreateMedia />}
+                            />
+                            <Route
+                              path={ROUTES.AI_TOOLS}
+                              element={<ImageAi />}
+                            />
+                            <Route
+                              path={ROUTES.MEDIA_DETAIL}
+                              element={<DetailMedia />}
+                            />
+                            <Route
+                              path={ROUTES.MY_ALBUM}
+                              element={<MyAlbum />}
+                            />
+                            <Route
+                              path={ROUTES.ALBUM_DETAIL}
+                              element={<DetailAlbum />}
+                            />
+                            <Route
+                              path={ROUTES.MY_MEDIA}
+                              element={<MyMedia />}
+                            />
+                            <Route
+                              path={ROUTES.PROFILE}
+                              element={<Profile />}
+                            />
+                            <Route
+                              path={ROUTES.EDIT_PROFILE}
+                              element={<EditProfile />}
+                            />
+                            <Route
+                              path={ROUTES.USER_PROFILE}
+                              element={<UserProfile />}
+                            />
+                            <Route path={ROUTES.SEARCH} element={<Search />} />
+                            <Route
+                              path={ROUTES.INSTAGRAM_ABOUT}
+                              element={<InstagramAbout />}
+                            />
+                            <Route
+                              path={ROUTES.INSTAGRAM_SYNC}
+                              element={<InstagramSync />}
+                            />
 
-                          {/* Catch all - redirect to 404 */}
-                          <Route
-                            path="*"
-                            element={<Navigate to={ROUTES.NOT_FOUND} replace />}
-                          />
-                        </Routes>
-                      </Content>
+                            {/* Catch all - redirect to 404 */}
+                            <Route
+                              path="*"
+                              element={
+                                <Navigate to={ROUTES.NOT_FOUND} replace />
+                              }
+                            />
+                          </Routes>
+                        </Content>
+                      </Layout>
+                      <ChatbotProvider />
                     </Layout>
-                    <ChatbotProvider />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </div>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
         </AlbumToastProvider>
       </MediaToastProvider>
     </ConfigProvider>

@@ -101,7 +101,7 @@ const SiderCommon = () => {
         setCollapsed(true);
       } else {
         setIsMobile(false);
-        setCollapsed(false);
+        // Keep sidebar collapsed by default on desktop
       }
     };
 

@@ -127,11 +127,27 @@ const CreateMedia: React.FC = () => {
     setTags((prevTags) => prevTags.filter((t) => t !== tagToRemove));
   };
 
+  // Helper function to map privacy from response (PRIVATE/PUBLIC or 0/1) to form value (0/1)
+  const mapPrivacyToFormValue = (privacy: string | undefined): "0" | "1" => {
+    if (!privacy) return PRIVACY.PRIVATE;
+
+    const privacyUpper = privacy.toUpperCase();
+    if (privacyUpper === "PUBLIC" || privacy === "1") {
+      return PRIVACY.PUBLIC;
+    }
+    if (privacyUpper === "PRIVATE" || privacy === "0") {
+      return PRIVACY.PRIVATE;
+    }
+
+    // Default to PRIVATE if unknown value
+    return PRIVACY.PRIVATE;
+  };
+
   const handleSelectMediaWithForm = (media: Media) => {
     form.setFieldsValue({
       media_name: media.media_name,
       description: media.description,
-      privacy: media.privacy === "1" ? PRIVACY.PUBLIC : PRIVACY.PRIVATE,
+      privacy: mapPrivacyToFormValue(media.privacy),
       tags_name: media.tags?.map(getTagName) || [],
       id: media.id,
     });

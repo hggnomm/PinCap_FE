@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 import { notification } from "antd";
 
 import { getDetailMedia, generateMetadata } from "@/api/media";
@@ -18,6 +20,21 @@ import { getTagName } from "@/utils/tagMapping";
 import { checkImagePolicy } from "@/utils/visionUtils";
 import { CreateMediaFormData, UpdateMediaFormData } from "@/validation/media";
 
+const mapPrivacyToFormValue = (privacy: string | undefined): "0" | "1" => {
+  if (!privacy) return PRIVACY.PRIVATE;
+
+  const privacyUpper = privacy.toUpperCase();
+  if (privacyUpper === "PUBLIC" || privacy === "1") {
+    return PRIVACY.PUBLIC;
+  }
+  if (privacyUpper === "PRIVATE" || privacy === "0") {
+    return PRIVACY.PRIVATE;
+  }
+
+  // Default to PRIVATE if unknown value
+  return PRIVACY.PRIVATE;
+};
+
 export const useCreateMedia = (
   resetFormFields?: () => void,
   updateFormFields?: (values: Partial<CreateMediaFormData>) => void
@@ -25,6 +42,7 @@ export const useCreateMedia = (
   const tokenPayload = useSelector(
     (state: { auth: TokenPayload }) => state.auth
   );
+  const queryClient = useQueryClient();
   const { createMedia, updateMedia, getMyMedia } = useMedia();
   const { showToast } = useMediaToast();
 
@@ -74,7 +92,7 @@ export const useCreateMedia = (
           id: media.id,
           media_name: media.media_name,
           description: media.description,
-          privacy: media.privacy === "1" ? PRIVACY.PUBLIC : PRIVACY.PRIVATE,
+          privacy: mapPrivacyToFormValue(media.privacy),
           tags_name: media.tags?.map(getTagName) || [],
         });
       }
@@ -170,6 +188,11 @@ export const useCreateMedia = (
           }
 
           showToast(response.media, formValue.id ? "update" : "create");
+
+          // Invalidate MyMedia query to refetch updated data
+          queryClient.invalidateQueries({
+            queryKey: ["medias", "my-media", "created"],
+          });
         }
       } else {
         toast.error("An unexpected error occurred.");
@@ -338,10 +361,7 @@ export const useCreateMedia = (
                 id: detailDraft.id,
                 media_name: detailDraft.media_name,
                 description: detailDraft.description,
-                privacy:
-                  detailDraft.privacy === "1"
-                    ? PRIVACY.PUBLIC
-                    : PRIVACY.PRIVATE,
+                privacy: mapPrivacyToFormValue(detailDraft.privacy),
                 tags_name: detailDraft.tags?.map(getTagName) || [],
               });
             }
