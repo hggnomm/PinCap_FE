@@ -13,6 +13,7 @@ export interface AdminMedia {
   album_id?: string | null;
   description?: string | null;
   privacy?: "PUBLIC" | "PRIVATE" | null;
+  is_policy_violation?: boolean | 0 | 1; // Policy violation status
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;
@@ -62,7 +63,7 @@ export interface CreateMediaData {
   user_id: string;
   album_id?: string | null;
   description?: string | null;
-  privacy?: string | null;
+  privacy?: "0" | "1" | null; // "0": PRIVATE, "1": PUBLIC
 }
 
 export interface UpdateMediaData {
@@ -72,7 +73,8 @@ export interface UpdateMediaData {
   user_id?: string;
   album_id?: string | null;
   description?: string | null;
-  privacy?: string | null;
+  privacy?: "0" | "1" | null; // "0": PRIVATE, "1": PUBLIC
+  is_policy_violation?: boolean; // true: violation, false: no violation
 }
 
 export interface GetMediasResponse {

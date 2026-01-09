@@ -19,7 +19,7 @@ import {
   ClearOutlined,
 } from "@ant-design/icons";
 import type { AdminAlbum, GetAlbumsParams } from "@/api/albums";
-import { getAlbums, restoreAlbum, forceDeleteAlbum } from "@/api/albums";
+import { getAlbums, restoreAlbumPost, forceDeleteAlbum } from "@/api/albums";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -200,7 +200,7 @@ const AlbumManagementView: React.FC = () => {
 
   const handleRestore = async (albumId: string) => {
     try {
-      await restoreAlbum(albumId);
+      await restoreAlbumPost(albumId);
       message.success("Album restored successfully");
       fetchAlbums();
     } catch (error: unknown) {

@@ -79,6 +79,23 @@ export const restoreAlbum = async (
 };
 
 /**
+ * Restore a soft-deleted album using POST method
+ */
+export const restoreAlbumPost = async (
+  albumId: string
+): Promise<AlbumResponse> => {
+  try {
+    const response = await apiClient.post(
+      `/api/admin/albums/${albumId}/restore`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to restore album:", error);
+    throw error;
+  }
+};
+
+/**
  * Permanently delete an album from database and all its album_media relationships
  */
 export const forceDeleteAlbum = async (

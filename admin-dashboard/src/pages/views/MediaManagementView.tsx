@@ -42,7 +42,7 @@ interface EditMediaFormData {
   media_url: string;
   media_type?: string | null;
   description?: string | null;
-  privacy?: string | null;
+  privacy?: "0" | "1" | null; // "0": PRIVATE, "1": PUBLIC
 }
 
 const MediaManagementView: React.FC = () => {
@@ -294,12 +294,19 @@ const MediaManagementView: React.FC = () => {
       ? media.media_url[0]
       : media.media_url;
     const mediaType = media.type || media.media_type || "";
+    // Convert "PUBLIC"/"PRIVATE" to "1"/"0" for form
+    const privacyValue =
+      media.privacy === "PUBLIC"
+        ? "1"
+        : media.privacy === "PRIVATE"
+        ? "0"
+        : undefined;
     form.setFieldsValue({
       media_name: media.media_name || "",
       media_url: typeof mediaUrl === "string" ? mediaUrl : "",
       media_type: mediaType,
       description: media.description || "",
-      privacy: media.privacy || "",
+      privacy: privacyValue,
     });
     setIsEditModalVisible(true);
   };
@@ -319,7 +326,10 @@ const MediaManagementView: React.FC = () => {
         media_url: values.media_url,
         media_type: editingMedia.type || editingMedia.media_type || null, // Keep original type, don't allow edit
         description: values.description || null,
-        privacy: values.privacy || null,
+        privacy:
+          values.privacy && (values.privacy === "0" || values.privacy === "1")
+            ? values.privacy
+            : null,
       };
 
       await updateMedia(editingMedia.id, updateData);
@@ -346,7 +356,10 @@ const MediaManagementView: React.FC = () => {
         media_type: values.media_type || null,
         user_id: values.user_id,
         description: values.description || null,
-        privacy: values.privacy || null,
+        privacy:
+          values.privacy && (values.privacy === "0" || values.privacy === "1")
+            ? values.privacy
+            : null,
       });
       message.success("Media created successfully");
       setIsCreateModalVisible(false);
@@ -804,9 +817,9 @@ const MediaManagementView: React.FC = () => {
             <Input.TextArea rows={4} />
           </Form.Item>
           <Form.Item name="privacy" label="Privacy">
-            <Select placeholder="Select privacy">
-              <Option value="PUBLIC">Public</Option>
-              <Option value="PRIVATE">Private</Option>
+            <Select placeholder="Select privacy" allowClear>
+              <Option value="1">Public</Option>
+              <Option value="0">Private</Option>
             </Select>
           </Form.Item>
         </Form>
@@ -856,9 +869,9 @@ const MediaManagementView: React.FC = () => {
             <Input.TextArea rows={4} />
           </Form.Item>
           <Form.Item name="privacy" label="Privacy">
-            <Select placeholder="Select privacy">
-              <Option value="PUBLIC">Public</Option>
-              <Option value="PRIVATE">Private</Option>
+            <Select placeholder="Select privacy" allowClear>
+              <Option value="1">Public</Option>
+              <Option value="0">Private</Option>
             </Select>
           </Form.Item>
         </Form>

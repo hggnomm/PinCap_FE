@@ -14,6 +14,7 @@ import LoadingSpinner from "@/components/LoadingSpinner/LoadingSpinner";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import SiderCommon from "@/components/Sider/SiderCommon";
 import { ROUTES } from "@/constants/routes";
+import { AlbumToastProvider } from "@/contexts/AlbumToastContext";
 import { MediaToastProvider } from "@/contexts/MediaToastContext";
 import { ImageAi } from "@/pages/AITools";
 import { Login, Register } from "@/pages/Auth";
@@ -37,6 +38,10 @@ import { useAuth } from "./react-query";
 
 const MediaToastContainer = lazy(
   () => import("./components/MediaSuccessToast/MediaToastContainer")
+);
+
+const AlbumToastContainer = lazy(
+  () => import("./components/AlbumSuccessToast/AlbumToastContainer")
 );
 
 const HomeRouteHandler = () => {
@@ -68,15 +73,17 @@ const App = () => {
   return (
     <ConfigProvider>
       <MediaToastProvider>
-        <ToastContainer
-          position="bottom-center"
-          autoClose={3000}
-          closeOnClick={true}
-          pauseOnHover={true}
-        />
-        <Suspense fallback={null}>
-          <MediaToastContainer />
-        </Suspense>
+        <AlbumToastProvider>
+          <ToastContainer
+            position="bottom-center"
+            autoClose={3000}
+            closeOnClick={true}
+            pauseOnHover={true}
+          />
+          <Suspense fallback={null}>
+            <MediaToastContainer />
+            <AlbumToastContainer />
+          </Suspense>
         <div className="App">
           <Routes>
             {/* Public Routes */}
@@ -151,6 +158,7 @@ const App = () => {
             />
           </Routes>
         </div>
+        </AlbumToastProvider>
       </MediaToastProvider>
     </ConfigProvider>
   );

@@ -265,34 +265,32 @@ const AlbumDropdown: React.FC<AlbumDropdownProps> = ({
         return;
       }
 
-      // Check if response has error message (for backward compatibility)
+      // Response is successful - invalidate queries and show success
+      queryClient.invalidateQueries({ queryKey: ["albums", mediaId] });
+      queryClient.invalidateQueries({ queryKey: ["albums"] });
+      queryClient.invalidateQueries({
+        queryKey: ["album-members", mediaId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["album-members"] });
+      queryClient.invalidateQueries({ queryKey: ["album", albumId] });
+
+      // Track save event
+      trackUserEvent({
+        event_type: "save",
+        media_id: mediaId,
+        metadata: null,
+      }).catch((error) => {
+        console.error("Failed to track save event:", error);
+      });
+
+      // Show success message if response has message, otherwise show default
       if (response?.message) {
-        toast.error(response.message);
-        return;
-      }
-
-      if (response) {
-        queryClient.invalidateQueries({ queryKey: ["albums", mediaId] });
-        queryClient.invalidateQueries({ queryKey: ["albums"] });
-        queryClient.invalidateQueries({
-          queryKey: ["album-members", mediaId],
-        });
-        queryClient.invalidateQueries({ queryKey: ["album-members"] });
-        queryClient.invalidateQueries({ queryKey: ["album", albumId] });
-
-        // Track save event
-        trackUserEvent({
-          event_type: "save",
-          media_id: mediaId,
-          metadata: null,
-        }).catch((error) => {
-          console.error("Failed to track save event:", error);
-        });
-
-        onSuccess?.();
+        toast.success(response.message);
       } else {
-        toast.error("Failed to save media to album");
+        toast.success("Media added to album successfully");
       }
+
+      onSuccess?.();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error saving media to album:", error);

@@ -14,6 +14,7 @@ import {
   Tag,
   Flex,
   Image,
+  Checkbox,
 } from "antd";
 import {
   EditOutlined,
@@ -25,16 +26,17 @@ import {
 } from "@ant-design/icons";
 import type { AdminMedia, GetMediasParams, UpdateMediaData } from "@/api/media";
 import { getMedias, updateMedia, deleteMedia, restoreMedia } from "@/api/media";
+import {
+  checkImagePolicy,
+  type ImagePolicyCheckResult,
+} from "@/utils/visionUtils";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 interface EditMediaFormData {
-  media_name: string;
-  media_url: string;
-  media_type?: string | null;
-  description?: string | null;
-  privacy?: string | null;
+  privacy?: "0" | "1" | null; // "0": PRIVATE, "1": PUBLIC
+  is_policy_violation?: boolean; // true: violation, false: no violation
 }
 
 const MediaPolicyDetectView: React.FC = () => {
@@ -218,16 +220,28 @@ const MediaPolicyDetectView: React.FC = () => {
   const handleEdit = (media: AdminMedia) => {
     console.log("Editing media:", media);
     setEditingMedia(media);
-    const mediaUrl = Array.isArray(media.media_url)
-      ? media.media_url[0]
-      : media.media_url;
-    const mediaType = media.type || media.media_type || "";
+    // Get policy violation status as boolean
+    // Check from safe_search_data first, then fallback to is_policy_violation
+    let isPolicyViolation = false;
+    if (media.safe_search_data && media.safe_search_data.length > 0) {
+      const policyResult = checkImagePolicy(media.safe_search_data);
+      // Only VIOLATION is considered as true, WARNING and SAFE are false
+      isPolicyViolation = policyResult.status === "VIOLATION";
+    } else {
+      // Fallback to is_policy_violation if safe_search_data is not available
+      isPolicyViolation =
+        media.is_policy_violation === true || media.is_policy_violation === 1;
+    }
+    // Convert "PUBLIC"/"PRIVATE" to "1"/"0" for form
+    const privacyValue =
+      media.privacy === "PUBLIC"
+        ? "1"
+        : media.privacy === "PRIVATE"
+        ? "0"
+        : undefined;
     const formValues = {
-      media_name: media.media_name || "",
-      media_url: typeof mediaUrl === "string" ? mediaUrl : "",
-      media_type: mediaType,
-      description: media.description || "",
-      privacy: media.privacy || "",
+      privacy: privacyValue,
+      is_policy_violation: isPolicyViolation,
     };
     console.log("Setting form values:", formValues);
     form.setFieldsValue(formValues);
@@ -242,11 +256,11 @@ const MediaPolicyDetectView: React.FC = () => {
 
     try {
       const updateData: UpdateMediaData = {
-        media_name: values.media_name,
-        media_url: values.media_url,
-        media_type: editingMedia.type || editingMedia.media_type || null,
-        description: values.description || null,
-        privacy: values.privacy || null,
+        privacy:
+          values.privacy && (values.privacy === "0" || values.privacy === "1")
+            ? values.privacy
+            : null,
+        is_policy_violation: values.is_policy_violation,
       };
 
       console.log("Updating media:", editingMedia.id, updateData);
@@ -384,11 +398,31 @@ const MediaPolicyDetectView: React.FC = () => {
     {
       title: "Policy Violation",
       key: "policy_violation",
-      render: () => (
-        <Tag color="red" icon={<WarningOutlined />}>
-          Violation Detected
-        </Tag>
-      ),
+      render: (_: unknown, record: AdminMedia) => {
+        if (!record.safe_search_data || record.safe_search_data.length === 0) {
+          return <Tag color="default">No Data</Tag>;
+        }
+
+        const policyResult: ImagePolicyCheckResult = checkImagePolicy(
+          record.safe_search_data
+        );
+
+        if (policyResult.status === "VIOLATION") {
+          return (
+            <Tag color="red" icon={<WarningOutlined />}>
+              Violation
+            </Tag>
+          );
+        } else if (policyResult.status === "WARNING") {
+          return (
+            <Tag color="orange" icon={<WarningOutlined />}>
+              Warning
+            </Tag>
+          );
+        } else {
+          return <Tag color="green">Normal</Tag>;
+        }
+      },
     },
     {
       title: "Status",
@@ -550,34 +584,19 @@ const MediaPolicyDetectView: React.FC = () => {
         okText="Update"
       >
         <Form form={form} layout="vertical" onFinish={handleEditSubmit}>
-          <Form.Item
-            name="media_name"
-            label="Media Name"
-            rules={[{ required: true, message: "Please enter media name" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="media_url"
-            label="Media URL"
-            rules={[{ required: true, message: "Please enter media URL" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="media_type" label="Media Type">
-            <Input
-              disabled
-              value={editingMedia?.type || editingMedia?.media_type || "-"}
-            />
-          </Form.Item>
-          <Form.Item name="description" label="Description">
-            <Input.TextArea rows={4} />
-          </Form.Item>
           <Form.Item name="privacy" label="Privacy">
-            <Select placeholder="Select privacy">
-              <Option value="PUBLIC">Public</Option>
-              <Option value="PRIVATE">Private</Option>
+            <Select placeholder="Select privacy" allowClear>
+              <Option value="1">Public</Option>
+              <Option value="0">Private</Option>
             </Select>
+          </Form.Item>
+          <Form.Item
+            name="is_policy_violation"
+            valuePropName="checked"
+            label="Policy Violation"
+            tooltip="Check if this media violates policy"
+          >
+            <Checkbox>Mark as policy violation</Checkbox>
           </Form.Item>
         </Form>
       </Modal>
