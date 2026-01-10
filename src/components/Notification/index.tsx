@@ -144,8 +144,6 @@ const Notification = () => {
   // Auto-refresh notifications every 5 seconds
   // Only refresh if dropdown is visible to avoid unnecessary API calls
   useEffect(() => {
-    if (!isComponentVisible) return;
-
     // Set up interval to fetch notifications every 5 seconds
     const intervalId = setInterval(() => {
       dispatch(
