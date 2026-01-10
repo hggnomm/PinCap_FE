@@ -29,7 +29,17 @@ const SyncMediaModal = ({
   const { mutate, isPending, isSuccess, isError, reset, error } = useMutation({
     mutationFn: (postId: string) => syncInstagramMedias([postId]),
     onSuccess: async () => {
+      // Invalidate Instagram medias query
       await queryClient.invalidateQueries({ queryKey: ["instagram-medias"] });
+
+      // Invalidate my media queries to trigger refetch
+      await queryClient.invalidateQueries({ queryKey: ["medias", "my-media"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["medias", "my-media", "created"],
+      });
+
+      // Invalidate all medias query to update the list
+      await queryClient.invalidateQueries({ queryKey: ["medias", "all"] });
     },
   });
 
