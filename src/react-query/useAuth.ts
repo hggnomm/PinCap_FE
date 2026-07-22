@@ -17,7 +17,7 @@ export const useAuth = () => {
 
   const {
     data: user,
-    isLoading: isLoadingUser,
+    isPending: isPendingUser,
     error,
   } = useQuery<User>({
     queryKey: ["user"],
@@ -26,16 +26,20 @@ export const useAuth = () => {
     refetchOnMount: false,
     retryOnMount: false,
     refetchOnReconnect: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!token, // Only run query if token exists
+    staleTime: 5 * 60 * 1000,
+    enabled: !!token,
   });
 
+  const isLoadingUser = !!token && isPendingUser;
+
   useEffect(() => {
-    if (error && (error as { status?: number })?.status === 401) {
-      localStorage.removeItem("token");
-      queryClient.clear();
-      navigate(ROUTES.LOGIN);
+    if (!error) {
+      return;
     }
+
+    localStorage.removeItem("token");
+    queryClient.removeQueries({ queryKey: ["user"] });
+    navigate(ROUTES.LOGIN, { replace: true });
   }, [error, queryClient, navigate]);
 
   const loginMutation = useMutation({
