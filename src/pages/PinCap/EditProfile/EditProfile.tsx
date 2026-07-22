@@ -422,7 +422,7 @@ const EditProfile = () => {
                   <button
                     type="submit"
                     disabled={updateMyProfileLoading}
-                    className="flex items-center justify-center gap-2 !px-8 !py-4 bg-rose-600 hover:!bg-rose-700 disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                    className="flex items-center justify-center gap-2 !px-8 !py-4 bg-[#a25772] hover:!bg-[#8b4a63] disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                   >
                     {updateMyProfileLoading
                       ? "Saving Changes..."
