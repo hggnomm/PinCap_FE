@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { ArrowLeft, Save, Upload, X } from "lucide-react";
+import { ArrowLeft, Instagram, Save, Upload, X } from "lucide-react";
 
 import { Form, Input } from "antd";
 
@@ -389,20 +389,8 @@ const EditProfile = () => {
 
                   {!instagramAccount && (
                     <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white/60 p-6 text-center">
-                      <div className="mx-auto mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-purple-600">
-                        <svg
-                          className="h-6 w-6"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={1.6}
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M16 8a6 6 0 11-8 0M12 14v6m0 0H9m3 0h3"
-                          />
-                        </svg>
+                      <div className="mx-auto mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-pink-50 text-pink-600">
+                        <Instagram className="h-6 w-6" />
                       </div>
                       <p className="text-base font-medium text-slate-700">
                         No Instagram account connected yet
@@ -414,15 +402,16 @@ const EditProfile = () => {
                       <button
                         type="button"
                         onClick={() => navigate(ROUTES.INSTAGRAM_SYNC)}
-                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-6 py-3 text-base font-medium text-white transition-all hover:bg-rose-700 sm:w-1/2"
+                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-pink-200 bg-pink-50 px-6 py-3 text-base font-medium text-pink-600 transition-colors hover:border-pink-300 hover:bg-pink-100 hover:text-pink-700 sm:mx-auto sm:w-1/2"
                       >
+                        <Instagram className="h-5 w-5" />
                         Connect Instagram
                       </button>
                     </div>
                   )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200">
+                <div className="flex flex-col justify-end gap-4 border-t border-slate-200 pt-8 sm:flex-row">
                   <button
                     type="button"
                     onClick={handleCancel}
@@ -433,7 +422,7 @@ const EditProfile = () => {
                   <button
                     type="submit"
                     disabled={updateMyProfileLoading}
-                    className="flex items-center justify-center gap-2 !px-8 !py-4 bg-[#a25772] hover:!bg-[#8b4a63] disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                    className="flex items-center justify-center gap-2 !px-8 !py-4 bg-rose-600 hover:!bg-rose-700 disabled:opacity-50 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                   >
                     {updateMyProfileLoading
                       ? "Saving Changes..."
